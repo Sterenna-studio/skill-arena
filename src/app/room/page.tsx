@@ -1,7 +1,15 @@
 'use client'
-import { useState, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { GAMES } from '@/lib/games'
+import { useState, useCallback, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useRoom } from '@/hooks/useRoom'
+import RoomLobby from '@/components/room/RoomLobby'
+import RoomCountdown from '@/components/room/RoomCountdown'
+import RoomResults from '@/components/room/RoomResults'
+import ReactionRace from '@/components/games/mp/ReactionRace'
+import FakeOut from '@/components/games/mp/FakeOut'
+import LastStand from '@/components/games/mp/LastStand'
+import RhythmDuel from '@/components/games/mp/RhythmDuel'
+import ChainReaction from '@/components/games/mp/ChainReaction'
 
 const MP_GAMES = [
   { slug: 'reaction-race', title: 'Reaction Race', icon: '⚡', desc: 'Le plus rapide gagne' },
@@ -11,26 +19,43 @@ const MP_GAMES = [
   { slug: 'chain-reaction',title: 'Chain Reaction', icon: '🔗', desc: 'Séquence de couleurs rapide' },
 ]
 
+const GAME_COMPONENTS: Record<string, React.ComponentType<{ onScore: (s: number) => void }>> = {
+  'reaction-race': ReactionRace,
+  'fake-out': FakeOut,
+  'last-stand': LastStand,
+  'rhythm-duel': RhythmDuel,
+  'chain-reaction': ChainReaction,
+}
+
 function randomCode() {
   return Math.random().toString(36).slice(2, 8).toUpperCase()
 }
 
-export default function RoomPage() {
+function RoomContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const code = searchParams.get('code')
+  const gameSlug = searchParams.get('game') ?? 'reaction-race'
   const [selectedGame, setSelectedGame] = useState('reaction-race')
   const [joinCode, setJoinCode] = useState('')
 
   const createRoom = useCallback(() => {
-    const code = randomCode()
-    router.push(`/room/${code}?game=${selectedGame}`)
+    const newCode = randomCode()
+    router.push(`/room?code=${newCode}&game=${selectedGame}`)
   }, [router, selectedGame])
 
   const joinRoom = useCallback(() => {
-    const code = joinCode.trim().toUpperCase()
-    if (code.length < 4) return
-    router.push(`/room/${code}?game=${selectedGame}`)
+    const c = joinCode.trim().toUpperCase()
+    if (c.length < 4) return
+    router.push(`/room?code=${c}&game=${selectedGame}`)
   }, [router, joinCode, selectedGame])
 
+  // Dans une room
+  if (code) {
+    return <ActiveRoom code={code} gameSlug={gameSlug} />
+  }
+
+  // Lobby d'accueil
   return (
     <div className="max-w-xl mx-auto px-6 py-12">
       <div className="mb-10 text-center">
@@ -38,7 +63,6 @@ export default function RoomPage() {
         <p style={{ color: 'var(--muted)' }}>Crée ou rejoins une room privée.</p>
       </div>
 
-      {/* Sélection du jeu */}
       <div className="mb-8">
         <div className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>
           Choisir le jeu
@@ -66,7 +90,6 @@ export default function RoomPage() {
         </div>
       </div>
 
-      {/* Créer / Rejoindre */}
       <div className="flex flex-col gap-4">
         <button onClick={createRoom}
           className="w-full py-4 rounded-xl font-bold text-lg transition-opacity hover:opacity-80"
@@ -104,5 +127,39 @@ export default function RoomPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function ActiveRoom({ code, gameSlug }: { code: string; gameSlug: string }) {
+  const { room, me, isHost, allReady, setReady, startCountdown, submitScore } = useRoom(code, gameSlug)
+  const GameComponent = GAME_COMPONENTS[gameSlug]
+
+  return (
+    <div className="max-w-2xl mx-auto px-6 py-12">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold">Room <span style={{ color: 'var(--accent)' }}>{code}</span></h1>
+        <button
+          onClick={() => navigator.clipboard.writeText(window.location.href)}
+          className="text-sm px-3 py-1 rounded-lg transition-opacity hover:opacity-70"
+          style={{ background: 'var(--surface2)', color: 'var(--muted)', border: '1px solid var(--border)' }}>
+          Copier le lien
+        </button>
+      </div>
+
+      {room.phase === 'lobby' && (
+        <RoomLobby room={room} me={me} isHost={isHost} allReady={allReady} onReady={setReady} onStart={startCountdown} />
+      )}
+      {room.phase === 'countdown' && <RoomCountdown countdown={room.countdown} />}
+      {room.phase === 'playing' && GameComponent && <GameComponent onScore={submitScore} />}
+      {room.phase === 'results' && <RoomResults room={room} me={me} gameSlug={gameSlug} />}
+    </div>
+  )
+}
+
+export default function RoomPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen" style={{ color: 'var(--muted)' }}>Chargement...</div>}>
+      <RoomContent />
+    </Suspense>
   )
 }
