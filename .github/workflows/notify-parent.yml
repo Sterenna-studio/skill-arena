@@ -15,3 +15,4 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/MutenRock/gwen-ha-star/dispatches \
             -d '{"event_type":"skill-arena-updated"}'
+# trigger sync test
