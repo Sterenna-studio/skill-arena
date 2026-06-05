@@ -3,13 +3,26 @@ export interface GameMeta {
   title: string
   description: string
   icon: string
-  category: 'reflexes' | 'precision' | 'memory' | 'perception' | 'typing'
+  category: 'reflexes' | 'precision' | 'memory' | 'perception' | 'typing' | 'arcade'
   unit: string
   higherIsBetter: boolean
   available: boolean
+  /** Lien absolu (hors basePath /arena) vers un jeu statique externe de l'écosystème */
+  external?: string
 }
 
 export const GAMES: GameMeta[] = [
+  {
+    slug: 'titan-rocket-run',
+    title: 'Titan Rocket Run',
+    description: 'Cours, saute depuis la rampe et va le plus loin possible.',
+    icon: '🚀',
+    category: 'arcade',
+    unit: 'distance',
+    higherIsBetter: true,
+    available: true,
+    external: '/titan-rocket-run/',
+  },
   {
     slug: 'reaction',
     title: 'Reaction Time',
@@ -88,4 +101,5 @@ export const CATEGORY_LABELS: Record<GameMeta['category'], string> = {
   memory: 'Mémoire',
   perception: 'Perception',
   typing: 'Frappe',
+  arcade: 'Arcade',
 }

@@ -20,24 +20,32 @@ export default function HomePage() {
         Mini-jeux disponibles
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-        {available.map(game => (
-          <Link key={game.slug} href={`/games/${game.slug}`}
-            className="card p-5 flex flex-col gap-3 hover:border-[var(--accent)] transition-colors group">
-            <div className="flex items-center justify-between">
-              <span className="text-3xl">{game.icon}</span>
-              <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>
-                {CATEGORY_LABELS[game.category]}
-              </span>
-            </div>
-            <div>
-              <div className="font-semibold group-hover:text-[var(--accent)] transition-colors">{game.title}</div>
-              <div className="text-sm mt-1" style={{ color: 'var(--muted)' }}>{game.description}</div>
-            </div>
-            <div className="text-xs mt-auto pt-2" style={{ color: 'var(--accent)', borderTop: '1px solid var(--border)' }}>
-              Score en {game.unit} →
-            </div>
-          </Link>
-        ))}
+        {available.map(game => {
+          const inner = (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-3xl">{game.icon}</span>
+                <span className="text-xs px-2 py-1 rounded-full" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>
+                  {CATEGORY_LABELS[game.category]}
+                </span>
+              </div>
+              <div>
+                <div className="font-semibold group-hover:text-[var(--accent)] transition-colors">{game.title}</div>
+                <div className="text-sm mt-1" style={{ color: 'var(--muted)' }}>{game.description}</div>
+              </div>
+              <div className="text-xs mt-auto pt-2" style={{ color: 'var(--accent)', borderTop: '1px solid var(--border)' }}>
+                {game.external ? 'Jouer ↗' : `Score en ${game.unit} →`}
+              </div>
+            </>
+          )
+          const cls = "card p-5 flex flex-col gap-3 hover:border-[var(--accent)] transition-colors group"
+          // Jeux externes (statiques, hors /arena) → <a> brut pour bypass le basePath Next.js
+          return game.external ? (
+            <a key={game.slug} href={game.external} className={cls}>{inner}</a>
+          ) : (
+            <Link key={game.slug} href={`/games/${game.slug}`} className={cls}>{inner}</Link>
+          )
+        })}
       </div>
 
       {coming.length > 0 && (
