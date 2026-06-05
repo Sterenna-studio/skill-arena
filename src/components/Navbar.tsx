@@ -15,6 +15,9 @@ export default function Navbar() {
         <Link href="/" className={path === '/' ? 'text-white font-medium' : 'hover:text-white transition-colors'}>
           Accueil
         </Link>
+        <Link href="/room" className={path.startsWith('/room') ? 'text-white font-medium' : 'hover:text-white transition-colors'}>
+          Multijoueur
+        </Link>
         <Link href="/leaderboard" className={path === '/leaderboard' ? 'text-white font-medium' : 'hover:text-white transition-colors'}>
           Classement
         </Link>
