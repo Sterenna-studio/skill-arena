@@ -59,7 +59,7 @@ const MATCH_THRESHOLD = 0.85 // tolérance au bruit de reconnaissance
 function normalize(s: string): string {
   return s
     .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '') // retire accents
+    .normalize('NFD').replace(/\p{Diacritic}/gu, '') // retire accents (propriété Unicode)
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
@@ -110,15 +110,18 @@ export default function CalembourGame() {
   const [heard, setHeard] = useState('')
   const [feedback, setFeedback] = useState<'ok' | 'ko' | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
-  const [best, setBestState] = useState(0)
+  const [lastRecord, setLastRecord] = useState(false)
 
   const recRef = useRef<SpeechRecognitionLike | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const scoreRef = useRef(0)
 
+  // Détection capacité navigateur au montage (client uniquement). setState en
+  // effect volontaire : évite un mismatch d'hydratation (le serveur statique
+  // rend `supported = null`, le client résout après montage).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSupported(getSR() !== null)
-    setBestState(getBest())
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
       try { recRef.current?.abort() } catch { /* noop */ }
@@ -131,8 +134,8 @@ export default function CalembourGame() {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
     try { recRef.current?.abort() } catch { /* noop */ }
     setListening(false)
+    setLastRecord(scoreRef.current > getBest())
     setBest(scoreRef.current)
-    setBestState(getBest())
     setPhase('done')
   }, [])
 
@@ -245,9 +248,9 @@ export default function CalembourGame() {
           <p className="mt-3 text-sm" style={{ color: 'var(--muted)' }}>
             {DURATION}s pour réussir un max de phrases. Le micro sera demandé.
           </p>
-          {best > 0 && (
+          {getBest() > 0 && (
             <p className="mt-2 text-sm" style={{ color: 'var(--muted)' }}>
-              Record : <b style={{ color: 'var(--accent)' }}>{best}</b> phrases
+              Record : <b style={{ color: 'var(--accent)' }}>{getBest()}</b> phrases
             </p>
           )}
         </div>
@@ -317,13 +320,13 @@ export default function CalembourGame() {
             <div className="text-sm mt-1" style={{ color: 'var(--muted)' }}>
               phrase{score > 1 ? 's' : ''} réussie{score > 1 ? 's' : ''} en {DURATION}s
             </div>
-            {score >= best && score > 0 && (
+            {lastRecord && score > 0 && (
               <div className="mt-2 text-sm font-semibold" style={{ color: 'var(--success)' }}>
                 🏆 Nouveau record !
               </div>
             )}
             <div className="mt-2 text-sm" style={{ color: 'var(--muted)' }}>
-              Record : <b style={{ color: 'var(--accent)' }}>{best}</b>
+              Record : <b style={{ color: 'var(--accent)' }}>{getBest()}</b>
             </div>
           </div>
           <button onClick={start} className="px-6 py-2 rounded-lg font-semibold transition-opacity hover:opacity-80"
