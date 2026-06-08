@@ -10,21 +10,24 @@ import FakeOut from '@/components/games/mp/FakeOut'
 import LastStand from '@/components/games/mp/LastStand'
 import RhythmDuel from '@/components/games/mp/RhythmDuel'
 import ChainReaction from '@/components/games/mp/ChainReaction'
+import CalembourDuel from '@/components/games/mp/CalembourDuel'
 
 const MP_GAMES = [
-  { slug: 'reaction-race', title: 'Reaction Race', icon: '⚡', desc: 'Le plus rapide gagne' },
-  { slug: 'fake-out',      title: 'Fake Out',      icon: '🎭', desc: 'Vert = cliquer, rouge = non' },
-  { slug: 'last-stand',    title: 'Last Stand',    icon: '⏳', desc: 'Tiens le plus longtemps' },
-  { slug: 'rhythm-duel',   title: 'Rhythm Duel',   icon: '🥁', desc: 'Le plus précis sur le beat' },
-  { slug: 'chain-reaction',title: 'Chain Reaction', icon: '🔗', desc: 'Séquence de couleurs rapide' },
+  { slug: 'reaction-race',   title: 'Reaction Race',   icon: '⚡', desc: 'Le plus rapide gagne' },
+  { slug: 'fake-out',        title: 'Fake Out',        icon: '🎭', desc: 'Vert = cliquer, rouge = non' },
+  { slug: 'last-stand',      title: 'Last Stand',      icon: '⏳', desc: 'Tiens le plus longtemps' },
+  { slug: 'rhythm-duel',     title: 'Rhythm Duel',     icon: '🥁', desc: 'Le plus précis sur le beat' },
+  { slug: 'chain-reaction',  title: 'Chain Reaction',  icon: '🔗', desc: 'Séquence de couleurs rapide' },
+  { slug: 'calembour-duel',  title: 'Calembour Duel',  icon: '🗣️', desc: 'Plus de virelangues en 30s' },
 ]
 
 const GAME_COMPONENTS: Record<string, React.ComponentType<{ onScore: (s: number) => void }>> = {
-  'reaction-race': ReactionRace,
-  'fake-out': FakeOut,
-  'last-stand': LastStand,
-  'rhythm-duel': RhythmDuel,
+  'reaction-race':  ReactionRace,
+  'fake-out':       FakeOut,
+  'last-stand':     LastStand,
+  'rhythm-duel':    RhythmDuel,
   'chain-reaction': ChainReaction,
+  'calembour-duel': CalembourDuel,
 }
 
 function randomCode() {

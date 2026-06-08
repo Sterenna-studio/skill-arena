@@ -3,7 +3,7 @@ export interface GameMeta {
   title: string
   description: string
   icon: string
-  category: 'reflexes' | 'precision' | 'memory' | 'perception' | 'typing' | 'arcade'
+  category: 'reflexes' | 'precision' | 'memory' | 'perception' | 'typing' | 'arcade' | 'diction'
   unit: string
   higherIsBetter: boolean
   available: boolean
@@ -74,6 +74,16 @@ export const GAMES: GameMeta[] = [
     available: true,
   },
   {
+    slug: 'calembour',
+    title: 'Calembour Vocal',
+    description: 'Lis le virelangue à voix haute sans erreur. Le micro valide ta diction.',
+    icon: '🗣️',
+    category: 'diction',
+    unit: 'phrases',
+    higherIsBetter: true,
+    available: true,
+  },
+  {
     slug: 'number-memory',
     title: 'Number Memory',
     description: 'Mémorise des séquences de chiffres de plus en plus longues.',
@@ -102,4 +112,5 @@ export const CATEGORY_LABELS: Record<GameMeta['category'], string> = {
   perception: 'Perception',
   typing: 'Frappe',
   arcade: 'Arcade',
+  diction: 'Diction',
 }
