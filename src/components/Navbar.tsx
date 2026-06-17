@@ -21,6 +21,9 @@ export default function Navbar() {
         <Link href="/leaderboard" className={path === '/leaderboard' ? 'text-white font-medium' : 'hover:text-white transition-colors'}>
           Classement
         </Link>
+        <Link href="/arcade" className={path.startsWith('/arcade') ? 'text-white font-medium' : 'hover:text-white transition-colors'}>
+          Arcade
+        </Link>
       </div>
     </nav>
   )

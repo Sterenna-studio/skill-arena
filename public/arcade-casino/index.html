@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STAR ARCADE — Gwen Ha Star</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/star.css">
+  <link rel="stylesheet" href="./css/casino.css">
+  <link rel="stylesheet" href="./css/chase.css">
+  <link rel="stylesheet" href="./css/neon-racer.css">
+  <link rel="icon" href="/shared/favicon.png" type="image/png">
+</head>
+<body class="star-page">
+  <div id="casino-root"></div>
+
+  <script type="module">
+    import { requireAuth } from '/shared/guards.js';
+    import { StarArcadeCore } from './js/star-arcade-core.js';
+
+    const auth = await requireAuth({ redirectTo: '/login.html' });
+    if (auth) {
+      const arcade = await StarArcadeCore.boot({ mount: '#casino-root', user: auth.user });
+      arcade.showLobby();
+    }
+  </script>
+</body>
+</html>
