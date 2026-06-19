@@ -1,17 +1,16 @@
-name: Notify gwen-ha-star-static
+name: Sync to gwen-ha-star-static
 
 on:
   push:
     branches: [master]
 
 jobs:
-  dispatch:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger deploy + submodule sync in gwen-ha-star-static
-        run: |
-          curl --fail-with-body -sS -X POST \
-            -H "Authorization: Bearer ${{ secrets.SYNC_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/sterenna-studio/gwen-ha-star-static/dispatches \
-            -d '{"event_type":"skill-arena-updated"}'
+      - name: Trigger deploy in gwen-ha-star-static
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.SYNC_TOKEN }}
+          repository: sterenna-studio/gwen-ha-star-static
+          event-type: skill-arena-updated
