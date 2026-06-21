@@ -3,7 +3,7 @@ name: Deploy Skill Arena
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 concurrency:
@@ -27,6 +27,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Inject Supabase config
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.GHSTAR_SUPABASE_URL }}" > .env.local
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.GHSTAR_SUPABASE_ANON }}" >> .env.local
 
       - name: Build static export
         run: npm run build
