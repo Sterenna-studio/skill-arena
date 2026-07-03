@@ -53,7 +53,7 @@
           text = text.split('RTP CIBLE').join('MODE LOCAL');
           text = text.split('RTP ALPHA ~90%').join('TOKENS LOCAUX');
           text = text.replace(/([+\-]?\d[\d\s.,]*) C\b/g, '$1 ST');
-          node.nodeValue = text;
+          if (text !== node.nodeValue) node.nodeValue = text;
         }
       };
 
@@ -75,7 +75,7 @@
 
       const tick = () => { normalize(); addReset(); };
       tick();
-      new MutationObserver(tick).observe(document.body, { childList: true, subtree: true });
+      new MutationObserver(tick).observe(document.body, { childList: true, characterData: true, subtree: true });
     }
   </script>
 </body>
