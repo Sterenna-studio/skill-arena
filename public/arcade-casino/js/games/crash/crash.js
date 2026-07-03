@@ -20,7 +20,7 @@ export class CrashGame {
         <div class="crash-rules-title">⚡ COMMENT JOUER</div>
         <div class="crash-rules-grid">
           <div class="crash-rule-block"><span class="crb-icon">🛸</span><span class="crb-label">DÉCOLLAGE</span><span class="crb-desc">Le vaisseau du hub Gwen Ha Star grimpe avec le multiplicateur.</span></div>
-          <div class="crash-rule-block"><span class="crb-icon">🚀</span><span class="crb-label">ÉJECTION</span><span class="crb-desc">Encaisse mise × multiplicateur avant la rupture moteur.</span></div>
+          <div class="crash-rule-block"><span class="crb-icon">🚀</span><span class="crb-label">ÉJECTION</span><span class="crb-desc">Encaisse le contrat en Star Tokens × multiplicateur avant la rupture moteur.</span></div>
           <div class="crash-rule-block"><span class="crb-icon">🤖</span><span class="crb-label">AUTO-EJECT</span><span class="crb-desc">Seuil conseillé : ×1.6 à ×2.5 pour limiter le risque.</span></div>
         </div>
       </div>
@@ -32,7 +32,7 @@ export class CrashGame {
           <button class="action-btn" id="cr-eject" disabled>🚀 ÉJECTER</button>
           <div class="crash-autoeject-row">AUTO ×<input class="crash-autoeject-inp" id="cr-auto" type="number" min="1.1" max="50" step="0.1" value="2.0"></div>
         </div>
-        <div class="game-msg" id="cr-msg">MISE ET LANCE LE VAISSEAU</div>
+        <div class="game-msg" id="cr-msg">CONTRAT LOCAL EN STAR TOKENS</div>
       </div>`;
     document.getElementById('game-back')?.addEventListener('click', () => this.backToLobby());
     document.getElementById('cr-start')?.addEventListener('click', () => this.start());
@@ -51,11 +51,11 @@ export class CrashGame {
   async start() {
     if (this.running) return;
     const bet = this.getBet();
-    if (!(await this.debit(bet))) return this.setMsg('CRÉDITS INSUFFISANTS', 'lose');
+    if (!(await this.debit(bet))) return this.setMsg('STAR TOKENS INSUFFISANTS', 'lose');
     this.running = true;
     this.cashed = false;
     this.target = this.crashPoint();
-    this.auto = Number(document.getElementById('cr-auto')?.value ?? 0);
+    this.auto = Math.max(1.1, Math.min(50, Number(document.getElementById('cr-auto')?.value ?? 0) || 0));
     this.t0 = performance.now();
     this.points = [[0, 1]];
     this.exhaust = [];
@@ -91,7 +91,7 @@ export class CrashGame {
     const gain = Math.round(bet * this.mult);
     await this.credit(gain);
     this.addHistory('CRASH', bet, 'win', gain - bet);
-    this.setMsg(`${auto ? 'AUTO ' : ''}ÉJECTION ×${this.mult.toFixed(2)} · +${gain - bet} C`, 'win');
+    this.setMsg(`${auto ? 'AUTO ' : ''}ÉJECTION ×${this.mult.toFixed(2)} · +${gain - bet} ST`, 'win');
     document.getElementById('cr-eject').disabled = true;
     this.addPill(this.mult, 'safe');
     SFX.win();
@@ -110,7 +110,7 @@ export class CrashGame {
     if (!this.cashed) {
       const bet = this.getBet();
       this.addHistory('CRASH', bet, 'lose', -bet);
-      this.setMsg(`RUPTURE MOTEUR ×${this.mult.toFixed(2)} · PERDU`, 'lose');
+      this.setMsg(`RUPTURE MOTEUR ×${this.mult.toFixed(2)} · -${bet} ST`, 'lose');
       SFX.crash();
     }
     document.getElementById('cr-start').disabled = false;
@@ -266,7 +266,7 @@ export class CrashGame {
       ctx.shadowBlur = 14;
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      ctx.lineTo(x + Math.cos(a) * r, x + Math.sin(a) * r);
       ctx.stroke();
     }
     ctx.restore();
