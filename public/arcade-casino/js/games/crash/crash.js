@@ -266,7 +266,7 @@ export class CrashGame {
       ctx.shadowBlur = 14;
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.lineTo(x + Math.cos(a) * r, x + Math.sin(a) * r);
+      ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
       ctx.stroke();
     }
     ctx.restore();
