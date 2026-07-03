@@ -32,12 +32,12 @@ export class WhackAMoleGame {
           <div class="wam-hud-block"><span class="wam-hud-label">SCORE</span><span class="wam-hud-val" id="wam-score">0</span></div>
           <div class="wam-hud-block"><span class="wam-hud-label">TEMPS</span><span class="wam-hud-val wam-timer" id="wam-timer">${WAM_DURATION}</span></div>
           <div class="wam-hud-block"><span class="wam-hud-label">COMBO</span><span class="wam-hud-val wam-combo" id="wam-combo">x1</span></div>
-          <div class="wam-hud-block"><span class="wam-hud-label">RATIO</span><span class="wam-hud-val" style="color:var(--c-green);font-size:1.15rem">12 pts = mise</span></div>
+          <div class="wam-hud-block"><span class="wam-hud-label">RATIO</span><span class="wam-hud-val" style="color:var(--c-green);font-size:1.15rem">12 pts = contrat</span></div>
         </div>
         <div class="wam-grid" id="wam-grid">${Array.from({ length: WAM_HOLES }, (_, i) => `<button class="wam-hole" id="wam-hole-${i}" data-type="normal"><span class="wam-mole">🤖</span></button>`).join('')}</div>
         <div class="wam-timebar-wrap"><div class="wam-timebar" id="wam-timebar"></div></div>
       </div>
-      <div class="game-msg" id="wam-msg">MISE ET LANCE LA PARTIE</div>
+      <div class="game-msg" id="wam-msg">CHOISIS UN CONTRAT EN STAR TOKENS</div>
       <div class="action-row"><button class="action-btn primary" id="wam-start">▶ DÉMARRER</button></div>`;
     document.getElementById('game-back')?.addEventListener('click', () => this.backToLobby());
     document.getElementById('wam-start')?.addEventListener('click', () => this.launch());
@@ -53,7 +53,7 @@ export class WhackAMoleGame {
   async launch() {
     if (this.running) return;
     const bet = this.getBet();
-    if (!(await this.debit(bet))) return this.setMsg('CRÉDITS INSUFFISANTS', 'lose');
+    if (!(await this.debit(bet))) return this.setMsg('STAR TOKENS INSUFFISANTS', 'lose');
     this.running = true;
     this.score = 0;
     this.combo = 1;
@@ -119,7 +119,7 @@ export class WhackAMoleGame {
     if (gain > 0) await this.credit(gain);
     const result = net > 0 ? 'win' : net < 0 ? 'lose' : 'push';
     this.addHistory('WHACK', bet, result, net);
-    this.setMsg(`Score ${this.score} · ${this.hits} hits · ${net >= 0 ? '+' : ''}${net} C`, result);
+    this.setMsg(`Score ${this.score} · ${this.hits} hits · ${net >= 0 ? '+' : ''}${net} ST`, result);
     const btn = document.getElementById('wam-start');
     if (btn) { btn.disabled = false; btn.textContent = '↺ REJOUER'; }
     result === 'win' ? SFX.win() : SFX.lose();
