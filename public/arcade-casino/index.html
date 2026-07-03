@@ -15,6 +15,15 @@
   <link rel="stylesheet" href="./css/chase.css">
   <link rel="stylesheet" href="./css/neon-racer.css">
   <link rel="icon" href="/shared/favicon.png" type="image/png">
+  <style>
+    #star-token-reset{border:1px solid rgba(255,204,0,.28);background:rgba(255,204,0,.06);color:var(--c-amber);border-radius:999px;padding:5px 9px;font:700 9px var(--font-mono);letter-spacing:.13em;cursor:pointer}
+    #star-token-reset:hover{border-color:var(--c-amber);box-shadow:0 0 14px rgba(255,204,0,.22)}
+    #slot-grid img{width:54px!important;height:54px!important;border-radius:14px;object-fit:cover;image-rendering:pixelated;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 14px rgba(0,229,255,.16)}
+    #slot-grid>div{min-height:88px!important;border-radius:16px!important}
+    .game-card{min-height:250px;border-radius:22px;box-shadow:0 14px 34px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.04)}
+    .game-card:hover{transform:translateY(-4px)}
+    @media(max-width:700px){#slot-grid img{width:42px!important;height:42px!important}.game-card{min-height:0}}
+  </style>
 </head>
 <body class="star-page">
   <div id="casino-root"></div>
@@ -27,6 +36,46 @@
     if (auth) {
       const arcade = await StarArcadeCore.boot({ mount: '#casino-root', user: auth.user });
       arcade.showLobby();
+      installStarTokenFinish(arcade);
+    }
+
+    function installStarTokenFinish(arcade) {
+      const normalize = () => {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        for (const node of nodes) {
+          let text = node.nodeValue;
+          text = text.split('CHRONICLES').join('STAR TOKENS');
+          text = text.split('Chronicles').join('Star Tokens');
+          text = text.split('CRÉDITS INSUFFISANTS').join('STAR TOKENS INSUFFISANTS');
+          text = text.split('CRÉDITS').join('STAR TOKENS');
+          text = text.split('RTP CIBLE').join('MODE LOCAL');
+          text = text.split('RTP ALPHA ~90%').join('TOKENS LOCAUX');
+          text = text.replace(/([+\-]?\d[\d\s.,]*) C\b/g, '$1 ST');
+          node.nodeValue = text;
+        }
+      };
+
+      const addReset = () => {
+        const bar = document.querySelector('.casino-statusbar .sb-right');
+        if (!bar || document.getElementById('star-token-reset')) return;
+        const btn = document.createElement('button');
+        btn.id = 'star-token-reset';
+        btn.type = 'button';
+        btn.textContent = '+1000 ST';
+        btn.title = 'Recharge locale de test, sans Chronicles';
+        btn.addEventListener('click', async () => {
+          arcade.credits += 1000;
+          await arcade.saveCredits();
+          normalize();
+        });
+        bar.appendChild(btn);
+      };
+
+      const tick = () => { normalize(); addReset(); };
+      tick();
+      new MutationObserver(tick).observe(document.body, { childList: true, subtree: true });
     }
   </script>
 </body>
