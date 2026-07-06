@@ -1,16 +1,18 @@
 /**
  * star-arcade-core.js — Star Arcade router
  *
- * This file now only owns the lobby, wallet, bet panel, history and game routing.
+ * This file now only owns the lobby, local wallet, bet panel, history and game routing.
  * Each mini-game lives in its own folder under /star/casino/js/games/.
  */
-import { supabase } from '/shared/supabase-client.js';
 import { ArcadeSFX as SFX } from './arcade-sfx.js';
-import { formatChronicles } from './arcade-utils.js';
 import { WhackAMoleGame } from './games/whack-a-mole/whack-a-mole.js';
 import { CrashGame } from './games/crash/crash.js';
 import { SlotMachineGame } from './games/slot-machine/slot-machine.js';
 import { NeonRacer } from './games/neon-racer/neon-racer.js';
+
+const STAR_TOKEN_STORAGE_KEY = 'star-arcade:star-tokens:v1';
+const STAR_TOKEN_START_BALANCE = 1000;
+const STAR_TOKEN_SYMBOL = 'ST';
 
 const GAME_CARDS = [
   {
@@ -19,7 +21,7 @@ const GAME_CARDS = [
     tag: '// JEU 01',
     title: 'WHACK-A-MOLE',
     desc: '30 secondes. Frappe les entités, évite les bombes, garde ton combo. Jeu plutôt skill.',
-    meta: 'RTP CIBLE ~95%',
+    meta: 'TOKENS LOCAUX',
     color: 'var(--c-orange)',
   },
   {
@@ -28,7 +30,7 @@ const GAME_CARDS = [
     tag: '// JEU 02',
     title: 'CRASH',
     desc: 'Le multiplicateur monte. Éjecte-toi avant le crash ou utilise l’auto-eject.',
-    meta: 'RTP CIBLE ~93%',
+    meta: 'TOKENS LOCAUX',
     color: 'var(--c-pink)',
   },
   {
@@ -37,7 +39,7 @@ const GAME_CARDS = [
     tag: '// JEU 03',
     title: 'SLOT MACHINE',
     desc: '5 rouleaux × 3 lignes. Gains gauche → droite sur 5 lignes. Version réparée.',
-    meta: 'RTP CIBLE ~90%',
+    meta: 'TOKENS LOCAUX',
     color: 'var(--c-amber)',
   },
   {
@@ -71,39 +73,27 @@ export class StarArcadeCore {
     this.nrBack = null;
   }
 
+  storageKey() {
+    return `${STAR_TOKEN_STORAGE_KEY}:${this.userId || 'guest'}`;
+  }
+
   async loadCredits() {
-    if (!this.userId) {
-      this.credits = 500;
-      return;
-    }
-
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('chronicles')
-        .eq('id', this.userId)
-        .maybeSingle();
-
-      if (error) throw error;
-      this.credits = data?.chronicles ?? 500;
-
-      if (data?.chronicles == null) await this.saveCredits();
+      const stored = window.localStorage.getItem(this.storageKey());
+      const parsed = Number(stored);
+      this.credits = Number.isFinite(parsed) && parsed >= 0 ? parsed : STAR_TOKEN_START_BALANCE;
+      await this.saveCredits();
     } catch (error) {
-      console.warn('[Star Arcade] credits fallback:', error?.message ?? error);
-      this.credits = 500;
+      console.warn('[Star Arcade] local Star Tokens fallback:', error?.message ?? error);
+      this.credits = STAR_TOKEN_START_BALANCE;
     }
   }
 
   async saveCredits() {
-    if (!this.userId) return;
-
     try {
-      await supabase
-        .from('profiles')
-        .update({ chronicles: this.credits })
-        .eq('id', this.userId);
+      window.localStorage.setItem(this.storageKey(), String(Math.max(0, Math.floor(this.credits))));
     } catch (error) {
-      console.warn('[Star Arcade] credits save failed:', error?.message ?? error);
+      console.warn('[Star Arcade] local Star Tokens save failed:', error?.message ?? error);
     }
 
     this.updateCreditsDisplay();
@@ -124,8 +114,8 @@ export class StarArcadeCore {
             <a href="/star/" class="sb-back">← RETOUR HUB</a>
           </div>
           <div class="sb-right">
-            <span class="sb-credits-label">CHRONICLES</span>
-            <span class="sb-credits-val" id="sb-credits">${this.format(this.credits)}</span>
+            <span class="sb-credits-label">STAR TOKENS</span>
+            <span class="sb-credits-val" id="sb-credits">${this.formatWithUnit(this.credits)}</span>
             <span class="sb-dot"></span>
           </div>
         </nav>
@@ -133,14 +123,14 @@ export class StarArcadeCore {
         <section class="casino-lobby" id="view-lobby">
           <div class="lobby-hero">
             <h1 class="lobby-hero-title">ARCADE</h1>
-            <p class="lobby-hero-sub">4 MINI-JEUX · CHRONICLES · STAR</p>
+            <p class="lobby-hero-sub">4 MINI-JEUX · STAR TOKENS LOCAUX · CONVERSION CHRONICLES PLUS TARD</p>
             <span class="lobby-hero-line"></span>
           </div>
 
           <div class="jackpot-banner" style="width:100%;max-width:620px;margin-bottom:32px">
-            <span class="jp-icon">⚖️</span>
-            <span class="jp-label">MODE ALPHA ÉQUILIBRÉ</span>
-            <span class="jp-val" id="jp-val">MISES LIMITÉES</span>
+            <span class="jp-icon">🪙</span>
+            <span class="jp-label">MODE LOCAL ACTIVÉ</span>
+            <span class="jp-val" id="jp-val">CHRONICLES BLOQUÉS</span>
           </div>
 
           <div class="lobby-grid">
@@ -247,7 +237,7 @@ export class StarArcadeCore {
     if (this.bet > maxBet) this.bet = maxBet;
 
     return `<div class="bet-panel">
-      <span class="bet-label">MISE</span>
+      <span class="bet-label">MISE ${STAR_TOKEN_SYMBOL}</span>
       <button class="bet-btn" id="${id}-bet-down">−</button>
       <span class="bet-val" id="${id}-bet-val">${this.bet}</span>
       <button class="bet-btn" id="${id}-bet-up">+</button>
@@ -317,7 +307,7 @@ export class StarArcadeCore {
     if (!body) return;
 
     if (!this.history.length) {
-      body.innerHTML = '<div class="history-empty">Aucune partie jouée</div>';
+      body.innerHTML = '<div class="history-empty">Aucune partie jouée en Star Tokens</div>';
       return;
     }
 
@@ -327,16 +317,16 @@ export class StarArcadeCore {
       return `<div class="history-row ${cls}">
         <span>${h.game}</span>
         <span class="history-result">${h.result.toUpperCase()}</span>
-        <span>${h.bet} C</span>
-        <span class="history-gain">${gain} C</span>
-        <span>${this.format(h.balance)} C</span>
+        <span>${h.bet} ${STAR_TOKEN_SYMBOL}</span>
+        <span class="history-gain">${gain} ${STAR_TOKEN_SYMBOL}</span>
+        <span>${this.formatWithUnit(h.balance)}</span>
       </div>`;
     }).join('');
   }
 
   updateCreditsDisplay() {
     const el = document.getElementById('sb-credits');
-    if (el) el.textContent = this.format(this.credits);
+    if (el) el.textContent = this.formatWithUnit(this.credits);
   }
 
   mountNeonRacer() {
@@ -378,6 +368,10 @@ export class StarArcadeCore {
   }
 
   format(value) {
-    return formatChronicles(value);
+    return Number(value ?? 0).toLocaleString('fr-FR');
+  }
+
+  formatWithUnit(value) {
+    return `${this.format(value)} ${STAR_TOKEN_SYMBOL}`;
   }
 }
