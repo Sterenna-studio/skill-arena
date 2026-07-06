@@ -1,0 +1,8 @@
+[
+  { "id": "calm",   "label": "Zone Calme",      "desc": "Moins d'ennemis, drop garanti.",          "enemyMult": 0.5, "dropGuaranteed": true, "color": "#44ffaa" },
+  { "id": "fog",    "label": "Brouillard",       "desc": "Vision réduite. +1 fragment si survie.",  "enemyMult": 1.0, "fogOverlay": true,    "color": "#aaddff" },
+  { "id": "surge",  "label": "Surpopulation",    "desc": "+4 ennemis supplémentaires. Drop rare.",  "enemyBonus": 4,  "dropChance": 0.08,   "color": "#ff6644" },
+  { "id": "cursed", "label": "Salle Corrompue",  "desc": "Power-up maudit : effet + mais -10 HP max.", "cursed": true, "maxHpPenalty": 10,  "color": "#cc44ff" },
+  { "id": "fast",   "label": "Signal Fort",      "desc": "Ennemis 30% plus rapides.",               "speedMult": 1.3,                        "color": "#ff8c00" },
+  { "id": "elite",  "label": "Zone Élite",       "desc": "1 ennemi élite. Drop légendaire.",         "elite": true,    "dropLegendary": true, "color": "#ffdd00" }
+]
