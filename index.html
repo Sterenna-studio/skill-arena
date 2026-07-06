@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Spirit Overdrive</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <p class="meta">Garage de course</p>
+          <h1>Spirit Overdrive</h1>
+        </div>
+        <div class="topbar-actions">
+          <button id="saveBtn" class="btn secondary">Sauver</button>
+          <button id="resetBtn" class="btn danger">Reset</button>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div class="car-view" aria-hidden="true">
+          <div class="road"></div>
+          <div class="car">
+            <span class="wheel front"></span>
+            <span class="wheel rear"></span>
+          </div>
+        </div>
+        <div>
+          <p class="meta">Ta voiture</p>
+          <h2 id="carName">Spirit GT</h2>
+          <p>Améliore la voiture, choisis une course, lance la simulation.</p>
+        </div>
+      </section>
+
+      <section class="summary">
+        <div><span>Crédits</span><strong id="credits">0</strong></div>
+        <div><span>Réputation</span><strong id="reputation">0</strong></div>
+        <div><span>Courses</span><strong id="runs">0</strong></div>
+      </section>
+
+      <section class="grid two">
+        <div class="panel">
+          <div class="section-title">
+            <h2>Stats</h2>
+          </div>
+          <div id="stats" class="stats"></div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">
+            <h2>Améliorer</h2>
+          </div>
+          <div id="upgrades" class="stack"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <h2>Courses</h2>
+        </div>
+        <div id="races" class="stack"></div>
+      </section>
+
+      <section class="grid two">
+        <div id="result" class="result hidden"></div>
+        <div class="panel">
+          <div class="section-title">
+            <h2>Journal</h2>
+          </div>
+          <div id="log" class="stack"></div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
