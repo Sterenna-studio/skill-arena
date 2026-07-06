@@ -1,36 +1,130 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
 :root {
-  --bg: #0d0d0f;
-  --surface: #16161a;
-  --surface2: #1e1e24;
-  --border: #2a2a35;
-  --accent: #6c63ff;
-  --accent-glow: rgba(108, 99, 255, 0.35);
-  --text: #e8e8f0;
-  --muted: #6b6b80;
-  --success: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  --c-bg:        #020403;
+  --c-surface:   #050906;
+  --c-surface-2: #080e09;
+  --c-surface-3: #0c140d;
+  --c-border:    rgba(57, 255, 20, 0.10);
+  --c-divider:   rgba(57, 255, 20, 0.05);
+
+  --c-text:       #b8ffc0;
+  --c-text-muted: rgba(184, 255, 192, 0.50);
+  --c-text-faint: rgba(184, 255, 192, 0.22);
+
+  --c-primary:    #39ff14;
+  --c-primary-h:  #6aff45;
+  --c-primary-hl: rgba(57, 255, 20, 0.08);
+
+  --c-cyan:   #00ffe7;
+  --c-amber:  #ffaa00;
+  --c-red:    #ff2d55;
+  --c-purple: #bf5fff;
+
+  --glow-primary: 0 0 12px rgba(57, 255, 20, 0.35), 0 0 30px rgba(57, 255, 20, 0.12);
+  --glow-green:   0 0 10px rgba(57, 255, 20, 0.30);
+  --glow-cyan:    0 0 12px rgba(0, 255, 231, 0.30);
+  --glow-amber:   0 0 12px rgba(255, 170, 0, 0.35);
+  --glow-red:     0 0 10px rgba(255, 45, 85, 0.35);
+  --glow-purple:  0 0 12px rgba(191, 95, 255, 0.30);
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.6);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.7);
+  --transition: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-display: 'VT323', 'Courier New', monospace;
+  --font-body:    'Share Tech Mono', 'Courier New', monospace;
+
+  --radius-sm: 2px; --radius-md: 4px; --radius-lg: 6px;
+
+  /* compat ancien code */
+  --bg: var(--c-bg);
+  --surface: var(--c-surface);
+  --surface2: var(--c-surface-2);
+  --border: var(--c-border);
+  --accent: var(--c-primary);
+  --accent-glow: rgba(57, 255, 20, 0.35);
+  --text: var(--c-text);
+  --muted: var(--c-text-muted);
+  --success: #39ff14;
+  --danger: #ff2d55;
+  --warning: #ffaa00;
 }
 
-* {
-  box-sizing: border-box;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  cursor: crosshair;
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
-  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--c-bg);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(57,255,20,0.04) 0%, transparent 70%);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  overflow-x: hidden;
 }
 
-.glow {
-  box-shadow: 0 0 20px var(--accent-glow);
+/* Scanlines overlay */
+.scanlines {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.1;
 }
 
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.card:hover {
+  border-color: rgba(57, 255, 20, 0.30);
+  box-shadow: var(--glow-green);
+}
+
+.glow { box-shadow: var(--glow-primary); }
+
+.section-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--c-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1.25vw, 2.5rem);
+  color: var(--c-text);
+  margin-bottom: 1.5rem;
+}
+
+.section-title span {
+  color: var(--c-primary);
+}
+
+.hub-divider {
+  height: 1px;
+  background: var(--c-divider);
+  margin: 3rem 0;
 }
