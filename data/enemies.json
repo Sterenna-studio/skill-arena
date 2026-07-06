@@ -1,0 +1,7 @@
+[
+  { "id": "shard",      "label": "Éclat du Code",    "hp": 15, "speed": 2.5, "damage": 3,  "behavior": "direct",       "ignoresBlocks": true },
+  { "id": "proxy",      "label": "Proxy Corrompu",   "hp": 40, "speed": 1.5, "damage": 6,  "behavior": "avoids_rune" },
+  { "id": "knight",     "label": "Chevalier Brisé",  "hp": 80, "speed": 1.0, "damage": 12, "behavior": "targets_block" },
+  { "id": "replicant",  "label": "Nœud Réplicant",   "hp": 30, "speed": 1.8, "damage": 4,  "behavior": "direct",       "onDeath": "spawn_shard" },
+  { "id": "ghost",      "label": "Fantôme du Signal","hp": 25, "speed": 2.0, "damage": 5,  "behavior": "direct",       "invisible": true }
+]

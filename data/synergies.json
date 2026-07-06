@@ -1,0 +1,20 @@
+[
+  {
+    "id": "forge_tourelle",
+    "condition": { "module": "FORGE", "adjacent": "TOURELLE" },
+    "bonus": { "target": "TOURELLE", "stat": "damage", "mult": 1.4 },
+    "label": "Forge Runique (+40% dégâts)"
+  },
+  {
+    "id": "chambre_piege",
+    "condition": { "module": "CHAMBRE", "sameRow": "PIEGE" },
+    "bonus": { "target": "PIEGE", "effect": "stun", "duration": 1 },
+    "label": "Stase Runique (stun 1s sur ennemis ralentis)"
+  },
+  {
+    "id": "triple_rune",
+    "condition": { "countTag": "RUNE", "min": 3 },
+    "bonus": { "target": "all_RUNE", "stat": "range", "add": 1 },
+    "label": "Résonance Nemeton (+1 portée tous [RUNE])"
+  }
+]
