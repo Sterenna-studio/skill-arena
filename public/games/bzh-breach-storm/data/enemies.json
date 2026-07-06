@@ -1,0 +1,7 @@
+[
+  { "id": "shard",    "label": "Éclat du Code",      "hp": 20, "speed": 160, "damage": 8,  "behavior": "charge" },
+  { "id": "proxy",    "label": "Proxy Corrompu",     "hp": 45, "speed": 90,  "damage": 12, "behavior": "ranged_retreat" },
+  { "id": "sentinel", "label": "Sentinelle Gwen-Ha", "hp": 35, "speed": 120, "damage": 10, "behavior": "orbit" },
+  { "id": "knight",   "label": "Chevalier Brisé",    "hp": 90, "speed": 60,  "damage": 20, "behavior": "charge_delayed" },
+  { "id": "echo",     "label": "Echo Signal",        "hp": 30, "speed": 200, "damage": 8,  "behavior": "mimic" }
+]
