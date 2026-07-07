@@ -13,6 +13,17 @@ export interface GameMeta {
 
 export const GAMES: GameMeta[] = [
   {
+    slug: 'mg-airship',
+    title: 'MG Airship',
+    description: 'Pilote ton dirigeable et survive le plus longtemps possible.',
+    icon: '🚢',
+    category: 'arcade',
+    unit: 'score',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/MG_airship.html',
+  },
+  {
     slug: 'titan-rocket-run',
     title: 'Titan Rocket Run',
     description: 'Cours, saute depuis la rampe et va le plus loin possible.',
