@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteamWars.io - Airship Battle Royale</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=swap');
+        
+        body {
+            font-family: 'IM Fell English', serif;
+            background-color: #1a1a1a;
+            color: #e0c9a1;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        .steampunk-bg {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23222222"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23333" stroke-width="0.5"/><circle cx="50" cy="50" r="40" stroke="%23333" stroke-width="0.5" fill="none"/></svg>');
+            background-size: 100px 100px;
+        }
+        
+        .airship {
+            transition: transform 0.1s ease-out;
+            filter: drop-shadow(0 0 5px rgba(224, 201, 161, 0.5));
+        }
+        
+        .gear {
+            animation: spin 5s linear infinite;
+        }
+        
+        .cannonball {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, #555 0%, #222 100%);
+        }
+        
+        .explosion {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff6600 0%, #ff3300 50%, transparent 70%);
+            animation: explode 0.5s forwards;
+        }
+        
+        .smoke {
+            position: absolute;
+            background: radial-gradient(circle, rgba(100,100,100,0.7) 0%, rgba(50,50,50,0) 70%);
+            border-radius: 50%;
+            animation: float 3s ease-out forwards;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(0.1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+        
+        .brass-text {
+            color: #b5a642;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .copper-text {
+            color: #b87333;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .steel-text {
+            color: #a8a8a8;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(to right, #5c3d00, #b87333, #5c3d00);
+            box-shadow: 0 0 5px #b87333;
+        }
+        
+        .steampunk-border {
+            border: 2px solid #b87333;
+            border-image: linear-gradient(to right, #b87333, #5c3d00, #b87333) 1;
+            box-shadow: 0 0 10px rgba(184, 115, 51, 0.5);
+        }
+        
+        .steampunk-button {
+            background: linear-gradient(to bottom, #5c3d00, #3d2800);
+            border: 1px solid #b87333;
+            color: #e0c9a1;
+            text-shadow: 1px 1px 2px #000;
+            box-shadow: 0 0 5px #b87333;
+            transition: all 0.2s;
+        }
+        
+        .steampunk-button:hover {
+            background: linear-gradient(to bottom, #b87333, #5c3d00);
+            box-shadow: 0 0 10px #ff9933;
+            transform: translateY(-2px);
+        }
+        
+        .steampunk-button:active {
+            transform: translateY(0);
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid #b87333;
+            padding: 5px 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            z-index: 100;
+            font-size: 14px;
+            max-width: 200px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+    </style>
+</head>
+<body class="steampunk-bg h-screen w-screen overflow-hidden relative">
+    <!-- Main Menu -->
+    <div id="mainMenu" class="absolute inset-0 flex flex-col items-center justify-center z-50 bg-black bg-opacity-80">
+        <div class="text-center mb-8">
+            <h1 class="text-6xl font-bold brass-text mb-2" style="font-family: 'IM Fell English SC', serif;">STEAMWARS.IO</h1>
+            <p class="text-xl copper-text">Airships of the Skies</p>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-4 w-64">
+            <button id="playBtn" class="steampunk-button py-3 px-6 rounded-lg font-bold text-lg">
+                <i class="fas fa-play mr-2"></i> Play
+            </button>
+            <button id="howToPlayBtn" class="steampunk-button py-3 px-6 rounded-lg font-bold text-lg">
+                <i class="fas fa-question-circle mr-2"></i> How to Play
+            </button>
+            <button id="creditsBtn" class="steampunk-button py-3 px-6 rounded-lg font-bold text-lg">
+                <i class="fas fa-cog mr-2"></i> Credits
+            </button>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <p class="text-sm steel-text">Collect gears to upgrade your airship</p>
+            <p class="text-xs steel-text mt-2">Use WASD or arrow keys to move, mouse to aim and shoot</p>
+        </div>
+    </div>
+    
+    <!-- How to Play Modal -->
+    <div id="howToPlayModal" class="hidden absolute inset-0 flex items-center justify-center z-50 bg-black bg-opacity-80">
+        <div class="bg-gray-900 steampunk-border p-6 rounded-lg max-w-md mx-4">
+            <h2 class="text-2xl brass-text mb-4 text-center">How to Play</h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                        <i class="fas fa-arrows-alt copper-text"></i>
+                    </div>
+                    <div>
+                        <h3 class="copper-text">Movement</h3>
+                        <p class="text-gray-300">Use WASD or arrow keys to navigate your airship through the skies</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                        <i class="fas fa-crosshairs copper-text"></i>
+                    </div>
+                    <div>
+                        <h3 class="copper-text">Combat</h3>
+                        <p class="text-gray-300">Aim with your mouse and click to fire your cannons at enemy airships</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                        <i class="fas fa-cog copper-text"></i>
+                    </div>
+                    <div>
+                        <h3 class="copper-text">Upgrades</h3>
+                        <p class="text-gray-300">Collect gears dropped by defeated enemies to upgrade your airship</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center mr-3 mt-1">
+                        <i class="fas fa-trophy copper-text"></i>
+                    </div>
+                    <div>
+                        <h3 class="copper-text">Victory</h3>
+                        <p class="text-gray-300">Dominate the skies by becoming the most powerful airship captain</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button id="backFromHowToPlay" class="steampunk-button py-2 px-6 rounded-lg">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Credits Modal -->
+    <div id="creditsModal" class="hidden absolute inset-0 flex items-center justify-center z-50 bg-black bg-opacity-80">
+        <div class="bg-gray-900 steampunk-border p-6 rounded-lg max-w-md mx-4">
+            <h2 class="text-2xl brass-text mb-4 text-center">Credits</h2>
+            
+            <div class="space-y-4">
+                <div class="text-center">
+                    <h3 class="copper-text">Game Design</h3>
+                    <p class="text-gray-300">Steampunk.io Development Team</p>
+                </div>
+                
+                <div class="text-center">
+                    <h3 class="copper-text">Art & Graphics</h3>
+                    <p class="text-gray-300">Victorian Illustrations Collective</p>
+                </div>
+                
+                <div class="text-center">
+                    <h3 class="copper-text">Sound Effects</h3>
+                    <p class="text-gray-300">Brass & Steam Audio Foundry</p>
+                </div>
+                
+                <div class="text-center">
+                    <h3 class="copper-text">Special Thanks</h3>
+                    <p class="text-gray-300">To all the airship captains who tested our game</p>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button id="backFromCredits" class="steampunk-button py-2 px-6 rounded-lg">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game UI -->
+    <div id="gameUI" class="hidden absolute inset-0 z-40 pointer-events-none">
+        <div class="absolute top-4 left-4">
+            <div class="flex items-center mb-2">
+                <div class="w-32 bg-gray-800 rounded-full h-4 overflow-hidden mr-2">
+                    <div id="healthBar" class="h-full progress-bar rounded-full" style="width: 100%"></div>
+                </div>
+                <span class="text-white font-bold"><i class="fas fa-heart text-red-400 mr-1"></i> <span id="healthText">100</span></span>
+            </div>
+            
+            <div class="flex items-center mb-2">
+                <div class="w-32 bg-gray-800 rounded-full h-4 overflow-hidden mr-2">
+                    <div id="energyBar" class="h-full bg-blue-500 rounded-full" style="width: 100%"></div>
+                </div>
+                <span class="text-white font-bold"><i class="fas fa-bolt text-yellow-300 mr-1"></i> <span id="energyText">100</span></span>
+            </div>
+        </div>
+        
+        <div class="absolute top-4 right-4 text-right">
+            <div class="text-white font-bold text-xl mb-1">
+                <i class="fas fa-cog text-yellow-600 mr-1"></i> <span id="gearCount">0</span>
+            </div>
+            <div class="text-white font-bold text-lg">
+                <i class="fas fa-trophy text-yellow-300 mr-1"></i> <span id="score">0</span>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+            <div class="bg-gray-900 bg-opacity-70 steampunk-border rounded-lg p-3 flex space-x-4">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i class="fas fa-fire text-red-500 text-xl"></i>
+                    </div>
+                    <span class="text-white text-xs">Cannons</span>
+                    <div class="text-yellow-400 text-sm font-bold" id="cannonLevel">1</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i class="fas fa-shield-alt text-blue-400 text-xl"></i>
+                    </div>
+                    <span class="text-white text-xs">Armor</span>
+                    <div class="text-yellow-400 text-sm font-bold" id="armorLevel">1</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i class="fas fa-tachometer-alt text-green-400 text-xl"></i>
+                    </div>
+                    <span class="text-white text-xs">Engine</span>
+                    <div class="text-yellow-400 text-sm font-bold" id="engineLevel">1</div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <i class="fas fa-bolt text-yellow-300 text-xl"></i>
+                    </div>
+                    <span class="text-white text-xs">Energy</span>
+                    <div class="text-yellow-400 text-sm font-bold" id="energyLevel">1</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="upgradeNotification" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 bg-opacity-90 steampunk-border rounded-lg p-4 text-center pointer-events-auto">
+            <h3 class="text-xl brass-text mb-2">Upgrade Available!</h3>
+            <p class="mb-4">You have <span id="availableGears" class="text-yellow-400 font-bold">0</span> gears to spend</p>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button class="upgradeBtn steampunk-button py-2 px-3 text-sm" data-upgrade="cannon">
+                    <i class="fas fa-fire mr-1"></i> Cannons (<span id="cannonCost">5</span>)
+                </button>
+                <button class="upgradeBtn steampunk-button py-2 px-3 text-sm" data-upgrade="armor">
+                    <i class="fas fa-shield-alt mr-1"></i> Armor (<span id="armorCost">5</span>)
+                </button>
+                <button class="upgradeBtn steampunk-button py-2 px-3 text-sm" data-upgrade="engine">
+                    <i class="fas fa-tachometer-alt mr-1"></i> Engine (<span id="engineCost">5</span>)
+                </button>
+                <button class="upgradeBtn steampunk-button py-2 px-3 text-sm" data-upgrade="energy">
+                    <i class="fas fa-bolt mr-1"></i> Energy (<span id="energyCost">5</span>)
+                </button>
+            </div>
+            <button id="closeUpgrade" class="steampunk-button py-1 px-4 text-sm">
+                Close
+            </button>
+        </div>
+    </div>
+    
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="hidden absolute inset-0 flex flex-col items-center justify-center z-50 bg-black bg-opacity-80">
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold brass-text mb-2">AIRSHIP DESTROYED</h1>
+            <p class="text-xl copper-text">Your journey ends here, captain</p>
+        </div>
+        
+        <div class="bg-gray-900 steampunk-border rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between mb-4">
+                <div class="text-center">
+                    <div class="text-3xl font-bold brass-text" id="finalScore">0</div>
+                    <div class="text-sm steel-text">Score</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold brass-text" id="finalGears">0</div>
+                    <div class="text-sm steel-text">Gears Collected</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold brass-text" id="finalKills">0</div>
+                    <div class="text-sm steel-text">Enemies Defeated</div>
+                </div>
+            </div>
+            
+            <div class="mt-6 grid grid-cols-1 gap-4">
+                <button id="playAgainBtn" class="steampunk-button py-3 px-6 rounded-lg font-bold text-lg">
+                    <i class="fas fa-redo mr-2"></i> Play Again
+                </button>
+                <button id="mainMenuBtn" class="steampunk-button py-3 px-6 rounded-lg font-bold text-lg">
+                    <i class="fas fa-home mr-2"></i> Main Menu
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" class="absolute inset-0 w-full h-full"></canvas>
+    
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+    
+    <script>
+        // Game state
+        const gameState = {
+            player: {
+                x: 0,
+                y: 0,
+                size: 30,
+                health: 100,
+                maxHealth: 100,
+                energy: 100,
+                maxEnergy: 100,
+                speed: 3,
+                rotation: 0,
+                lastShot: 0,
+                shotDelay: 500,
+                cannonLevel: 1,
+                armorLevel: 1,
+                engineLevel: 1,
+                energyLevel: 1,
+                score: 0,
+                gears: 0,
+                kills: 0
+            },
+            enemies: [],
+            gears: [],
+            cannonballs: [],
+            explosions: [],
+            smokeParticles: [],
+            keys: {},
+            mouse: { x: 0, y: 0 },
+            canvas: null,
+            ctx: null,
+            lastTime: 0,
+            gameTime: 0,
+            enemySpawnTimer: 0,
+            enemySpawnDelay: 9000   ,
+            upgradeCosts: {
+                cannon: [5, 10, 20, 40, 80],
+                armor: [5, 10, 20, 40, 80],
+                engine: [5, 10, 20, 40, 80],
+                energy: [5, 10, 20, 40, 80]
+            },
+            gameActive: false
+        };
+        
+        // DOM elements
+        const mainMenu = document.getElementById('mainMenu');
+        const howToPlayModal = document.getElementById('howToPlayModal');
+        const creditsModal = document.getElementById('creditsModal');
+        const gameUI = document.getElementById('gameUI');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const gameCanvas = document.getElementById('gameCanvas');
+        const tooltip = document.getElementById('tooltip');
+        
+        // UI elements
+        const healthBar = document.getElementById('healthBar');
+        const healthText = document.getElementById('healthText');
+        const energyBar = document.getElementById('energyBar');
+        const energyText = document.getElementById('energyText');
+        const gearCount = document.getElementById('gearCount');
+        const score = document.getElementById('score');
+        const cannonLevel = document.getElementById('cannonLevel');
+        const armorLevel = document.getElementById('armorLevel');
+        const engineLevel = document.getElementById('engineLevel');
+        const energyLevel = document.getElementById('energyLevel');
+        const upgradeNotification = document.getElementById('upgradeNotification');
+        const availableGears = document.getElementById('availableGears');
+        const cannonCost = document.getElementById('cannonCost');
+        const armorCost = document.getElementById('armorCost');
+        const engineCost = document.getElementById('engineCost');
+        const energyCost = document.getElementById('energyCost');
+        const finalScore = document.getElementById('finalScore');
+        const finalGears = document.getElementById('finalGears');
+        const finalKills = document.getElementById('finalKills');
+        
+        // Buttons
+        const playBtn = document.getElementById('playBtn');
+        const howToPlayBtn = document.getElementById('howToPlayBtn');
+        const creditsBtn = document.getElementById('creditsBtn');
+        const backFromHowToPlay = document.getElementById('backFromHowToPlay');
+        const backFromCredits = document.getElementById('backFromCredits');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const mainMenuBtn = document.getElementById('mainMenuBtn');
+        const closeUpgrade = document.getElementById('closeUpgrade');
+        const upgradeBtns = document.querySelectorAll('.upgradeBtn');
+        
+        // Initialize game
+        function initGame() {
+            gameState.canvas = gameCanvas;
+            gameState.ctx = gameCanvas.getContext('2d');
+            
+            // Set canvas size
+            resizeCanvas();
+            
+            // Event listeners
+            window.addEventListener('resize', resizeCanvas);
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+            gameCanvas.addEventListener('mousemove', handleMouseMove);
+            gameCanvas.addEventListener('click', handleMouseClick);
+            
+            // Button event listeners
+            playBtn.addEventListener('click', startGame);
+            howToPlayBtn.addEventListener('click', () => {
+                mainMenu.classList.add('hidden');
+                howToPlayModal.classList.remove('hidden');
+            });
+            creditsBtn.addEventListener('click', () => {
+                mainMenu.classList.add('hidden');
+                creditsModal.classList.remove('hidden');
+            });
+            backFromHowToPlay.addEventListener('click', () => {
+                howToPlayModal.classList.add('hidden');
+                mainMenu.classList.remove('hidden');
+            });
+            backFromCredits.addEventListener('click', () => {
+                creditsModal.classList.add('hidden');
+                mainMenu.classList.remove('hidden');
+            });
+            playAgainBtn.addEventListener('click', startGame);
+            mainMenuBtn.addEventListener('click', showMainMenu);
+            closeUpgrade.addEventListener('click', () => {
+                upgradeNotification.classList.add('hidden');
+            });
+            
+            upgradeBtns.forEach(btn => {
+                btn.addEventListener('click', handleUpgrade);
+                btn.addEventListener('mouseenter', showTooltip);
+                btn.addEventListener('mouseleave', hideTooltip);
+            });
+            
+            // Start game loop
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Resize canvas to window size
+        function resizeCanvas() {
+            gameCanvas.width = window.innerWidth;
+            gameCanvas.height = window.innerHeight;
+        }
+        
+        // Start game
+        function startGame() {
+            // Reset game state
+            gameState.player = {
+                x: gameCanvas.width / 2,
+                y: gameCanvas.height / 2,
+                size: 30,
+                health: 100,
+                maxHealth: 100,
+                energy: 100,
+                maxEnergy: 100,
+                speed: 3,
+                rotation: 0,
+                lastShot: 0,
+                shotDelay: 500,
+                cannonLevel: 1,
+                armorLevel: 1,
+                engineLevel: 1,
+                energyLevel: 1,
+                score: 0,
+                gears: 0,
+                kills: 0
+            };
+            
+            gameState.enemies = [];
+            gameState.gears = [];
+            gameState.cannonballs = [];
+            gameState.explosions = [];
+            gameState.smokeParticles = [];
+            gameState.gameTime = 0;
+            gameState.enemySpawnTimer = 0;
+            gameState.gameActive = true;
+            
+            // Update UI
+            updateUI();
+            
+            // Hide menus and show game
+            mainMenu.classList.add('hidden');
+            howToPlayModal.classList.add('hidden');
+            creditsModal.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            gameUI.classList.remove('hidden');
+            
+            // Focus canvas for keyboard input
+            gameCanvas.focus();
+        }
+        
+        // Show main menu
+        function showMainMenu() {
+            gameState.gameActive = false;
+            gameOverScreen.classList.add('hidden');
+            gameUI.classList.add('hidden');
+            mainMenu.classList.remove('hidden');
+        }
+        
+        // Game over
+        function gameOver() {
+            gameState.gameActive = false;
+            
+            // Update final stats
+            finalScore.textContent = gameState.player.score;
+            finalGears.textContent = gameState.player.gears;
+            finalKills.textContent = gameState.player.kills;
+            
+            // Show game over screen
+            gameUI.classList.add('hidden');
+            gameOverScreen.classList.remove('hidden');
+        }
+        
+        // Game loop
+        function gameLoop(timestamp) {
+            if (!gameState.lastTime) gameState.lastTime = timestamp;
+            const deltaTime = timestamp - gameState.lastTime;
+            gameState.lastTime = timestamp;
+            
+            if (gameState.gameActive) {
+                // Update game time
+                gameState.gameTime += deltaTime;
+                
+                // Spawn enemies
+                gameState.enemySpawnTimer += deltaTime;
+                if (gameState.enemySpawnTimer >= gameState.enemySpawnDelay) {
+                    spawnEnemy();
+                    gameState.enemySpawnTimer = 0;
+                    // Increase spawn rate over time
+                    gameState.enemySpawnDelay = Math.max(500, 3000 - gameState.gameTime / 10000 * 2500);
+                }
+                
+                // Update player
+                updatePlayer(deltaTime);
+                
+                // Update enemies
+                updateEnemies(deltaTime);
+                
+                // Update gears
+                updateGears(deltaTime);
+                
+                // Update cannonballs
+                updateCannonballs(deltaTime);
+                
+                // Update explosions
+                updateExplosions(deltaTime);
+                
+                // Update smoke particles
+                updateSmokeParticles(deltaTime);
+                
+                // Regenerate energy
+                if (gameState.player.energy < gameState.player.maxEnergy) {
+                    gameState.player.energy = Math.min(
+                        gameState.player.maxEnergy,
+                        gameState.player.energy + deltaTime * 0.02
+                    );
+                }
+                
+                // Check for upgrades
+                if (gameState.player.gears >= 5 && !upgradeNotification.classList.contains('hidden')) {
+                    availableGears.textContent = gameState.player.gears;
+                }
+            }
+            
+            // Render game
+            render();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Update player
+        function updatePlayer(deltaTime) {
+            // Movement
+            let moveX = 0;
+            let moveY = 0;
+            
+            if (gameState.keys['ArrowUp'] || gameState.keys['w']) moveY -= 1;
+            if (gameState.keys['ArrowDown'] || gameState.keys['s']) moveY += 1;
+            if (gameState.keys['ArrowLeft'] || gameState.keys['a']) moveX -= 1;
+            if (gameState.keys['ArrowRight'] || gameState.keys['d']) moveX += 1;
+            
+            // Normalize diagonal movement
+            if (moveX !== 0 && moveY !== 0) {
+                moveX *= 0.7071;
+                moveY *= 0.7071;
+            }
+            
+            const speed = gameState.player.speed * (1 + (gameState.player.engineLevel - 1) * 0.2);
+            moveX *= speed;
+            moveY *= speed;
+            
+            gameState.player.x = Math.max(
+                gameState.player.size,
+                Math.min(gameCanvas.width - gameState.player.size, gameState.player.x + moveX)
+            );
+            gameState.player.y = Math.max(
+                gameState.player.size,
+                Math.min(gameCanvas.height - gameState.player.size, gameState.player.y + moveY)
+            );
+            
+            const dx = gameState.mouse.x - gameState.player.x;
+            const dy = gameState.mouse.y - gameState.player.y;
+            gameState.player.rotation = Math.atan2(dy, dx);
+        }
+        
+        // Update enemies
+        function updateEnemies(deltaTime) {
+            for (let i = gameState.enemies.length - 1; i >= 0; i--) {
+                const enemy = gameState.enemies[i];
+                const dx = gameState.player.x - enemy.x;
+                const dy = gameState.player.y - enemy.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist > 0) {
+                    enemy.x += (dx / dist) * enemy.speed;
+                    enemy.y += (dy / dist) * enemy.speed;
+                }
+                
+                enemy.rotation = Math.atan2(dy, dx);
+                
+                if (dist < gameState.player.size + enemy.size) {
+                    gameState.player.health -= 1;
+                    updateUI();
+                    
+                    if (gameState.player.health <= 0) {
+                        gameState.player.health = 0;
+                        gameOver();
+                        return;
+                    }
+                }
+                
+                for (let j = gameState.cannonballs.length - 1; j >= 0; j--) {
+                    const ball = gameState.cannonballs[j];
+                    if (ball.fromPlayer) {
+                        const ballDx = enemy.x - ball.x;
+                        const ballDy = enemy.y - ball.y;
+                        const ballDist = Math.sqrt(ballDx * ballDx + ballDy * ballDy);
+                        
+                        if (ballDist < enemy.size + ball.size) {
+                            enemy.health -= 10 + (gameState.player.cannonLevel - 1) * 5;
+                            gameState.cannonballs.splice(j, 1);
+                            createExplosion(ball.x, ball.y);
+                            
+                            if (enemy.health <= 0) {
+                                gameState.player.score += 10;
+                                gameState.player.kills += 1;
+                                
+                                const gearCount = 1 + Math.floor(Math.random() * 3);
+                                for (let k = 0; k < gearCount; k++) {
+                                    gameState.gears.push({
+                                        x: enemy.x + (Math.random() - 0.5) * 20,
+                                        y: enemy.y + (Math.random() - 0.5) * 20,
+                                        size: 10 + Math.random() * 5,
+                                        value: 1,
+                                        rotation: Math.random() * Math.PI * 2,
+                                        rotationSpeed: (Math.random() - 0.5) * 0.1
+                                    });
+                                }
+                                
+                                gameState.enemies.splice(i, 1);
+                                
+                                for (let k = 0; k < 10; k++) {
+                                    gameState.smokeParticles.push({
+                                        x: enemy.x,
+                                        y: enemy.y,
+                                        size: 10 + Math.random() * 20,
+                                        life: 1000 + Math.random() * 1000,
+                                        createdAt: gameState.gameTime
+                                    });
+                                }
+                                
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Update gears
+        function updateGears(deltaTime) {
+            for (let i = gameState.gears.length - 1; i >= 0; i--) {
+                const gear = gameState.gears[i];
+                gear.rotation += gear.rotationSpeed;
+                
+                const dx = gameState.player.x - gear.x;
+                const dy = gameState.player.y - gear.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < gameState.player.size + gear.size) {
+                    gameState.player.gears += gear.value;
+                    updateUI();
+                    
+                    if (gameState.player.gears >= 5) {
+                        availableGears.textContent = gameState.player.gears;
+                        cannonCost.textContent = gameState.upgradeCosts.cannon[gameState.player.cannonLevel - 1] || 'MAX';
+                        armorCost.textContent = gameState.upgradeCosts.armor[gameState.player.armorLevel - 1] || 'MAX';
+                        engineCost.textContent = gameState.upgradeCosts.engine[gameState.player.engineLevel - 1] || 'MAX';
+                        energyCost.textContent = gameState.upgradeCosts.energy[gameState.player.energyLevel - 1] || 'MAX';
+                        
+                        if (!upgradeNotification.classList.contains('hidden')) {
+                            upgradeNotification.classList.remove('hidden');
+                        }
+                    }
+                    
+                    gameState.gears.splice(i, 1);
+                }
+            }
+        }
+        
+        function updateCannonballs(deltaTime) {
+            for (let i = gameState.cannonballs.length - 1; i >= 0; i--) {
+                const ball = gameState.cannonballs[i];
+                ball.x += Math.cos(ball.rotation) * ball.speed;
+                ball.y += Math.sin(ball.rotation) * ball.speed;
+                
+                if (ball.x < -ball.size || ball.x > gameCanvas.width + ball.size ||
+                    ball.y < -ball.size || ball.y > gameCanvas.height + ball.size) {
+                    gameState.cannonballs.splice(i, 1);
+                }
+            }
+        }
+        
+        function updateExplosions(deltaTime) {
+            for (let i = gameState.explosions.length - 1; i >= 0; i--) {
+                const explosion = gameState.explosions[i];
+                if (gameState.gameTime - explosion.createdAt > explosion.duration) {
+                    gameState.explosions.splice(i, 1);
+                }
+            }
+        }
+        
+        function updateSmokeParticles(deltaTime) {
+            for (let i = gameState.smokeParticles.length - 1; i >= 0; i--) {
+                const smoke = gameState.smokeParticles[i];
+                if (gameState.gameTime - smoke.createdAt > smoke.life) {
+                    gameState.smokeParticles.splice(i, 1);
+                }
+            }
+        }
+        
+        function spawnEnemy() {
+            let x, y;
+            if (Math.random() < 0.5) {
+                x = Math.random() < 0.5 ? -20 : gameCanvas.width + 20;
+                y = Math.random() * gameCanvas.height;
+            } else {
+                x = Math.random() * gameCanvas.width;
+                y = Math.random() < 0.5 ? -20 : gameCanvas.height + 20;
+            }
+            
+            const size = 20 + Math.random() * 20;
+            const speed = 0.5 + Math.random() * 1.25;
+            
+            gameState.enemies.push({
+                x,
+                y,
+                size,
+                speed,
+                health: 30 + Math.random() * 20,
+                rotation: 0,
+                color: `hsl(${Math.random() * 60 + 20}, 70%, 50%)`
+            });
+        }
+        
+        function createExplosion(x, y) {
+            gameState.explosions.push({
+                x,
+                y,
+                size: 10,
+                createdAt: gameState.gameTime,
+                duration: 500
+            });
+        }
+        
+        function render() {
+            const ctx = gameState.ctx;
+            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+            drawBackground();
+            drawGears();
+            drawSmoke();
+            drawEnemies();
+            drawCannonballs();
+            drawExplosions();
+            drawPlayer();
+        }
+        
+        function drawBackground() {
+            const ctx = gameState.ctx;
+            const gridSize = 50;
+            
+            ctx.strokeStyle = 'rgba(184, 115, 51, 0.1)';
+            ctx.lineWidth = 1;
+            
+            for (let x = 0; x < gameCanvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, gameCanvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y < gameCanvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(gameCanvas.width, y);
+                ctx.stroke();
+            }
+            
+            const centerX = gameCanvas.width / 2;
+            const centerY = gameCanvas.height / 2;
+            const compassSize = 100;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.strokeStyle = 'rgba(184, 115, 51, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, compassSize, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = 'rgba(224, 201, 161, 0.7)';
+            ctx.font = '14px "IM Fell English SC", serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            ctx.fillText('N', 0, -compassSize + 20);
+            ctx.fillText('S', 0, compassSize - 20);
+            ctx.fillText('E', compassSize - 20, 0);
+            ctx.fillText('W', -compassSize + 20, 0);
+            
+            ctx.strokeStyle = 'rgba(184, 115, 51, 0.2)';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i < 3; i++) {
+                const size = compassSize * 0.3 + i * compassSize * 0.2;
+                ctx.beginPath();
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                const teeth = 8 + i * 4;
+                for (let j = 0; j < teeth; j++) {
+                    const angle = (j / teeth) * Math.PI * 2;
+                    ctx.beginPath();
+                    ctx.moveTo(
+                        Math.cos(angle) * size,
+                        Math.sin(angle) * size
+                    );
+                    ctx.lineTo(
+                        Math.cos(angle) * (size + 5),
+                        Math.sin(angle) * (size + 5)
+                    );
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawPlayer() {
+            const ctx = gameState.ctx;
+            const player = gameState.player;
+            
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.rotation);
+            
+            ctx.fillStyle = '#b5a642';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, player.size, player.size * 0.6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#b87333';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, player.size * 0.4, player.size * 0.3, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            for (let i = -3; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.ellipse(
+                    0,
+                    i * player.size * 0.15,
+                    player.size * 0.9,
+                    player.size * 0.5,
+                    0,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.stroke();
+            }
+            
+            ctx.fillStyle = '#5c3d00';
+            ctx.beginPath();
+            ctx.rect(-player.size * 1.2, -player.size * 0.1, player.size * 0.4, player.size * 0.2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#3d2800';
+            for (let i = 0; i < 3; i++) {
+                const angle = (i / 3) * Math.PI * 2 + gameState.gameTime * 0.01;
+                ctx.save();
+                ctx.translate(-player.size, 0);
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(player.size * 0.5, -player.size * 0.1);
+                ctx.lineTo(player.size * 0.5, player.size * 0.1);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            ctx.fillStyle = '#333';
+            for (let i = -1; i <= 1; i += 2) {
+                ctx.beginPath();
+                ctx.rect(
+                    player.size * 0.3,
+                    i * player.size * 0.3,
+                    player.size * 0.4,
+                    player.size * 0.1
+                );
+                ctx.fill();
+            }
+            
+            if (gameState.keys['w'] || gameState.keys['ArrowUp'] ||
+                gameState.keys['a'] || gameState.keys['ArrowLeft'] ||
+                gameState.keys['s'] || gameState.keys['ArrowDown'] ||
+                gameState.keys['d'] || gameState.keys['ArrowRight']) {
+                
+                for (let i = 0; i < 2; i++) {
+                    if (Math.random() < 0.3) {
+                        gameState.smokeParticles.push({
+                            x: -player.size * 1.5 + Math.random() * player.size * 0.5,
+                            y: (Math.random() - 0.5) * player.size * 0.3,
+                            size: 5 + Math.random() * 10,
+                            life: 500 + Math.random() * 500,
+                            createdAt: gameState.gameTime
+                        });
+                    }
+                }
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawEnemies() {
+            const ctx = gameState.ctx;
+            
+            gameState.enemies.forEach(enemy => {
+                ctx.save();
+                ctx.translate(enemy.x, enemy.y);
+                ctx.rotate(enemy.rotation);
+                
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, enemy.size, enemy.size * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, enemy.size * 0.4, enemy.size * 0.3, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                for (let i = -2; i <= 2; i++) {
+                    ctx.beginPath();
+                    ctx.ellipse(
+                        0,
+                        i * enemy.size * 0.2,
+                        enemy.size * 0.9,
+                        enemy.size * 0.5,
+                        0,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.stroke();
+                }
+                
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.rect(-enemy.size * 1.2, -enemy.size * 0.1, enemy.size * 0.4, enemy.size * 0.2);
+                ctx.fill();
+                
+                for (let i = 0; i < 3; i++) {
+                    const angle = (i / 3) * Math.PI * 2 + gameState.gameTime * 0.02;
+                    ctx.save();
+                    ctx.translate(-enemy.size, 0);
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(enemy.size * 0.5, -enemy.size * 0.1);
+                    ctx.lineTo(enemy.size * 0.5, enemy.size * 0.1);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+                
+                const healthPercent = enemy.health / (30 + 20);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(-enemy.size, -enemy.size * 1.5, enemy.size * 2, 5);
+                ctx.fillStyle = healthPercent > 0.6 ? '#00ff00' : healthPercent > 0.3 ? '#ffff00' : '#ff0000';
+                ctx.fillRect(-enemy.size, -enemy.size * 1.5, enemy.size * 2 * healthPercent, 5);
+                
+                ctx.restore();
+            });
+        }
+        
+        function drawGears() {
+            const ctx = gameState.ctx;
+            
+            gameState.gears.forEach(gear => {
+                ctx.save();
+                ctx.translate(gear.x, gear.y);
+                ctx.rotate(gear.rotation);
+                
+                ctx.fillStyle = '#b87333';
+                ctx.beginPath();
+                ctx.arc(0, 0, gear.size * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#5c3d00';
+                const teeth = 8;
+                for (let i = 0; i < teeth; i++) {
+                    const angle = (i / teeth) * Math.PI * 2;
+                    ctx.save();
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(gear.size * 0.3, 0);
+                    ctx.lineTo(gear.size * 0.6, -gear.size * 0.1);
+                    ctx.lineTo(gear.size, 0);
+                    ctx.lineTo(gear.size * 0.6, gear.size * 0.1);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+                
+                ctx.fillStyle = '#b87333';
+                ctx.beginPath();
+                ctx.arc(0, 0, gear.size * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.beginPath();
+                ctx.arc(gear.size * 0.1, -gear.size * 0.1, gear.size * 0.1, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            });
+        }
+        
+        function drawCannonballs() {
+            const ctx = gameState.ctx;
+            
+            gameState.cannonballs.forEach(ball => {
+                ctx.save();
+                ctx.translate(ball.x, ball.y);
+                
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(0, 0, ball.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (ball.fromPlayer) {
+                    ctx.strokeStyle = 'rgba(255, 165, 0, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(
+                        -Math.cos(ball.rotation) * ball.size * 3,
+                        -Math.sin(ball.rotation) * ball.size * 3
+                    );
+                    ctx.lineTo(0, 0);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            });
+        }
+        
+        function drawExplosions() {
+            const ctx = gameState.ctx;
+            
+            gameState.explosions.forEach(explosion => {
+                const progress = (gameState.gameTime - explosion.createdAt) / explosion.duration;
+                const size = explosion.size * (1 + progress * 3);
+                const alpha = 1 - progress;
+                
+                ctx.save();
+                ctx.translate(explosion.x, explosion.y);
+                
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                gradient.addColorStop(0, `rgba(255, 100, 0, ${alpha})`);
+                gradient.addColorStop(0.7, `rgba(255, 50, 0, ${alpha * 0.5})`);
+                gradient.addColorStop(1, `rgba(255, 0, 0, 0)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (progress < 0.3) {
+                    for (let i = 0; i < 3; i++) {
+                        if (Math.random() < 0.3) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const sparkSize = 2 + Math.random() * 3;
+                            const sparkLength = size * (0.5 + Math.random() * 0.5);
+                            
+                            ctx.fillStyle = `rgba(255, ${150 + Math.random() * 100}, 0, ${alpha})`;
+                            ctx.beginPath();
+                            ctx.moveTo(0, 0);
+                            ctx.lineTo(
+                                Math.cos(angle) * sparkLength,
+                                Math.sin(angle) * sparkLength
+                            );
+                            ctx.lineTo(
+                                Math.cos(angle + 0.2) * sparkSize,
+                                Math.sin(angle + 0.2) * sparkSize
+                            );
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                }
+                
+                ctx.restore();
+            });
+        }
+        
+        function drawSmoke() {
+            const ctx = gameState.ctx;
+            
+            gameState.smokeParticles.forEach(smoke => {
+                const progress = (gameState.gameTime - smoke.createdAt) / smoke.life;
+                const size = smoke.size * (0.5 + progress * 1.5);
+                const alpha = 1 - progress;
+                
+                ctx.save();
+                ctx.translate(smoke.x, smoke.y);
+                
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                gradient.addColorStop(0, `rgba(100, 100, 100, ${alpha * 0.7})`);
+                gradient.addColorStop(1, `rgba(50, 50, 50, 0)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            });
+        }
+        
+        function updateUI() {
+            const healthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
+            healthBar.style.width = `${healthPercent}%`;
+            healthText.textContent = Math.floor(gameState.player.health);
+            
+            const energyPercent = (gameState.player.energy / gameState.player.maxEnergy) * 100;
+            energyBar.style.width = `${energyPercent}%`;
+            energyText.textContent = Math.floor(gameState.player.energy);
+            
+            gearCount.textContent = gameState.player.gears;
+            score.textContent = gameState.player.score;
+            cannonLevel.textContent = gameState.player.cannonLevel;
+            armorLevel.textContent = gameState.player.armorLevel;
+            engineLevel.textContent = gameState.player.engineLevel;
+            energyLevel.textContent = gameState.player.energyLevel;
+        }
+        
+        function handleKeyDown(e) {
+            gameState.keys[e.key] = true;
+            
+            if (e.key === ' ' && gameState.gameActive) {
+                if (gameState.player.gears >= 5) {
+                    availableGears.textContent = gameState.player.gears;
+                    cannonCost.textContent = gameState.upgradeCosts.cannon[gameState.player.cannonLevel - 1] || 'MAX';
+                    armorCost.textContent = gameState.upgradeCosts.armor[gameState.player.armorLevel - 1] || 'MAX';
+                    engineCost.textContent = gameState.upgradeCosts.engine[gameState.player.engineLevel - 1] || 'MAX';
+                    energyCost.textContent = gameState.upgradeCosts.energy[gameState.player.energyLevel - 1] || 'MAX';
+                    
+                    upgradeNotification.classList.remove('hidden');
+                }
+            }
+        }
+        
+        function handleKeyUp(e) {
+            gameState.keys[e.key] = false;
+        }
+        
+        function handleMouseMove(e) {
+            const rect = gameCanvas.getBoundingClientRect();
+            gameState.mouse.x = e.clientX - rect.left;
+            gameState.mouse.y = e.clientY - rect.top;
+        }
+        
+        function handleMouseClick(e) {
+            if (!gameState.gameActive) return;
+            
+            const now = Date.now();
+            if (now - gameState.player.lastShot < gameState.player.shotDelay) return;
+            
+            if (gameState.player.energy >= 10) {
+                const angle = gameState.player.rotation;
+                const cannonOffset = gameState.player.size * 0.3;
+                
+                gameState.cannonballs.push({
+                    x: gameState.player.x + Math.cos(angle) * gameState.player.size * 0.8 - Math.sin(angle) * cannonOffset,
+                    y: gameState.player.y + Math.sin(angle) * gameState.player.size * 0.8 + Math.cos(angle) * cannonOffset,
+                    rotation: angle,
+                    speed: 8,
+                    size: 5 + gameState.player.cannonLevel,
+                    fromPlayer: true
+                });
+                
+                gameState.cannonballs.push({
+                    x: gameState.player.x + Math.cos(angle) * gameState.player.size * 0.8 + Math.sin(angle) * cannonOffset,
+                    y: gameState.player.y + Math.sin(angle) * gameState.player.size * 0.8 - Math.cos(angle) * cannonOffset,
+                    rotation: angle,
+                    speed: 8,
+                    size: 5 + gameState.player.cannonLevel,
+                    fromPlayer: true
+                });
+                
+                gameState.player.lastShot = now;
+                gameState.player.energy -= 10;
+                
+                for (let i = 0; i < 3; i++) {
+                    gameState.smokeParticles.push({
+                        x: gameState.player.x - Math.cos(angle) * gameState.player.size * 0.5,
+                        y: gameState.player.y - Math.sin(angle) * gameState.player.size * 0.5,
+                        size: 5 + Math.random() * 10,
+                        life: 500 + Math.random() * 500,
+                        createdAt: gameState.gameTime
+                    });
+                }
+                
+                updateUI();
+            }
+        }
+        
+        function handleUpgrade(e) {
+            const upgradeType = e.target.dataset.upgrade;
+            let cost;
+            
+            switch (upgradeType) {
+                case 'cannon':
+                    cost = gameState.upgradeCosts.cannon[gameState.player.cannonLevel - 1];
+                    if (cost && gameState.player.gears >= cost) {
+                        gameState.player.gears -= cost;
+                        gameState.player.cannonLevel++;
+                        gameState.player.shotDelay = Math.max(200, 500 - (gameState.player.cannonLevel - 1) * 50);
+                    }
+                    break;
+                case 'armor':
+                    cost = gameState.upgradeCosts.armor[gameState.player.armorLevel - 1];
+                    if (cost && gameState.player.gears >= cost) {
+                        gameState.player.gears -= cost;
+                        gameState.player.armorLevel++;
+                        gameState.player.maxHealth = 100 + (gameState.player.armorLevel - 1) * 25;
+                        gameState.player.health = gameState.player.maxHealth;
+                    }
+                    break;
+                case 'engine':
+                    cost = gameState.upgradeCosts.engine[gameState.player.engineLevel - 1];
+                    if (cost && gameState.player.gears >= cost) {
+                        gameState.player.gears -= cost;
+                        gameState.player.engineLevel++;
+                    }
+                    break;
+                case 'energy':
+                    cost = gameState.upgradeCosts.energy[gameState.player.energyLevel - 1];
+                    if (cost && gameState.player.gears >= cost) {
+                        gameState.player.gears -= cost;
+                        gameState.player.energyLevel++;
+                        gameState.player.maxEnergy = 100 + (gameState.player.energyLevel - 1) * 25;
+                        gameState.player.energy = gameState.player.maxEnergy;
+                    }
+                    break;
+            }
+            
+            updateUI();
+            cannonCost.textContent = gameState.upgradeCosts.cannon[gameState.player.cannonLevel - 1] || 'MAX';
+            armorCost.textContent = gameState.upgradeCosts.armor[gameState.player.armorLevel - 1] || 'MAX';
+            engineCost.textContent = gameState.upgradeCosts.engine[gameState.player.engineLevel - 1] || 'MAX';
+            energyCost.textContent = gameState.upgradeCosts.energy[gameState.player.energyLevel - 1] || 'MAX';
+            
+            if (gameState.player.gears < 5) {
+                upgradeNotification.classList.add('hidden');
+            }
+        }
+        
+        function showTooltip(e) {
+            const upgradeType = e.target.dataset.upgrade;
+            let text = '';
+            
+            switch (upgradeType) {
+                case 'cannon':
+                    text = `Increases cannon damage and fire rate (Level ${gameState.player.cannonLevel})`;
+                    break;
+                case 'armor':
+                    text = `Increases maximum health (Level ${gameState.player.armorLevel})`;
+                    break;
+                case 'engine':
+                    text = `Increases movement speed (Level ${gameState.player.engineLevel})`;
+                    break;
+                case 'energy':
+                    text = `Increases maximum energy capacity (Level ${gameState.player.energyLevel})`;
+                    break;
+            }
+            
+            tooltip.textContent = text;
+            tooltip.style.left = `${e.target.getBoundingClientRect().left}px`;
+            tooltip.style.top = `${e.target.getBoundingClientRect().top - 30}px`;
+            tooltip.style.opacity = '1';
+        }
+        
+        function hideTooltip() {
+            tooltip.style.opacity = '0';
+        }
+        
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
