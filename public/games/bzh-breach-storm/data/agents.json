@@ -1,5 +1,0 @@
-{
-  "MutenRock": { "hp": 120, "speed": 180, "fireRate": 0.25, "baseDamage": 10, "passive": "fragment_bonus" },
-  "Sniky":     { "hp": 80,  "speed": 240, "fireRate": 0.15, "baseDamage": 14, "passive": "dash_bonus" },
-  "DrSoRn":   { "hp": 100, "speed": 150, "fireRate": 0.35, "baseDamage": 8,  "passive": "drop_bonus" }
-}
