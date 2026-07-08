@@ -3,6 +3,15 @@ import { GAMES, CATEGORY_LABELS } from '@/lib/games'
 
 const FULLGAMES = [
   {
+    slug: 'mg-airship',
+    title: 'MG Airship',
+    desc: 'Pilote ton dirigeable steampunk — abats tes ennemis, collecte des engrenages et améliore ton navire.',
+    icon: '🚢',
+    tag: 'ARCADE',
+    tagColor: '--c-amber',
+    external: '/arena/MG_airship.html',
+  },
+  {
     slug: 'bzh-breach-storm',
     title: 'BZH Breach Storm',
     desc: 'Roguelite de tir top-down — explore des salles procédurales, bats des boss, collecte des fragments de pouvoir.',
