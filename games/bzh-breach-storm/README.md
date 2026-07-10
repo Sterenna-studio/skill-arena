@@ -4,6 +4,13 @@
 
 ---
 
+> **Statut Skill Arena** — ✅ Branché sur le hub (slug `bzh-breach-storm`,
+> `public/games/bzh-breach-storm/`). Un lien cassé dans le catalogue a été
+> corrigé le 2026-07-11 (le jeu déployé vivait dans un sous-dossier imbriqué
+> en trop) — voir [`../README.md`](../README.md) pour le détail de l'audit.
+
+---
+
 ## Lore
 
 La Brèche interdimensionnelle ouverte par le **Code** dans la Bretagne Originelle a déstabilisé les Chronicles.

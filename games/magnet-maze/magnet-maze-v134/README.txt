@@ -1,3 +1,9 @@
+[Statut Skill Arena] ❌ Non déployée — quasi-identique à v133 (seul
+admin.js diffère) ; nécessite le même serveur Node/WebSocket, non
+compatible avec l'hébergement statique du hub. La v12 (statique) est la
+version branchée. Committe aussi node_modules/ (paquet ws, ~192Ko) — à
+nettoyer si cette version est reprise. Détail : ../README.md
+
 Magnet Maze v1.3.2 — Fix shared helpers + fix server + reconnexion/pause
 
 Magnet Maze v1.3.1 — Auto-pause jusqu’à reconnexion (LAN)

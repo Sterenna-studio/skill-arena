@@ -1,9 +1,0 @@
-[
-  { "id": "TOURELLE",   "label": "Tourelle Runique",    "tags": ["RUNE"],            "range": 2, "damage": 12, "fireRate": 1.5 },
-  { "id": "CHAMBRE",    "label": "Chambre Nemeton",     "tags": ["SLOW","RUNE"],     "range": 2, "slowFactor": 0.5 },
-  { "id": "BROUILLEUR", "label": "Brouilleur MiniStar", "tags": ["TECH"],            "range": 3, "cancelsSignal": true },
-  { "id": "MUR",        "label": "Mur Organique",       "tags": ["BLOCK"],           "hp": 30 },
-  { "id": "PIEGE",      "label": "Piège à Echo",        "tags": ["ECHO"],            "damage": 25, "aoe": 1, "uses": 1 },
-  { "id": "FORGE",      "label": "Forge Bretonne",      "tags": ["RUNE","BOOST"],    "boostTags": ["RUNE"], "boostAmount": 0.4 },
-  { "id": "NEXUS",      "label": "Nexus de Drain",      "tags": ["TECH","RUNE"],     "range": 3, "healPerKill": 1 }
-]

@@ -1,5 +1,9 @@
 # Spirit Overdrive
 
+> **Statut Skill Arena** — ✅ Branché sur le hub (slug `spirit-overdrive`,
+> `public/games/spirit-overdrive/`). Un dossier dupliqué en trop dans
+> `public/` a été nettoyé le 2026-07-11 — voir [`../README.md`](../README.md).
+
 Petit jeu web de course automobile en vanilla HTML/CSS/JS.
 
 ## Principe

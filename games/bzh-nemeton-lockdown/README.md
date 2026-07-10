@@ -4,6 +4,12 @@
 
 ---
 
+> **Statut Skill Arena** — ✅ Branché sur le hub (slug `bzh-nemeton-lockdown`,
+> `public/games/bzh-nemeton-lockdown/`). Un dossier dupliqué en trop dans
+> `public/` a été nettoyé le 2026-07-11 — voir [`../README.md`](../README.md).
+
+---
+
 ## Lore
 
 Les **Nemetons** sont d'anciens sanctuaires de la Bretagne Originelle devenus des ancres de stabilité

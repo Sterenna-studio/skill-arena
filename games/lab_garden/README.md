@@ -1,5 +1,10 @@
 # 🌳 Gold Garden Pro - Version Ultime
 
+> **Statut Skill Arena** — ✅ Branché sur le hub (slug `lab-garden`,
+> `public/games/lab-garden/`). Le jeu tourne en 100% localStorage
+> (`game.js` ligne 1) — `SUPABASE_SETUP.sql` ci-dessous est **obsolète**,
+> conservé pour référence historique seulement. Voir [`../README.md`](../README.md).
+
 Jeu de farming très ambitieux avec des systèmes de progression complexes et secrets cachés.
 
 ## 📦 Installation
@@ -196,7 +201,7 @@ console.log(window.game.achievements)
 
 **Status**: ✅ Production-Ready
 **Taille**: ~50KB compressé
-**Dépendances**: Supabase only
+**Dépendances**: Aucune — 100% localStorage (voir bandeau de statut en haut, section Supabase ci-dessus désormais obsolète)
 **Support**: France (BZH special!)
 
 Bon farming! 🌳💰✨

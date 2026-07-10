@@ -1,9 +1,0 @@
-{
-  "name": "spirit-overdrive",
-  "version": "0.6.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "start": "python -m http.server 8080"
-  }
-}

@@ -1,3 +1,7 @@
+[Statut Skill Arena] ✅ Version DÉPLOYÉE sur le hub (slug magnet-maze,
+public/games/magnet-maze/) — c'est la seule des 4 versions branchée, car
+c'est la seule 100% statique. Détail : ../README.md
+
 Magnet Maze v1.2 — Pulse 10s • 1/5 visible (offline)
 
 Changements demandés

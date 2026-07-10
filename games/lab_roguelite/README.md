@@ -1,5 +1,11 @@
 # 🎮 BZH Chronicles: Cyber Cellules - v3
 
+> **Statut Skill Arena** — ✅ Branché sur le hub (slug `lab-roguelite`,
+> `public/games/lab-roguelite/`). Voir [`../README.md`](../README.md).
+> Note : ce README décrit `index-v3.html`/`style-v3.css`, mais les fichiers
+> réels servis sont `index.html`/`style.css`/`app-v3.js` (mêmes noms
+> simplifiés, contenu équivalent).
+
 ## ROGUE-LITE CYBERPUNK COMPLET
 
 Une v3 hybride combinant :

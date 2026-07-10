@@ -18,7 +18,7 @@ const FULLGAMES = [
     icon: '🌩️',
     tag: 'ROGUELITE',
     tagColor: '--c-cyan',
-    external: '/arena/games/bzh-breach-storm/bzh-breach-storm/',
+    external: '/arena/games/bzh-breach-storm/',
   },
   {
     slug: 'spirit-overdrive',
@@ -27,7 +27,7 @@ const FULLGAMES = [
     icon: '🏎️',
     tag: 'COURSE',
     tagColor: '--c-amber',
-    external: '/arena/games/spirit-overdrive/spirit-overdrive/',
+    external: '/arena/games/spirit-overdrive/',
   },
   {
     slug: 'bzh-nemeton-lockdown',
@@ -36,7 +36,7 @@ const FULLGAMES = [
     icon: '🌿',
     tag: 'INFILTRATION',
     tagColor: '--c-primary',
-    external: '/arena/games/bzh-nemeton-lockdown/bzh-nemeton-lockdown/',
+    external: '/arena/games/bzh-nemeton-lockdown/',
   },
   {
     slug: 'lab-garden',
