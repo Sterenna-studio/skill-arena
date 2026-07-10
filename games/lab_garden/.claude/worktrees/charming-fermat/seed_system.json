@@ -1,0 +1,269 @@
+{
+  "seeds": {
+    "common_seed": {
+      "name": "Graine Commune",
+      "emoji": "🌱",
+      "color": "#00ff88",
+      "tier": 1,
+      "baseCost": 50,
+      "tiers": [
+        {
+          "level": 1,
+          "time": 3600,
+          "gold": 10,
+          "emoji": "🌱"
+        },
+        {
+          "level": 2,
+          "time": 2000,
+          "gold": 20,
+          "emoji": "🌿"
+        },
+        {
+          "level": 3,
+          "time": 1111,
+          "gold": 40,
+          "emoji": "🪴"
+        }
+      ]
+    },
+    "rare_seed": {
+      "name": "Graine Rare",
+      "emoji": "💜",
+      "color": "#9d4edd",
+      "tier": 2,
+      "baseCost": 200,
+      "tiers": [
+        {
+          "level": 1,
+          "time": 3600,
+          "gold": 30,
+          "emoji": "💜"
+        },
+        {
+          "level": 2,
+          "time": 2000,
+          "gold": 60,
+          "emoji": "🌺"
+        },
+        {
+          "level": 3,
+          "time": 1111,
+          "gold": 120,
+          "emoji": "🌸"
+        }
+      ]
+    },
+    "epic_seed": {
+      "name": "Graine Épique",
+      "emoji": "🔵",
+      "color": "#3a86ff",
+      "tier": 3,
+      "baseCost": 800,
+      "tiers": [
+        {
+          "level": 1,
+          "time": 3600,
+          "gold": 100,
+          "emoji": "🔵"
+        },
+        {
+          "level": 2,
+          "time": 2000,
+          "gold": 200,
+          "emoji": "🌊"
+        },
+        {
+          "level": 3,
+          "time": 1111,
+          "gold": 400,
+          "emoji": "💎"
+        }
+      ]
+    },
+    "legendary_seed": {
+      "name": "Graine Légendaire",
+      "emoji": "🔥",
+      "color": "#ff006e",
+      "tier": 4,
+      "baseCost": 5000,
+      "tiers": [
+        {
+          "level": 1,
+          "time": 3600,
+          "gold": 500,
+          "emoji": "🔥"
+        },
+        {
+          "level": 2,
+          "time": 2000,
+          "gold": 1000,
+          "emoji": "⚡"
+        },
+        {
+          "level": 3,
+          "time": 1111,
+          "gold": 2000,
+          "emoji": "👑"
+        }
+      ]
+    },
+    "booster_growth": {
+      "name": "Plante Boosteuse de Croissance",
+      "emoji": "⚡",
+      "color": "#ffbe0b",
+      "tier": 5,
+      "type": "booster_growth",
+      "baseCost": 10000,
+      "effect": "Boost la croissance des pots adjacents",
+      "tiers": [
+        {
+          "level": 1,
+          "boost": 0.1,
+          "emoji": "⚡"
+        },
+        {
+          "level": 2,
+          "boost": 0.2,
+          "emoji": "⚡⚡"
+        },
+        {
+          "level": 3,
+          "boost": 0.3,
+          "emoji": "⚡⚡⚡"
+        }
+      ]
+    },
+    "booster_gold": {
+      "name": "Plante Boosteuse d'Or",
+      "emoji": "💰",
+      "color": "#ffd700",
+      "tier": 5,
+      "type": "booster_gold",
+      "baseCost": 15000,
+      "effect": "Boost l'or des pots adjacents",
+      "tiers": [
+        {
+          "level": 1,
+          "boost": 0.05,
+          "emoji": "💰"
+        },
+        {
+          "level": 2,
+          "boost": 0.1,
+          "emoji": "💰💰"
+        },
+        {
+          "level": 3,
+          "boost": 0.15,
+          "emoji": "💰💰💰"
+        }
+      ]
+    }
+  },
+  "upgrades": {
+    "plot_slots": [
+      {
+        "level": 1,
+        "cost": 0,
+        "slots": 6,
+        "label": "Jardin Starter"
+      },
+      {
+        "level": 2,
+        "cost": 50000,
+        "slots": 9,
+        "label": "Jardin Étendu"
+      },
+      {
+        "level": 3,
+        "cost": 200000,
+        "slots": 12,
+        "label": "Jardin Luxe"
+      },
+      {
+        "level": 4,
+        "cost": 1000000,
+        "slots": 20,
+        "label": "Plantation Géante"
+      }
+    ],
+    "luck": [
+      {
+        "level": 0,
+        "cost": 0,
+        "value": 0
+      },
+      {
+        "level": 1,
+        "cost": 10000,
+        "value": 0.05
+      },
+      {
+        "level": 2,
+        "cost": 50000,
+        "value": 0.1
+      },
+      {
+        "level": 3,
+        "cost": 200000,
+        "value": 0.15
+      },
+      {
+        "level": 4,
+        "cost": 500000,
+        "value": 0.2
+      }
+    ],
+    "cooldown": [
+      {
+        "level": 0,
+        "cost": 0,
+        "multiplier": 1.0
+      },
+      {
+        "level": 1,
+        "cost": 25000,
+        "multiplier": 0.8
+      },
+      {
+        "level": 2,
+        "cost": 100000,
+        "multiplier": 0.6
+      },
+      {
+        "level": 3,
+        "cost": 250000,
+        "multiplier": 0.4
+      }
+    ],
+    "gardener": {
+      "cost": 1000000,
+      "effect": "Récolte automatiquement lors de la croissance",
+      "unlocks": "jardin_multidimensionnel"
+    },
+    "jardin_multidimensionnel": {
+      "cost": 10000000,
+      "maxDimensions": 10,
+      "costPerDimension": 10000000,
+      "effect": "Double les ressources par dimension",
+      "unlocks": "quantum_evolution"
+    },
+    "quantum_evolution": {
+      "cost": 100000000,
+      "effect": "Le jardinier devient voyageur quantique",
+      "unlocks": "quantum_dimension"
+    },
+    "quantum_dimension": {
+      "cost": 1000000000,
+      "effect": "Accès à la dimension quantique",
+      "goldPerSec": [
+        1,
+        5,
+        10,
+        25,
+        50
+      ]
+    }
+  }
+}
