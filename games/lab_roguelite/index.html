@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BZH Chronicles: Cyber Cellules - v3</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="cyber-container">
+        
+        <!-- MAIN MENU -->
+        <div id="mainMenu" class="screen active">
+            <div class="game-header">
+                <h1 class="cyber-title">CYBER CELLULES</h1>
+                <p class="cyber-subtitle">v3 - EXP & ZONES</p>
+            </div>
+
+            <div class="menu-grid">
+                <!-- Characters Section -->
+                <div class="menu-section">
+                    <h3>Personnages</h3>
+                    <div id="characterSelection" class="character-grid">
+                        <!-- Characters dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Progression Section -->
+                <div class="menu-section">
+                    <h3>Statistiques Globales</h3>
+                    <div class="progress-info">
+                        <div class="stat-row">
+                            <span>Meilleur Score:</span>
+                            <span class="cyber-number" id="bestScore">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Meilleur Stage:</span>
+                            <span class="cyber-number" id="bestStage">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>XP Total Gagnée:</span>
+                            <span class="cyber-number" id="totalExpEarned">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Zone Collecte Actuelle:</span>
+                            <span class="cyber-number" id="zoneRadius">120</span>
+                            <span>px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-actions">
+                <button id="startGame" class="cyber-btn btn-glow">LANCER MISSION</button>
+                <button id="talentsBtn" class="cyber-btn magenta">TALENTS GLOBAUX</button>
+                <button id="statsBtn" class="cyber-btn">STATISTIQUES</button>
+            </div>
+        </div>
+
+        <!-- TALENTS SCREEN -->
+        <div id="talentsScreen" class="screen">
+            <div class="screen-header">
+                <h2>TALENTS GLOBAUX</h2>
+                <button class="cyber-btn backToMenu">Retour</button>
+            </div>
+            <div id="talentsList" class="talents-grid">
+                <!-- Talents dynamically populated -->
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen" class="screen">
+            <!-- HUD -->
+            <div class="game-hud">
+                <div class="hud-top">
+                    <div class="player-info">
+                        <div class="hp-container">
+                            <div class="hp-bar-bg">
+                                <div class="hp-bar"></div>
+                            </div>
+                            <span class="hp-text">100/100</span>
+                        </div>
+                        <div class="character-name-display">
+                            <span id="characterDisplay">Néo-Druide</span>
+                            <span class="level-display">LVL <span id="weaponLevel">1</span></span>
+                        </div>
+                    </div>
+
+                    <div class="room-info">
+                        <div class="info-item">
+                            <span class="info-label">ÉTAGE</span>
+                            <span class="cyber-number" id="currentStage">1</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">SALLE</span>
+                            <span class="cyber-number" id="currentRoom">1</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">ENNEMIS</span>
+                            <span class="cyber-number" id="enemiesLeft">0</span>
+                        </div>
+                    </div>
+
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">SCORE</span>
+                            <span class="cyber-number" id="currentScore">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">EXP</span>
+                            <span class="cyber-number" id="expThisRun">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">ZONE</span>
+                            <span class="cyber-number" id="expZone">120</span>
+                            <span style="font-size: 10px;">px</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boss Info (hidden by default) -->
+                <div id="bossHUD" class="boss-hud" style="display: none;">
+                    <div class="boss-name">
+                        <span id="bossName">BOSS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Canvas -->
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <!-- PAUSE SCREEN -->
+        <div id="pauseScreen" class="overlay">
+            <div class="overlay-content">
+                <h2>MISSION EN PAUSE</h2>
+                <div class="pause-stats">
+                    <div class="stat-row">
+                        <span>Temps écoulé:</span>
+                        <span class="cyber-number" id="pauseTime">00:00</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Ennemis éliminés:</span>
+                        <span class="cyber-number" id="pauseKills">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>XP collectée:</span>
+                        <span class="cyber-number" id="pauseExp">0</span>
+                    </div>
+                </div>
+                <div class="overlay-actions">
+                    <button id="resumeBtn" class="cyber-btn btn-glow">REPRENDRE</button>
+                    <button id="quitToMenuBtn" class="cyber-btn magenta">MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="overlay">
+            <div class="overlay-content">
+                <h2>MISSION TERMINÉE</h2>
+                <div class="game-over-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Score Final</span>
+                        <span class="cyber-number large" id="finalScore">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Étage Atteint</span>
+                        <span class="cyber-number" id="finalStage">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Ennemis Éliminés</span>
+                        <span class="cyber-number" id="finalKills">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">XP Gagnée</span>
+                        <span class="cyber-number" id="finalExp">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Temps Survie</span>
+                        <span class="cyber-number" id="finalTime">00:00</span>
+                    </div>
+                </div>
+                <div class="overlay-actions">
+                    <button id="playAgainBtn" class="cyber-btn btn-glow">NOUVELLE MISSION</button>
+                    <button id="backToMenuBtn" class="cyber-btn magenta">MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPGRADE SCREEN -->
+        <div id="upgradeScreen" class="overlay">
+            <div class="overlay-content">
+                <h2>AMÉLIORATION DE SALLE</h2>
+                <p class="upgrade-subtitle">/// CHOISISSEZ VOTRE ÉVOLUTION ///</p>
+                <div id="upgradeChoices" class="upgrade-grid">
+                    <!-- Upgrade choices dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="app-v3.js"></script>
+</body>
+</html>

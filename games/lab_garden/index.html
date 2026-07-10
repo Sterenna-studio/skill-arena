@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold Garden Pro - Farming Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-container">
+        <header class="game-header">
+            <div class="header-left">
+                <h1>🌱 Gold Garden Pro</h1>
+                <div class="dimension-counter" id="dimension-counter" style="display: none;">
+                    Dimension: <span id="dimension-count">1</span> (x<span id="dimension-multiplier">1</span>)
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat">Solde: <span id="balance">0</span> 💰</div>
+                <div class="stat">Récoltes: <span id="harvests">0</span></div>
+                <div class="stat">Streak: <span id="streak">0</span></div>
+                <div class="stat">Luck: <span id="stat-luck">10%</span></div>
+            </div>
+            <div class="header-buttons">
+                <button id="btn-shop" class="btn-header">🛒</button>
+                <button id="btn-upgrades" class="btn-header">⚙️</button>
+                <button id="btn-achievements" class="btn-header">🏆</button>
+            </div>
+        </header>
+
+        <div class="game-wrapper">
+            <section class="garden-section">
+                <div class="garden-header">
+                    <h2>🌳 Mon Jardin</h2>
+                    <div id="cooldown-bar" style="display: none; height: 10px; background: rgba(0,255,136,0.1); border-radius: 5px; margin-top: 10px; overflow: hidden;">
+                        <div id="cooldown-fill" style="height: 100%; background: var(--primary); width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <div id="cooldown-text" style="font-size: 0.8em; color: var(--warning); margin-top: 5px;"></div>
+                </div>
+                <div id="garden-grid" class="garden-grid"></div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>🎒 Sac à Dos</h3>
+                    <div id="inventory" class="inventory-grid"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>🛠️ Outils</h3>
+                    <div class="tools-grid">
+                        <button id="tool-shovel" class="tool-btn" title="Déterrer">🔨</button>
+                        <button id="tool-lock" class="tool-btn" title="Verrouiller">🔒</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>📊 Statistiques</h3>
+                    <div class="stats-list">
+                        <div class="stat-item"><span>Jardinier:</span> <span id="stat-gardener">Non recruté</span></div>
+                        <div class="stat-item"><span>Boosts Actifs:</span> <span id="stat-boosts">0</span></div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="notifications"></div>
+
+    <div id="shop-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 Boutique</h2>
+                <button id="btn-close-shop" class="btn-close">×</button>
+            </div>
+            <div id="shop-grid" class="shop-grid"></div>
+        </div>
+    </div>
+
+    <div id="upgrades-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Améliorations</h2>
+                <button id="btn-close-upgrades" class="btn-close">×</button>
+            </div>
+            <div class="upgrades-tabs">
+                <button class="tab-btn active" data-tab="slots">Pots</button>
+                <button class="tab-btn" data-tab="luck">Chance</button>
+                <button class="tab-btn" data-tab="cooldown">Cooldown</button>
+                <button class="tab-btn" data-tab="special">Spécial</button>
+            </div>
+            <div id="upgrades-content" class="upgrades-content"></div>
+        </div>
+    </div>
+
+    <div id="achievements-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏆 Accomplissements</h2>
+                <button id="btn-close-achievements" class="btn-close">×</button>
+            </div>
+            <div id="achievements-list" class="achievements-list"></div>
+        </div>
+    </div>
+
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content confirmation-dialog">
+            <h3 id="confirmation-title"></h3>
+            <p id="confirmation-text"></p>
+            <div class="confirmation-buttons">
+                <button id="btn-confirm-yes" class="btn-confirm">Oui</button>
+                <button id="btn-confirm-no" class="btn-confirm cancel">Non</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="achievement-unlock-popup" class="modal" style="z-index: 1001;">
+        <div class="achievement-unlock-content">
+            <h2 style="color: var(--gold); margin-bottom: 10px;">🏆 Accomplissement Déverrouillé!</h2>
+            <h3 id="popup-achievement-name" style="color: var(--secondary); margin-bottom: 5px;"></h3>
+            <p id="popup-achievement-reward" style="color: var(--gold); font-size: 1.1em;">+<span></span>💰</p>
+        </div>
+    </div>
+
+    <script type="module" src="game.js"></script>
+</body>
+</html>

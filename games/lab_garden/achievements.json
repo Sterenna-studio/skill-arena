@@ -1,0 +1,148 @@
+{
+  "achievements": [
+    {
+      "id": "first_harvest",
+      "name": "Premier Pas",
+      "description": "Récolte ta première graine",
+      "reward": 100,
+      "hidden": false,
+      "type": "milestone"
+    },
+    {
+      "id": "gold_rush_100",
+      "name": "Riche et Célèbre",
+      "description": "Accumule 10 000 💰",
+      "reward": 500,
+      "hidden": false,
+      "type": "milestone"
+    },
+    {
+      "id": "gold_rush_1000",
+      "name": "Millionnaire Vert",
+      "description": "Accumule 100 000 💰",
+      "reward": 5000,
+      "hidden": false,
+      "type": "milestone"
+    },
+    {
+      "id": "gold_rush_10000",
+      "name": "Pharaon des Jardins",
+      "description": "Accumule 1 000 000 💰",
+      "reward": 50000,
+      "hidden": false,
+      "type": "milestone"
+    },
+    {
+      "id": "gold_rush_100000",
+      "name": "Dieu du Farming",
+      "description": "Accumule 100 000 000 💰",
+      "reward": 1000000,
+      "hidden": false,
+      "type": "milestone"
+    },
+    {
+      "id": "collector_10",
+      "name": "Petit Collectionneur",
+      "description": "Récolte 10 fois",
+      "reward": 250,
+      "hidden": false,
+      "type": "collector"
+    },
+    {
+      "id": "collector_100",
+      "name": "Fermier Acharné",
+      "description": "Récolte 100 fois",
+      "reward": 2500,
+      "hidden": false,
+      "type": "collector"
+    },
+    {
+      "id": "collector_1000",
+      "name": "Esclave du Farming",
+      "description": "Récolte 1000 fois",
+      "reward": 25000,
+      "hidden": false,
+      "type": "collector"
+    },
+    {
+      "id": "collector_10000",
+      "name": "Addiction Sévère",
+      "description": "Récolte 10 000 fois",
+      "reward": 250000,
+      "hidden": false,
+      "type": "collector"
+    },
+    {
+      "id": "master_gardener",
+      "name": "Maître Jardinier",
+      "description": "Atteins le tier 3 sur une graine",
+      "reward": 5000,
+      "hidden": false,
+      "type": "tier"
+    },
+    {
+      "id": "legendary_farmer",
+      "name": "Fermier Légendaire",
+      "description": "Atteins le tier 3 sur une graine légendaire",
+      "reward": 50000,
+      "hidden": false,
+      "type": "tier"
+    },
+    {
+      "id": "booster_king",
+      "name": "Roi des Boosters",
+      "description": "Plante une graine boosteuse",
+      "reward": 10000,
+      "hidden": false,
+      "type": "special"
+    },
+    {
+      "id": "gardener_hire",
+      "name": "Le Jardinier Arrive",
+      "description": "Recrute ton premier jardinier",
+      "reward": 100000,
+      "hidden": false,
+      "type": "upgrade"
+    },
+    {
+      "id": "multidim_unlock",
+      "name": "Dimension Déverrouillée",
+      "description": "Accès au jardin multidimensionnel",
+      "reward": 5000000,
+      "hidden": true,
+      "type": "upgrade"
+    },
+    {
+      "id": "quantum_evolution_unlock",
+      "name": "Évolution Quantique",
+      "description": "Le jardinier devient voyageur quantique",
+      "reward": 50000000,
+      "hidden": true,
+      "type": "upgrade"
+    },
+    {
+      "id": "quantum_dimension_unlock",
+      "name": "La Dimension Étrange",
+      "description": "Accès à la dimension quantique superpositionnée",
+      "reward": 500000000,
+      "hidden": true,
+      "type": "upgrade"
+    },
+    {
+      "id": "quantum_gold_generator",
+      "name": "L'Or du Multivers",
+      "description": "Génère 100 💰/sec en quantique",
+      "reward": 100000000,
+      "hidden": true,
+      "type": "quantum"
+    },
+    {
+      "id": "bzh_pw_path",
+      "name": "Membre du BZH_PW Crew",
+      "description": "Atteins le statut de Voyageur Quantique",
+      "reward": 1000000000,
+      "hidden": true,
+      "type": "secret"
+    }
+  ]
+}
