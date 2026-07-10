@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useCallback } from 'react'
 
 const TEXTS = [
   "Le soleil se lève à l'est et se couche à l'ouest chaque jour sans exception.",

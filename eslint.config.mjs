@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Static game bundles — not part of the Next.js app source.
+    "games/**",
+    "public/**",
   ]),
 ]);
 

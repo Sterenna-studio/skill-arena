@@ -39,7 +39,6 @@ export default function CounterGame() {
   const [score, setScore] = useState(0)
   const [round, setRound] = useState(0)
   const [history, setHistory] = useState<{ score: number; rounds: number }[]>([])
-  const [showTime, setShowTime] = useState(2000)
 
   const startRound = useCallback((lvl: number) => {
     const { min, max } = LEVELS[Math.min(lvl, LEVELS.length - 1)]
@@ -49,7 +48,6 @@ export default function CounterGame() {
     setAnswer('')
     setPhase('showing')
     const time = Math.max(800, 2500 - lvl * 300)
-    setShowTime(time)
     setTimeout(() => setPhase('answering'), time)
   }, [])
 
