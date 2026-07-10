@@ -16,7 +16,7 @@ et ajoute une entrée dans `src/lib/games.ts` + `src/app/page.tsx`.
 | Spirit Overdrive | `spirit-overdrive/` | `spirit-overdrive` | ✅ Oui | Vanilla JS / ESM | RAS |
 | Gold Garden Pro | `lab_garden/` | `lab-garden` | ✅ Oui | Vanilla JS, 100% localStorage | Ex-Supabase, migré ([voir README](lab_garden/README.md)) |
 | Cyber Cellules v3 | `lab_roguelite/` | `lab-roguelite` | ✅ Oui | Vanilla JS / Canvas | RAS |
-| Magnet Maze | `magnet-maze/` | `magnet-maze` | ✅ Oui (v12 seulement) | Vanilla JS | 4 versions en parallèle, voir [magnet-maze/README.md](magnet-maze/README.md) |
+| Magnet Maze | `magnet-maze/` | `magnet-maze` | ✅ Oui (v12 seulement) | Vanilla JS | 2 versions restantes (v12 + v134), voir [magnet-maze/README.md](magnet-maze/README.md) |
 
 Tous les jeux de ce dossier sont désormais accessibles depuis la section
 « 01 · JEUX COMPLETS » de la home ([src/app/page.tsx](../src/app/page.tsx)).
@@ -48,6 +48,26 @@ copie à plat fonctionnait déjà (donc pas de lien cassé, juste du poids mort)
   leur `node_modules/` (paquet `ws`) — retiré du suivi git (`git rm -r
   --cached`), les fichiers restent sur disque (déjà couverts par
   `**/node_modules/` dans `.gitignore`, donc pas re-trackés).
+
+## Nettoyage doublons/anciennes versions — 2026-07-11
+
+Contenu supprimé de `master` après vérification qu'il n'était référencé nulle
+part ; récupérable sur la branche `archive/cleanup-2026-07-11` :
+
+- **`magnet-maze/magnet-maze-v13/`** et **`magnet-maze-v133/`** — versions
+  intermédiaires dépassées (v133 réécrivait v13 en quasi-totalité ; v134,
+  conservée, ne différait de v133 que par un fichier). Voir
+  [magnet-maze/README.md](magnet-maze/README.md).
+- **`lab_garden/{SUPABASE_SETUP.sql, achievements.json, seed_system.json,
+  lab-css-additions.css}`** — reliquats de l'ère Supabase, non référencés
+  depuis la migration 100% localStorage.
+- **`public/arcade-casino/js/casino-core.js`** et les fichiers qu'il était
+  seul à référencer (`js/games/blackjack.js`, `js/games/dice.js`,
+  `js/games/roulette.js`, `js/games/slots.js` — un doublon de
+  `js/games/slot-machine/slot-machine.js` —, `js/midnight-chase.js`,
+  `js/road-runner.js`, `css/road-runner.css`) — ~140 Ko jamais chargés par
+  `index.html`, qui utilise `js/star-arcade-core.js` comme point d'entrée
+  réel.
 
 ## Non traité (à trancher plus tard)
 
