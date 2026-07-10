@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Magnet Maze — V1.2 (Pulse 10s • 1/5 visible)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <div class="title">Magnet Maze <span class="tag">v1.2</span></div>
+        <div class="subtitle">Mur entre agents • Pulse 10s • 1 pulse sur 5 visible par A</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="newLevelBtn" class="btn">Nouveau niveau</button>
+
+      <label class="toggle">
+        <input id="hardMode" type="checkbox" />
+        <span>Mode “tendu”</span>
+      </label>
+
+      <label class="toggle">
+        <input id="showGrid" type="checkbox" />
+        <span>Grille (Agent A)</span>
+      </label>
+
+      <button id="adminBtn" class="btn btn-ghost">Admin</button>
+      <button id="resetBtn" class="btn btn-ghost">Reset laby</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Agent A</h2>
+        <p>
+          Voit le labyrinthe + l’objet + la sortie (<b>verrouillée</b> tant que le fragment n’est pas révélé).
+          <br/>
+          <b>Ne voit pas</b> l’aimant d’Agent B, sauf quand un <b>pulse “visible”</b> survient (1 pulse sur 5).
+        </p>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="canvasA" width="720" height="480" aria-label="Vue Agent A"></canvas>
+
+        <div class="status">
+          <div class="chip">Progression</div>
+          <div id="progressA" class="mono"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Agent B</h2>
+        <p>
+          Ne voit <b>pas</b> les murs, ni la sortie, ni l’objet.
+          <br/>
+          Pilote l’aimant ; le <b>pulse</b> a une recharge configurable (défaut <b>10s</b>) et peut révéler un fragment si l’objet est dans une <b>salle</b>.
+        </p>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="canvasB" width="720" height="480" aria-label="Vue Agent B"></canvas>
+
+        <div class="hud">
+          <div class="hud-row">
+            <div class="chip">Contrôles</div>
+            <div class="kbd">
+              <span>🖱️ (clic maintenu) déplacer l’aimant</span>
+              <span class="sep">•</span>
+              <span><b>WASD</b>/<b>Flèches</b></span>
+              <span class="sep">•</span>
+              <span><b>Espace</b> = Pulse</span>
+            </div>
+          </div>
+          <div class="hud-row">
+            <div class="chip">Pulse</div>
+            <div class="mono" id="pulseInfo">—</div>
+          </div>
+          <div class="hud-row">
+            <div class="chip">Progression</div>
+            <div id="progressB" class="mono"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="small">
+      Offline • Ouvre <code>index.html</code> • Astuce : cache une des vues avec un carton/feuille si vous jouez sur un seul écran.
+    </div>
+  </footer>
+
+  <!-- Admin -->
+  <div id="adminOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Admin">
+    <div class="overlay-card">
+      <div class="win-title">🔧 Panneau d’administration</div>
+      <div class="win-subtitle">Pour tester / debug (le but final sera 2 liens + admin séparé).</div>
+
+      <div class="admin-grid">
+        <label class="field">
+          <span>Texte cible (mot/phrase)</span>
+          <input id="adminTarget" type="text" spellcheck="false" />
+        </label>
+
+        <label class="field">
+          <span>Mode</span>
+          <select id="adminMode">
+            <option value="auto">Auto (tirage)</option>
+            <option value="word">Mot</option>
+            <option value="phrase">Phrase</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Max labyrinthes</span>
+          <select id="adminMaxMazes">
+            <option>3</option>
+            <option selected>5</option>
+            <option>8</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>CD pulse (secondes)</span>
+          <input id="adminPulseCD" type="number" min="1" step="1" value="10" />
+        </label>
+
+        <div class="admin-actions">
+          <button id="adminApplyBtn" class="btn">Appliquer</button>
+          <button id="adminCloseBtn" class="btn btn-ghost">Fermer</button>
+        </div>
+      </div>
+
+      <div class="note">
+        <b>Rappel :</b> la sortie du labyrinthe est <b>fermée</b> tant que le fragment du laby n’a pas été révélé (pulse + objet dans une salle).
+        <br/>
+        <b>Visibilité aimant :</b> 1 pulse sur 5 est “bruyant” (visible par A), les autres pulses restent “silencieux”.
+      </div>
+    </div>
+  </div>
+
+  <!-- End / next -->
+  <div id="endOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Fin">
+    <div class="overlay-card">
+      <div class="win-title" id="endTitle">✅ Fragment récupéré</div>
+      <div class="win-subtitle" id="endSubtitle">—</div>
+      <div class="overlay-actions">
+        <button id="nextMazeBtn" class="btn">Labyrinthe suivant</button>
+        <button id="closeEndBtn" class="btn btn-ghost">Continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="revealToast" class="toast hidden" aria-live="polite"></div>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html><html lang="fr"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Magnet Maze — Admin</title><link rel="stylesheet" href="style.css" />
+</head><body data-role="ADMIN">
+<header class="topbar">
+  <div class="brand"><div class="dot"></div><div>
+    <div class="title">Magnet Maze <span class="tag">v1.3.3</span> <span class="tag">Admin</span></div>
+    <div class="subtitle">Serveur de vérité (seed, texte, CD pulse, synchro). WebSocket LAN.</div>
+  </div></div>
+  <div class="controls">
+    <a class="btn btn-ghost" href="./">Lobby</a>
+    <a class="btn btn-ghost" href="a.html">Agent A</a>
+    <a class="btn btn-ghost" href="b.html">Agent B</a>
+    <button id="pauseBtn" class="btn btn-ghost">Pause</button>
+    <button id="syncBtn" class="btn">Sync</button>
+  </div>
+</header>
+
+<main class="page">
+  <section class="panel">
+    <div class="panel-head"><h2>Prévisualisation Admin (debug)</h2><p>Affiche la scène complète : murs + bille + aimant + sortie.</p></div>
+    <div class="canvas-wrap"><canvas id="canvas" width="720" height="480"></canvas></div>
+  </section>
+
+  <aside class="card">
+    <div class="badge">Config partie</div>
+    <label class="field"><span>Seed (entier)</span><input id="seed" type="number" step="1" /></label>
+    <label class="field"><span>Texte cible (mot/phrase)</span><input id="target" type="text" spellcheck="false" placeholder="L'AGENCE S.T.E.A.M. RECOUD LE TEMPS" /></label>
+    <label class="field"><span>Mode</span><select id="mode"><option value="auto">Auto</option><option value="word">Mot</option><option value="phrase">Phrase</option></select></label>
+    <label class="field"><span>Max labyrinthes</span><select id="maxMazes"><option>3</option><option selected>5</option><option>8</option></select></label>
+    <label class="field"><span>Cooldown Pulse (secondes)</span><input id="pulseCd" type="number" min="1" step="1" value="10" /></label>
+    <div class="row"><button id="applyBtn" class="btn">Appliquer + Nouveau niveau</button><button id="resetBtn" class="btn btn-ghost">Reset laby</button><button id="nextBtn" class="btn btn-ghost">Labyrinthe suivant</button></div>
+    <div class="badge" style="margin-top:12px;">État temps réel</div>
+    <div class="kv"><div class="k">Clients</div><div class="v" id="clients">—</div></div>
+    <div class="kv"><div class="k">Progression</div><div class="v mono" id="prog">—</div></div>
+    <div class="kv"><div class="k">Pulse</div><div class="v mono" id="pulse">—</div></div>
+    <div class="kv"><div class="k">Info</div><div class="v" id="info">—</div></div>
+  </aside>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+<footer class="footer">Lance <code>start.bat</code>, puis ouvre <code>http://zyra:8000/</code>.</footer>
+<script src="shared.js"></script><script src="admin.js"></script>
+</body></html>
