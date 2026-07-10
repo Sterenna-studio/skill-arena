@@ -38,6 +38,33 @@ const FULLGAMES = [
     tagColor: '--c-primary',
     external: '/arena/games/bzh-nemeton-lockdown/bzh-nemeton-lockdown/',
   },
+  {
+    slug: 'lab-garden',
+    title: 'Gold Garden Pro',
+    desc: 'Farming cyberpunk — cultive tes graines, débloque des dimensions et récolte des fortunes.',
+    icon: '🌱',
+    tag: 'FARMING',
+    tagColor: '--c-primary',
+    external: '/arena/games/lab-garden/',
+  },
+  {
+    slug: 'lab-roguelite',
+    title: 'Cyber Cellules v3',
+    desc: 'Roguelite cyberpunk — élimine des vagues d\'ennemis, récolte de l\'XP et affronte des boss.',
+    icon: '🤖',
+    tag: 'ROGUELITE',
+    tagColor: '--c-cyan',
+    external: '/arena/games/lab-roguelite/',
+  },
+  {
+    slug: 'magnet-maze',
+    title: 'Magnet Maze',
+    desc: 'Coopération à deux écrans — guide l\'aimant pour révéler le fragment et ouvrir la sortie.',
+    icon: '🧲',
+    tag: 'COOP',
+    tagColor: '--c-amber',
+    external: '/arena/games/magnet-maze/',
+  },
 ]
 
 export default function HomePage() {
