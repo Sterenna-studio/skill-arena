@@ -39,16 +39,18 @@ supprimés. Le même nettoyage a été fait pour `bzh-nemeton-lockdown` et
 copie à plat fonctionnait déjà (donc pas de lien cassé, juste du poids mort).
 `src/app/page.tsx` a été mis à jour pour pointer vers les chemins à plat.
 
-## Cleanup restant (non traité, à trancher plus tard)
+## Cleanup — 2026-07-11
 
-- **`games/lab-garden/`** (avec un tiret, à ne pas confondre avec
-  `games/lab_garden/` en underscore) ne contient qu'un reliquat de worktree
-  Claude Code (`.claude/worktrees/charming-fermat/`) — non suivi par git,
-  probablement une session abandonnée. À supprimer manuellement si confirmé
-  inutile.
-- **`magnet-maze/magnet-maze-v133/`** et **`magnet-maze-v134/`** committent
-  leur `node_modules/` (le paquet `ws`, ~192 Ko chacun) — à retirer du suivi
-  git et ajouter à `.gitignore` si ces versions sont conservées.
+- **`games/lab-garden/`** (avec un tiret) ne contenait qu'un reliquat de
+  worktree Claude Code (`.claude/worktrees/charming-fermat/`), non suivi par
+  git — supprimé.
+- **`magnet-maze/magnet-maze-v133/`** et **`magnet-maze-v134/`** committaient
+  leur `node_modules/` (paquet `ws`) — retiré du suivi git (`git rm -r
+  --cached`), les fichiers restent sur disque (déjà couverts par
+  `**/node_modules/` dans `.gitignore`, donc pas re-trackés).
+
+## Non traité (à trancher plus tard)
+
 - Chaque jeu importé par merge commit (`bzh-breach-storm`,
   `bzh-nemeton-lockdown`, `spirit-overdrive`) n'a ni `LICENSE` ni fichier de
   crédits — à vérifier si ces assets ont des contraintes de licence avant

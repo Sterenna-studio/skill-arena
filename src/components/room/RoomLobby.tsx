@@ -38,7 +38,7 @@ export default function RoomLobby({ room, me, isHost, allReady, onReady, onStart
           ))}
           {players.length < 2 && (
             <div className="text-sm text-center py-4" style={{ color: 'var(--muted)', borderTop: '1px solid var(--border)', marginTop: 8 }}>
-              En attente d'un autre joueur...
+              En attente d&apos;un autre joueur...
             </div>
           )}
         </div>

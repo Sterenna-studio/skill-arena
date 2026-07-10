@@ -62,7 +62,7 @@ export default function RoomResults({ room, me, gameSlug }: Props) {
       <Link href="/"
         className="py-3 rounded-xl font-semibold text-center transition-opacity hover:opacity-80"
         style={{ background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)' }}>
-        ← Retour à l'accueil
+        ← Retour à l&apos;accueil
       </Link>
     </div>
   )

@@ -10,10 +10,12 @@ export default function FakeOut({ onScore }: Props) {
   const [done, setDone] = useState(false)
   const [penalty, setPenalty] = useState(0)
   const [hits, setHits] = useState(0)
+  const [round, setRound] = useState(0)
   const totalPenaltyRef = useRef(0)
   const hitsRef = useRef(0)
   const roundRef = useRef(0)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const nextSignalRef = useRef<() => void>(() => {})
 
   const ROUNDS = 8
 
@@ -30,6 +32,7 @@ export default function FakeOut({ onScore }: Props) {
       const isGreen = Math.random() > 0.35
       setSignal(isGreen ? 'green' : 'red')
       roundRef.current++
+      setRound(roundRef.current)
       // Auto-advance after 1.2s if no click
       timerRef.current = setTimeout(() => {
         if (isGreen) {
@@ -37,15 +40,16 @@ export default function FakeOut({ onScore }: Props) {
           totalPenaltyRef.current += 300
           setPenalty(p => p + 300)
         }
-        nextSignal()
+        nextSignalRef.current()
       }, 1200)
     }, delay)
   }, [onScore])
+  useEffect(() => { nextSignalRef.current = nextSignal }, [nextSignal])
 
   useEffect(() => {
-    nextSignal()
+    queueMicrotask(() => nextSignalRef.current())
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
-  }, [nextSignal])
+  }, [])
 
   const handleClick = useCallback(() => {
     if (done || signal === null) return
@@ -66,7 +70,7 @@ export default function FakeOut({ onScore }: Props) {
     <div className="flex flex-col gap-4">
       <div className="flex justify-between text-sm mb-1" style={{ color: 'var(--muted)' }}>
         <span>🟢 Vert = cliquer · 🔴 Rouge = ne pas cliquer</span>
-        <span>Tour {Math.min(roundRef.current, ROUNDS)}/{ROUNDS}</span>
+        <span>Tour {Math.min(round, ROUNDS)}/{ROUNDS}</span>
       </div>
       <button
         onClick={handleClick}
@@ -75,7 +79,7 @@ export default function FakeOut({ onScore }: Props) {
         style={{ background: bg, height: 260, border: '2px solid var(--border)', cursor: done ? 'default' : 'pointer' }}
       >
         {done
-          ? <span style={{ color: 'var(--text)' }}>✅ Terminé — {totalPenaltyRef.current}ms pénalité</span>
+          ? <span style={{ color: 'var(--text)' }}>✅ Terminé — {penalty}ms pénalité</span>
           : signal === null
             ? <span style={{ color: 'var(--muted)' }}>Attends...</span>
             : <span style={{ color: '#fff' }}>{signal === 'green' ? 'CLIQUE !' : 'NE CLIQUE PAS !'}</span>

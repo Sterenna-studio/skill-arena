@@ -48,49 +48,24 @@ export function useRoom(roomCode: string, gameSlug: string) {
     gameSlug,
     hostId: '',
   })
-  const [me, setMe] = useState<PlayerState | null>(null)
+  // Lazy init (not an effect) so this never fires a post-mount setState —
+  // getStoredPlayer() is SSR-safe (returns a blank player when window is undefined).
+  const [me] = useState<PlayerState | null>(() => {
+    if (typeof window === 'undefined') return null
+    const player = getStoredPlayer()
+    return { id: player.id, name: player.name, ready: false, score: null, finishedAt: null }
+  })
   const channelRef = useRef<RealtimeChannel | null>(null)
   const meRef = useRef<PlayerState | null>(null)
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
-    const player = getStoredPlayer()
-    const myState: PlayerState = { id: player.id, name: player.name, ready: false, score: null, finishedAt: null }
-    setMe(myState)
-    meRef.current = myState
+    meRef.current = me
+  }, [me])
 
-    const supabase = createClient()
-    const channel = supabase.channel(`room:${roomCode}`, {
-      config: { presence: { key: player.id } },
-    })
-    channelRef.current = channel
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState<PlayerState>()
-        const players: Record<string, PlayerState> = {}
-        let hostId = ''
-        Object.entries(state).forEach(([key, presences]) => {
-          const p = presences[0] as PlayerState
-          players[key] = p
-          if (!hostId) hostId = key
-        })
-        setRoom(r => ({ ...r, players, hostId }))
-      })
-      .on('broadcast', { event: 'room_event' }, ({ payload }: { payload: RoomEvent }) => {
-        handleEvent(payload)
-      })
-      .subscribe(async status => {
-        if (status === 'SUBSCRIBED') {
-          await channel.track(myState)
-        }
-      })
-
-    return () => {
-      if (countdownRef.current) clearInterval(countdownRef.current)
-      supabase.removeChannel(channel)
-    }
-  }, [roomCode]) // eslint-disable-line react-hooks/exhaustive-deps
+  const broadcast = useCallback((event: RoomEvent) => {
+    channelRef.current?.send({ type: 'broadcast', event: 'room_event', payload: event })
+  }, [])
 
   const handleEvent = useCallback((event: RoomEvent) => {
     if (event.type === 'countdown_start') {
@@ -135,11 +110,43 @@ export function useRoom(roomCode: string, gameSlug: string) {
         return { ...updated, phase: allDone ? 'results' : r.phase }
       })
     }
-  }, [])
+  }, [broadcast])
 
-  const broadcast = useCallback((event: RoomEvent) => {
-    channelRef.current?.send({ type: 'broadcast', event: 'room_event', payload: event })
-  }, [])
+  useEffect(() => {
+    if (!me) return
+
+    const supabase = createClient()
+    const channel = supabase.channel(`room:${roomCode}`, {
+      config: { presence: { key: me.id } },
+    })
+    channelRef.current = channel
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState<PlayerState>()
+        const players: Record<string, PlayerState> = {}
+        let hostId = ''
+        Object.entries(state).forEach(([key, presences]) => {
+          const p = presences[0] as PlayerState
+          players[key] = p
+          if (!hostId) hostId = key
+        })
+        setRoom(r => ({ ...r, players, hostId }))
+      })
+      .on('broadcast', { event: 'room_event' }, ({ payload }: { payload: RoomEvent }) => {
+        handleEvent(payload)
+      })
+      .subscribe(async status => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track(me)
+        }
+      })
+
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current)
+      supabase.removeChannel(channel)
+    }
+  }, [roomCode, me, handleEvent])
 
   const setReady = useCallback(() => {
     const me = meRef.current

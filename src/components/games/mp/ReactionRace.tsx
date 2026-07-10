@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 interface Props { onScore: (ms: number) => void }
 
@@ -13,13 +13,14 @@ export default function ReactionRace({ onScore }: Props) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Auto-start on mount
-  useCallback(() => {
+  useEffect(() => {
     const delay = 1500 + Math.random() * 3000
     timerRef.current = setTimeout(() => {
       setPhase('ready')
       startRef.current = performance.now()
     }, delay)
-  }, [])()
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [])
 
   const handleClick = useCallback(() => {
     if (phase === 'waiting') {

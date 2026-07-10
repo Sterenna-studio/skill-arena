@@ -98,6 +98,7 @@ export default function CalembourDuel({ onScore }: Props) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const deckIdxRef = useRef(0)
   const deckRef = useRef(deck)
+  const startListenRef = useRef<() => void>(() => {})
 
   const stopRec = useCallback(() => {
     try { recRef.current?.abort() } catch { /* noop */ }
@@ -155,16 +156,17 @@ export default function CalembourDuel({ onScore }: Props) {
         return
       }
       // no-speech ou autre : on relance
-      if (!doneRef.current) setTimeout(() => startListen(), 150)
+      if (!doneRef.current) setTimeout(() => startListenRef.current(), 150)
     }
 
     rec.onend = () => {
       setListening(false)
-      if (!doneRef.current) setTimeout(() => startListen(), 100)
+      if (!doneRef.current) setTimeout(() => startListenRef.current(), 100)
     }
 
     try { rec.start(); setListening(true) } catch { /* noop */ }
   }, [])
+  useEffect(() => { startListenRef.current = startListen }, [startListen])
 
   // Démarrage auto au mount
   useEffect(() => {
@@ -178,8 +180,8 @@ export default function CalembourDuel({ onScore }: Props) {
       })
     }, 1000)
 
-    // Micro
-    startListen()
+    // Micro — déféré (pas d'appel setState synchrone dans le corps de l'effet)
+    queueMicrotask(() => startListenRef.current())
 
     return () => {
       doneRef.current = true

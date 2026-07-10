@@ -18,6 +18,21 @@ export default function RhythmDuel({ onScore }: Props) {
   const startRef = useRef(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const finish = useCallback(() => {
+    const beatTimes = beatTimesRef.current
+    const clickTimes = clickTimesRef.current
+    const errs: number[] = []
+    beatTimes.forEach((bt, i) => {
+      const ct = clickTimes[i]
+      if (ct !== undefined) errs.push(Math.abs(ct - bt))
+      else errs.push(BEAT_MS / 2) // missed beat = half-beat penalty
+    })
+    const avg = Math.round(errs.reduce((a, b) => a + b, 0) / errs.length)
+    setErrors(errs)
+    setDone(true)
+    onScore(avg)
+  }, [onScore])
+
   useEffect(() => {
     // Short delay then start metronome
     const t = setTimeout(() => {
@@ -37,22 +52,7 @@ export default function RhythmDuel({ onScore }: Props) {
       }, BEAT_MS)
     }, 800)
     return () => { clearTimeout(t); if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const finish = useCallback(() => {
-    const beatTimes = beatTimesRef.current
-    const clickTimes = clickTimesRef.current
-    const errs: number[] = []
-    beatTimes.forEach((bt, i) => {
-      const ct = clickTimes[i]
-      if (ct !== undefined) errs.push(Math.abs(ct - bt))
-      else errs.push(BEAT_MS / 2) // missed beat = half-beat penalty
-    })
-    const avg = Math.round(errs.reduce((a, b) => a + b, 0) / errs.length)
-    setErrors(errs)
-    setDone(true)
-    onScore(avg)
-  }, [onScore])
+  }, [finish])
 
   const handleClick = useCallback(() => {
     if (!active || done) return

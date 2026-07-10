@@ -10,11 +10,12 @@ export default function LastStand({ onScore }: Props) {
   const [done, setDone] = useState(false)
   const [result, setResult] = useState<number | null>(null)
   const [failed, setFailed] = useState(false)
-  const startRef = useRef(performance.now())
+  const startRef = useRef(0)
   const rafRef = useRef<number>(0)
   const doneRef = useRef(false)
 
   useEffect(() => {
+    startRef.current = performance.now()
     const tick = () => {
       const elapsed = performance.now() - startRef.current
       const remaining = Math.max(0, 100 - (elapsed / DURATION) * 100)

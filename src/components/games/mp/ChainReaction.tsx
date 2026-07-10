@@ -18,6 +18,7 @@ export default function ChainReaction({ onScore }: Props) {
   const startRef = useRef<number>(0)
   const idxRef = useRef(0)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const startChainRef = useRef<(chain: Signal[]) => void>(() => {})
 
   const generateChain = useCallback((): Signal[] =>
     Array.from({ length: CHAIN_LENGTH }, (_, i) => ({
@@ -36,9 +37,10 @@ export default function ChainReaction({ onScore }: Props) {
       setFailed(true)
       setAttempts(a => a + 1)
       // restart
-      setTimeout(() => startChain(generateChain()), 600)
+      setTimeout(() => startChainRef.current(generateChain()), 600)
     }, WINDOW_MS)
   }, [generateChain])
+  useEffect(() => { startChainRef.current = startChain }, [startChain])
 
   useEffect(() => {
     const chain = generateChain()
@@ -83,7 +85,7 @@ export default function ChainReaction({ onScore }: Props) {
   return (
     <div className="flex flex-col gap-6">
       <div className="text-center text-sm" style={{ color: 'var(--muted)' }}>
-        🔗 Clique sur la couleur indiquée dans l'ordre — sans erreur !
+        🔗 Clique sur la couleur indiquée dans l&apos;ordre — sans erreur !
       </div>
 
       {/* Signal actuel */}

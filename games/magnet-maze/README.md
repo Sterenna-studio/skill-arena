@@ -24,5 +24,6 @@ l'hébergement statique actuel ne permet pas. Les brancher demanderait un
 petit service Node séparé (ou une réécriture en WebRTC/Supabase Realtime,
 comme le reste du hub multijoueur — voir `src/hooks/useRoom.ts`).
 
-`magnet-maze-v133/` et `magnet-maze-v134/` committent leur `node_modules/`
-(paquet `ws`) — à nettoyer si l'une de ces versions est reprise un jour.
+`magnet-maze-v133/` et `magnet-maze-v134/` committaient leur `node_modules/`
+(paquet `ws`) — retiré du suivi git le 2026-07-11 (fichiers conservés sur
+disque, plus trackés).
