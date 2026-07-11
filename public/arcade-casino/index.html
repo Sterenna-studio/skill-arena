@@ -33,14 +33,34 @@
   <div id="casino-root"></div>
 
   <script type="module">
-    import { requireAuth } from '/shared/guards.js';
     import { StarArcadeCore } from './js/star-arcade-core.js';
 
-    const auth = await requireAuth({ redirectTo: '/login.html' });
-    if (auth) {
-      const arcade = await StarArcadeCore.boot({ mount: '#casino-root', user: auth.user });
-      arcade.showLobby();
-      await installStarTokenFinish(arcade);
+    boot();
+
+    async function boot() {
+      // /shared/guards.js is served by the Gwen Ha Star platform at the domain
+      // root (nitro.sterenna.fr) — it doesn't exist when this repo runs on its
+      // own (local dev, a preview deploy, ...). Dynamic import so that case
+      // fails gracefully instead of a silent blank page.
+      let requireAuth;
+      try {
+        ({ requireAuth } = await import('/shared/guards.js'));
+      } catch {
+        document.getElementById('casino-root').innerHTML =
+          '<div style="max-width:44ch;margin:15vh auto;padding:1.5rem;text-align:center;' +
+          'font-family:var(--font-mono, monospace);color:var(--c-text-muted, #9ca3af);line-height:1.6">' +
+          '⚠️ Star Arcade indisponible ici — cette page dépend de l’authentification ' +
+          'partagée Gwen Ha Star, servie depuis la racine de nitro.sterenna.fr. ' +
+          'Elle n’est pas jouable dans cet environnement autonome.</div>';
+        return;
+      }
+
+      const auth = await requireAuth({ redirectTo: '/login.html' });
+      if (auth) {
+        const arcade = await StarArcadeCore.boot({ mount: '#casino-root', user: auth.user });
+        arcade.showLobby();
+        await installStarTokenFinish(arcade);
+      }
     }
 
     async function installStarTokenFinish(arcade) {
