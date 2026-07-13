@@ -487,6 +487,246 @@ body::before {
 .crash-autoeject-inp { width:68px; padding:var(--sp1) var(--sp2); background:var(--c-surface-2); border:1px solid var(--c-border); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--c-pink); text-align:center; }
 .crash-autoeject-inp:focus { outline:none; border-color:var(--c-pink); }
 
+/* HYPERJUMP CRASH */
+.hyperjump-hud {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:var(--sp3);
+}
+.hyperjump-hud-block {
+  padding:var(--sp3) var(--sp4);
+  border:1px solid color-mix(in oklch,var(--c-pink) 22%,var(--c-border));
+  border-radius:var(--radius-md);
+  background:rgba(255,110,180,.035);
+  box-shadow:inset 0 0 24px rgba(0,0,0,.24);
+}
+.hyperjump-hud-block span {
+  display:block;
+  margin-bottom:4px;
+  color:var(--c-text-faint);
+  font-size:8px;
+  letter-spacing:.18em;
+}
+.hyperjump-hud-block strong {
+  display:block;
+  min-height:1.15em;
+  color:var(--c-pink);
+  font-family:var(--font-display);
+  font-size:1.15rem;
+  letter-spacing:.08em;
+  text-shadow:var(--glow-purple);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.hyperjump-stability {
+  height:7px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 12px rgba(0,0,0,.5);
+}
+.hyperjump-stability span {
+  display:block;
+  width:100%;
+  height:100%;
+  transform-origin:left;
+  background:linear-gradient(90deg,var(--c-green),var(--c-amber),var(--c-red));
+  box-shadow:0 0 16px rgba(255,204,0,.38);
+  transition:transform .08s linear;
+}
+.hyperjump-canvas-wrap {
+  min-height:320px;
+}
+.hyperjump-canvas {
+  height:320px;
+}
+.hyperjump-canvas-wrap.critical {
+  animation:hyperjump-critical .34s linear infinite;
+}
+.hyperjump-canvas-wrap.cashed {
+  border-color:rgba(0,255,128,.42);
+  box-shadow:inset 0 0 56px rgba(0,0,0,.5),0 0 28px rgba(0,255,128,.16);
+}
+.hyperjump-canvas-wrap.crashed {
+  border-color:rgba(255,71,87,.52);
+}
+@keyframes hyperjump-critical {
+  0%,100%{transform:translateX(0)}
+  33%{transform:translateX(-2px)}
+  66%{transform:translateX(2px)}
+}
+.hyperjump-status {
+  position:absolute;
+  left:16px;
+  top:14px;
+  padding:5px 9px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:999px;
+  background:rgba(4,5,12,.68);
+  color:var(--c-text-muted);
+  font-size:8px;
+  letter-spacing:.16em;
+}
+.hyperjump-sparks {
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:6px;
+  pointer-events:none;
+}
+.hyperjump-spark {
+  padding:5px 8px;
+  border:1px solid rgba(0,229,255,.32);
+  border-radius:999px;
+  background:rgba(4,5,12,.78);
+  color:var(--c-cyan);
+  font-size:8px;
+  letter-spacing:.16em;
+  text-shadow:var(--glow-cyan);
+  animation:hyperjump-spark .85s ease forwards;
+}
+.hyperjump-spark.safe {
+  border-color:rgba(0,255,128,.38);
+  color:var(--c-green);
+  text-shadow:var(--glow-green);
+}
+.hyperjump-spark.hot {
+  border-color:rgba(255,204,0,.42);
+  color:var(--c-amber);
+  text-shadow:var(--glow-amber);
+}
+@keyframes hyperjump-spark {
+  0%{opacity:0;transform:translateY(8px) scale(.96)}
+  18%{opacity:1;transform:translateY(0) scale(1)}
+  72%{opacity:1}
+  100%{opacity:0;transform:translateY(-10px) scale(.98)}
+}
+.hyperjump-rail {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:var(--sp2);
+}
+.hyperjump-mark {
+  position:relative;
+  padding:var(--sp2);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,.025);
+  color:var(--c-text-faint);
+  font-size:8px;
+  letter-spacing:.14em;
+  text-align:center;
+  overflow:hidden;
+}
+.hyperjump-mark::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+  transform:translateX(-110%);
+}
+.hyperjump-mark strong {
+  display:block;
+  margin-bottom:2px;
+  color:var(--c-text-muted);
+  font-family:var(--font-display);
+  font-size:.92rem;
+}
+.hyperjump-mark.hit {
+  border-color:var(--c-pink);
+  color:var(--c-pink);
+  background:rgba(255,110,180,.09);
+  box-shadow:0 0 14px rgba(255,110,180,.2);
+}
+.hyperjump-mark.hit::before {
+  animation:hyperjump-mark-sweep .45s ease;
+}
+.hyperjump-mark.hit strong {
+  color:var(--c-amber);
+  text-shadow:var(--glow-amber);
+}
+@keyframes hyperjump-mark-sweep {
+  from{transform:translateX(-110%)}
+  to{transform:translateX(110%)}
+}
+.hyperjump-result {
+  min-height:0;
+}
+.hyperjump-result-card {
+  display:grid;
+  grid-template-columns:auto auto 1fr;
+  align-items:center;
+  gap:var(--sp4);
+  padding:var(--sp4);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-lg);
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(255,110,180,.1),transparent 48%),
+    rgba(5,6,12,.72);
+}
+.hyperjump-result-card.win {
+  border-color:rgba(0,255,128,.26);
+}
+.hyperjump-result-card.lose {
+  border-color:rgba(255,71,87,.3);
+}
+.hyperjump-result-title {
+  color:var(--c-text-muted);
+  font-size:9px;
+  letter-spacing:.18em;
+}
+.hyperjump-result-rank {
+  color:var(--c-amber);
+  font-family:var(--font-display);
+  font-size:1.25rem;
+  letter-spacing:.16em;
+  text-shadow:var(--glow-amber);
+}
+.hyperjump-result-main {
+  justify-self:end;
+  color:var(--c-pink);
+  font-family:var(--font-display);
+  font-size:2rem;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-shadow:var(--glow-purple);
+}
+.hyperjump-result-grid {
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:var(--sp2);
+}
+.hyperjump-result-grid span {
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  padding:var(--sp2);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--radius-md);
+  color:var(--c-text-faint);
+  font-size:8px;
+  letter-spacing:.12em;
+  text-align:center;
+}
+.hyperjump-result-grid strong {
+  color:var(--c-text);
+  font-family:var(--font-display);
+  font-size:.95rem;
+  letter-spacing:.04em;
+}
+@media(max-width:700px){
+  .hyperjump-hud,
+  .hyperjump-rail,
+  .hyperjump-result-grid { grid-template-columns:1fr 1fr; }
+  .hyperjump-result-card { grid-template-columns:1fr; }
+  .hyperjump-result-main { justify-self:start; }
+}
+
 /* ═══════════════════════════════════════════════════════
    JACKPOT BANNER
 ═══════════════════════════════════════════════════════ */
