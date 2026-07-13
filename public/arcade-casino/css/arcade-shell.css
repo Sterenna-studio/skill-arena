@@ -1,0 +1,436 @@
+/* STAR ARCADE - shared cabinet shell */
+
+.arcade-floor-panel {
+  width: min(100%, 820px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--sp4);
+  margin: 0 auto var(--sp6);
+  padding: var(--sp3) var(--sp5);
+  border: 1px solid rgba(0,229,255,.18);
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, rgba(0,229,255,.07), rgba(255,204,0,.05), rgba(255,110,180,.07)),
+    rgba(8,10,18,.62);
+  box-shadow: inset 0 0 28px rgba(0,0,0,.35), 0 0 24px rgba(0,229,255,.08);
+  color: var(--c-text-faint);
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-align: center;
+}
+
+.arcade-floor-panel strong {
+  color: var(--c-cyan);
+  font-family: var(--font-display);
+  font-size: .92rem;
+  letter-spacing: .16em;
+  text-shadow: var(--glow-cyan);
+}
+
+.arcade-cabinet-card.game-card {
+  min-height: 410px;
+  padding: 14px 14px 18px;
+  border-radius: 18px 18px 8px 8px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0) 18%),
+    linear-gradient(145deg, rgba(13,15,24,.98), rgba(5,6,12,.98));
+  border-color: color-mix(in oklch, var(--card-color, var(--c-cyan)) 24%, rgba(255,255,255,.08));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -18px 40px rgba(0,0,0,.42),
+    0 18px 38px rgba(0,0,0,.34);
+}
+
+.arcade-cabinet-card.game-card::before {
+  height: 7px;
+  opacity: .95;
+  box-shadow: 0 0 20px color-mix(in oklch, var(--card-color, var(--c-cyan)) 58%, transparent);
+}
+
+.arcade-cabinet-card.game-card::after {
+  background:
+    radial-gradient(ellipse at 50% 10%, color-mix(in oklch, var(--card-color, var(--c-cyan)) 12%, transparent), transparent 48%),
+    linear-gradient(90deg, transparent 0 7%, rgba(255,255,255,.035) 7% 8%, transparent 8% 92%, rgba(255,255,255,.035) 92% 93%, transparent 93%);
+}
+
+.gc-cabinet-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 4px;
+  color: var(--card-color, var(--c-cyan));
+  font-size: 8px;
+  letter-spacing: .18em;
+  position: relative;
+  z-index: 1;
+}
+
+.gc-live {
+  color: var(--c-green);
+  text-shadow: var(--glow-green);
+  animation: arcade-live-blink 1.8s ease-in-out infinite;
+}
+
+@keyframes arcade-live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .42; }
+}
+
+.gc-screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 132px;
+  margin: 4px 0 12px;
+  border: 1px solid color-mix(in oklch, var(--card-color, var(--c-cyan)) 42%, rgba(255,255,255,.1));
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--card-color, var(--c-cyan)) 16%, transparent), transparent 44%),
+    linear-gradient(180deg, #101323, #03040a);
+  box-shadow:
+    inset 0 0 44px rgba(0,0,0,.74),
+    0 0 18px color-mix(in oklch, var(--card-color, var(--c-cyan)) 20%, transparent);
+  z-index: 1;
+}
+
+.gc-screen .gc-icon {
+  font-size: 3.8rem;
+  transform: translateY(-8px);
+  animation: arcade-screen-float 2.8s ease-in-out infinite;
+}
+
+.gc-attract {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  color: var(--card-color, var(--c-cyan));
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-align: center;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.gc-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.05) 3px 4px),
+    linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+  mix-blend-mode: screen;
+  opacity: .42;
+  transform: translateX(-100%);
+  animation: arcade-card-scan 3.6s linear infinite;
+}
+
+@keyframes arcade-card-scan {
+  0% { transform: translateX(-100%); }
+  42%, 100% { transform: translateX(100%); }
+}
+
+@keyframes arcade-screen-float {
+  0%, 100% { transform: translateY(-8px) scale(1); }
+  50% { transform: translateY(-13px) scale(1.04); }
+}
+
+.arcade-cabinet-card .gc-tag,
+.arcade-cabinet-card .gc-title,
+.arcade-cabinet-card .gc-desc,
+.arcade-cabinet-card .gc-meta,
+.arcade-cabinet-card .gc-play-btn {
+  position: relative;
+  z-index: 1;
+}
+
+.arcade-cabinet-card .gc-title {
+  font-size: 1.18rem;
+}
+
+.gc-stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: auto;
+}
+
+.gc-stats span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 7px 5px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 6px;
+  background: rgba(255,255,255,.025);
+  color: var(--c-text-faint);
+  font-size: 7px;
+  letter-spacing: .14em;
+  text-align: center;
+}
+
+.gc-stats strong {
+  color: var(--c-text);
+  font-family: var(--font-display);
+  font-size: .78rem;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gc-controls {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 28px;
+}
+
+.gc-controls span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklch, var(--card-color, var(--c-cyan)) 45%, rgba(255,255,255,.14));
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.36), color-mix(in oklch, var(--card-color, var(--c-cyan)) 40%, #080910));
+  box-shadow: 0 0 12px color-mix(in oklch, var(--card-color, var(--c-cyan)) 20%, transparent);
+}
+
+.gc-controls .gc-stick {
+  width: 22px;
+  height: 22px;
+  border-radius: 50% 50% 45% 45%;
+}
+
+.arcade-boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in oklch, var(--machine-color, var(--c-cyan)) 18%, transparent), transparent 34%),
+    rgba(2,3,8,.92);
+  animation: boot-overlay-in .14s ease both;
+}
+
+.arcade-boot-overlay.leaving {
+  animation: boot-overlay-out .18s ease both;
+}
+
+.boot-frame {
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 30px 24px;
+  border: 1px solid color-mix(in oklch, var(--machine-color, var(--c-cyan)) 62%, rgba(255,255,255,.16));
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 5px),
+    linear-gradient(180deg, rgba(15,17,30,.94), rgba(3,4,10,.96));
+  box-shadow:
+    inset 0 0 60px rgba(0,0,0,.62),
+    0 0 38px color-mix(in oklch, var(--machine-color, var(--c-cyan)) 28%, transparent);
+  text-align: center;
+}
+
+.boot-frame .boot-kicker,
+.boot-frame span,
+.boot-frame em {
+  color: var(--c-text-faint);
+  font-size: 10px;
+  letter-spacing: .22em;
+  font-style: normal;
+}
+
+.boot-frame strong {
+  color: var(--machine-color, var(--c-cyan));
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 9vw, 5rem);
+  line-height: .95;
+  letter-spacing: .16em;
+  text-shadow: 0 0 18px currentColor, 0 0 52px color-mix(in oklch, var(--machine-color, var(--c-cyan)) 48%, transparent);
+}
+
+.boot-progress {
+  width: min(380px, 84vw);
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+}
+
+.boot-progress i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--machine-color, var(--c-cyan)), var(--c-amber));
+  box-shadow: 0 0 18px var(--machine-color, var(--c-cyan));
+  transform-origin: left;
+  animation: boot-progress-fill .68s linear both;
+}
+
+@keyframes boot-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes boot-overlay-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.035); }
+}
+
+@keyframes boot-progress-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.casino-page.in-machine {
+  background:
+    radial-gradient(ellipse at 50% 0, rgba(0,229,255,.06), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.018), transparent 35%);
+}
+
+.casino-game.arcade-machine-screen {
+  max-width: 1180px;
+  min-height: calc(100dvh - 52px);
+  position: relative;
+  padding: 74px clamp(12px, 3vw, 34px) 32px;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+
+.casino-game.arcade-machine-screen.active {
+  border-color: color-mix(in oklch, var(--machine-color, var(--c-cyan)) 24%, rgba(255,255,255,.05));
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.035), transparent 5% 95%, rgba(255,255,255,.035)),
+    radial-gradient(ellipse at 50% 0, color-mix(in oklch, var(--machine-color, var(--c-cyan)) 10%, transparent), transparent 48%);
+}
+
+.casino-game.arcade-machine-screen.active::before {
+  content: attr(data-machine);
+  position: absolute;
+  top: 18px;
+  left: clamp(12px, 3vw, 34px);
+  right: clamp(12px, 3vw, 34px);
+  display: block;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in oklch, var(--machine-color, var(--c-cyan)) 35%, rgba(255,255,255,.08));
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--machine-color, var(--c-cyan)) 18%, transparent), rgba(255,255,255,.025), transparent),
+    rgba(4,5,12,.82);
+  color: var(--machine-color, var(--c-cyan));
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.4vw, 1.65rem);
+  font-weight: 900;
+  letter-spacing: .2em;
+  text-align: center;
+  text-shadow: 0 0 18px currentColor;
+  pointer-events: none;
+}
+
+.casino-game.arcade-machine-screen.active::after {
+  content: attr(data-machine-meta);
+  position: absolute;
+  top: 52px;
+  left: 0;
+  right: 0;
+  color: var(--c-text-faint);
+  font-size: 8px;
+  letter-spacing: .18em;
+  text-align: center;
+  pointer-events: none;
+}
+
+.casino-game.arcade-machine-screen .game-header,
+.casino-game.arcade-machine-screen .bet-panel,
+.casino-game.arcade-machine-screen .wam-arena,
+.casino-game.arcade-machine-screen .crash-rules,
+.casino-game.arcade-machine-screen .crash-layout,
+.casino-game.arcade-machine-screen .sl-machine,
+.casino-game.arcade-machine-screen .chase-select,
+.casino-game.arcade-machine-screen .chase-arena {
+  position: relative;
+  z-index: 1;
+}
+
+.casino-game.arcade-machine-screen .game-header {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: var(--sp4);
+}
+
+.machine-led {
+  margin-left: auto;
+  padding: 5px 9px;
+  border: 1px solid color-mix(in oklch, var(--machine-color, var(--c-cyan)) 36%, rgba(255,255,255,.1));
+  border-radius: 999px;
+  color: var(--machine-color, var(--c-cyan));
+  background: color-mix(in oklch, var(--machine-color, var(--c-cyan)) 8%, transparent);
+  font-size: 8px;
+  letter-spacing: .16em;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.casino-game.arcade-machine-screen .bet-panel {
+  border-color: color-mix(in oklch, var(--machine-color, var(--c-cyan)) 26%, rgba(255,255,255,.08));
+  background: rgba(5,7,14,.86);
+}
+
+.casino-game.arcade-machine-screen .wam-arena,
+.casino-game.arcade-machine-screen .crash-canvas-wrap,
+.casino-game.arcade-machine-screen .sl-machine,
+.casino-game.arcade-machine-screen .chase-arena canvas {
+  border-radius: 10px !important;
+  border-color: color-mix(in oklch, var(--machine-color, var(--c-cyan)) 36%, rgba(255,255,255,.1)) !important;
+  box-shadow:
+    inset 0 0 54px rgba(0,0,0,.55),
+    0 0 24px color-mix(in oklch, var(--machine-color, var(--c-cyan)) 14%, transparent) !important;
+}
+
+@media (max-width: 760px) {
+  .arcade-floor-panel {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .arcade-cabinet-card.game-card {
+    min-height: 0;
+  }
+
+  .gc-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .casino-statusbar {
+    position: relative;
+    flex-direction: column;
+    gap: var(--sp2);
+  }
+
+  .casino-game.arcade-machine-screen {
+    min-height: auto;
+    padding-top: 82px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gc-live,
+  .gc-screen .gc-icon,
+  .gc-scan,
+  .boot-progress i {
+    animation: none;
+  }
+}

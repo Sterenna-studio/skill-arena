@@ -11,51 +11,70 @@ import { SlotMachineGame } from './games/slot-machine/slot-machine.js';
 import { NeonRacer } from './games/neon-racer/neon-racer.js';
 
 const STAR_TOKEN_STORAGE_KEY = 'star-arcade:star-tokens:v1';
+const ARCADE_STATS_STORAGE_KEY = 'star-arcade:machine-stats:v1';
 const STAR_TOKEN_START_BALANCE = 1000;
 const STAR_TOKEN_SYMBOL = 'ST';
+const BOOT_DURATION_MS = 680;
 
 const GAME_CARDS = [
   {
     id: 'wam',
     icon: '🔨',
-    tag: '// JEU 01',
+    tag: '// CABINET 01',
+    machine: 'DRONE BASH',
     title: 'WHACK-A-MOLE',
     desc: '30 secondes. Frappe les entités, évite les bombes, garde ton combo. Jeu plutôt skill.',
-    meta: 'TOKENS LOCAUX',
+    meta: 'REFLEXES · COMBO',
+    attract: '30 SEC RUN',
+    controls: 'TAP / CLIC',
     color: 'var(--c-orange)',
   },
   {
     id: 'crash',
     icon: '🚀',
-    tag: '// JEU 02',
+    tag: '// CABINET 02',
+    machine: 'HYPERJUMP',
     title: 'CRASH',
     desc: 'Le multiplicateur monte. Éjecte-toi avant le crash ou utilise l’auto-eject.',
-    meta: 'TOKENS LOCAUX',
+    meta: 'RISQUE · CASHOUT',
+    attract: 'MULTIPLIER RUSH',
+    controls: 'EJECT',
     color: 'var(--c-pink)',
   },
   {
     id: 'slots',
     icon: '🎰',
-    tag: '// JEU 03',
+    tag: '// CABINET 03',
+    machine: 'COIN REACTOR',
     title: 'SLOT MACHINE',
     desc: '5 rouleaux × 3 lignes. Gains gauche → droite sur 5 lignes. Version réparée.',
-    meta: 'TOKENS LOCAUX',
+    meta: 'LUCK · PAYLINES',
+    attract: '5 LIGNES',
+    controls: 'SPIN',
     color: 'var(--c-amber)',
   },
   {
     id: 'nr',
     icon: '🏁',
-    tag: '// JEU 04',
+    tag: '// CABINET 04',
+    machine: 'NEON CIRCUIT',
     title: 'NEON RACER',
     desc: 'Course arcade à axes alternés. Choisis véhicule et cœurs. Jeu skill/risque.',
     meta: 'SKILL · COURSE',
+    attract: 'DRIFT / BOOST',
+    controls: 'ARROWS',
     color: 'var(--c-cyan)',
   },
 ];
 
+function emptyMachineStats() {
+  return { runs: 0, wins: 0, bestNet: null, lastNet: null, lastResult: 'none' };
+}
+
 export class StarArcadeCore {
   static async boot({ mount, user }) {
     const inst = new StarArcadeCore(mount, user);
+    inst.loadMachineStats();
     await inst.loadCredits();
     return inst;
   }
@@ -71,10 +90,42 @@ export class StarArcadeCore {
     this.activeGameId = null;
     this.nrResult = null;
     this.nrBack = null;
+    this.machineStats = {};
+    this.booting = false;
   }
 
   storageKey() {
     return `${STAR_TOKEN_STORAGE_KEY}:${this.userId || 'guest'}`;
+  }
+
+  statsKey() {
+    return `${ARCADE_STATS_STORAGE_KEY}:${this.userId || 'guest'}`;
+  }
+
+  loadMachineStats() {
+    try {
+      const raw = window.localStorage.getItem(this.statsKey());
+      const parsed = raw ? JSON.parse(raw) : {};
+      this.machineStats = Object.fromEntries(
+        GAME_CARDS.map(card => [card.id, { ...emptyMachineStats(), ...(parsed[card.id] ?? {}) }]),
+      );
+    } catch (error) {
+      console.warn('[Star Arcade] local machine stats fallback:', error?.message ?? error);
+      this.machineStats = Object.fromEntries(GAME_CARDS.map(card => [card.id, emptyMachineStats()]));
+    }
+  }
+
+  saveMachineStats() {
+    try {
+      window.localStorage.setItem(this.statsKey(), JSON.stringify(this.machineStats));
+    } catch (error) {
+      console.warn('[Star Arcade] local machine stats save failed:', error?.message ?? error);
+    }
+  }
+
+  getMachineStats(id) {
+    if (!this.machineStats[id]) this.machineStats[id] = emptyMachineStats();
+    return this.machineStats[id];
   }
 
   async loadCredits() {
@@ -127,6 +178,12 @@ export class StarArcadeCore {
             <span class="lobby-hero-line"></span>
           </div>
 
+          <div class="arcade-floor-panel">
+            <span>SELECT MACHINE</span>
+            <strong>BOOT · PLAY · SCORE · RETRY</strong>
+            <span>LOCAL ST MODE</span>
+          </div>
+
           <div class="jackpot-banner" style="width:100%;max-width:620px;margin-bottom:32px">
             <span class="jp-icon">🪙</span>
             <span class="jp-label">MODE LOCAL ACTIVÉ</span>
@@ -143,10 +200,10 @@ export class StarArcadeCore {
           </div>
         </section>
 
-        <section class="casino-game" id="game-wam"></section>
-        <section class="casino-game" id="game-crash"></section>
-        <section class="casino-game" id="game-slots"></section>
-        <section class="casino-game" id="game-nr"></section>
+        <section class="casino-game arcade-machine-screen" id="game-wam" data-machine="DRONE BASH"></section>
+        <section class="casino-game arcade-machine-screen" id="game-crash" data-machine="HYPERJUMP"></section>
+        <section class="casino-game arcade-machine-screen" id="game-slots" data-machine="COIN REACTOR"></section>
+        <section class="casino-game arcade-machine-screen" id="game-nr" data-machine="NEON CIRCUIT"></section>
       </div>`;
 
     GAME_CARDS.forEach(card => {
@@ -160,44 +217,125 @@ export class StarArcadeCore {
   }
 
   card(card) {
-    return `<button class="game-card" id="card-${card.id}" style="--card-color:${card.color}">
-      <div class="gc-icon">${card.icon}</div>
-      <div class="gc-tag">${card.tag}</div>
+    const stats = this.getMachineStats(card.id);
+    return `<button class="game-card arcade-cabinet-card" id="card-${card.id}" style="--card-color:${card.color}" aria-label="Sélectionner ${card.machine}">
+      <div class="gc-cabinet-top"><span>${card.tag}</span><span class="gc-live">READY</span></div>
+      <div class="gc-screen">
+        <div class="gc-icon">${card.icon}</div>
+        <div class="gc-attract">${card.attract}</div>
+        <div class="gc-scan"></div>
+      </div>
+      <div class="gc-tag">${card.machine}</div>
       <div class="gc-title">${card.title}</div>
       <div class="gc-desc">${card.desc}</div>
-      <div class="gc-meta"><span class="gc-badge">${card.meta}</span></div>
-      <div class="gc-play-btn">▶ JOUER</div>
+      <div class="gc-meta">
+        <span class="gc-badge">${card.meta}</span>
+        <span class="gc-badge">${card.controls}</span>
+      </div>
+      <div class="gc-stats">
+        <span>RUNS <strong id="stat-${card.id}-runs">${this.format(stats.runs)}</strong></span>
+        <span>BEST <strong id="stat-${card.id}-best">${this.formatNet(stats.bestNet)}</strong></span>
+        <span>LAST <strong id="stat-${card.id}-last">${this.formatNet(stats.lastNet)}</strong></span>
+      </div>
+      <div class="gc-controls" aria-hidden="true"><span class="gc-stick"></span><span></span><span></span></div>
+      <div class="gc-play-btn">▶ BOOT MACHINE</div>
     </button>`;
   }
 
-  showGame(name) {
+  async showGame(name) {
+    if (this.booting) return;
+    const card = GAME_CARDS.find(item => item.id === name);
+    if (!card) return;
+
+    this.booting = true;
     this.cleanupActiveGame();
 
-    document.getElementById('view-lobby')?.style.setProperty('display', 'none');
-    document.querySelectorAll('.casino-game').forEach(g => g.classList.remove('active'));
-    document.getElementById(`game-${name}`)?.classList.add('active');
+    try {
+      await this.bootMachine(card);
 
-    this.activeGameId = name;
-    this.renderBetPanel(name);
+      const page = document.getElementById('casino-page');
+      page?.classList.add('in-machine');
+      if (page) page.dataset.activeMachine = card.machine;
 
-    const common = {
-      mountId: `game-${name}`,
-      getBet: () => this.bet,
-      debit: amount => this.debit(amount),
-      credit: amount => this.credit(amount),
-      addHistory: (...args) => this.addHistory(...args),
-      backToLobby: () => this.backToLobby(),
-    };
+      document.getElementById('view-lobby')?.style.setProperty('display', 'none');
+      document.querySelectorAll('.casino-game').forEach(g => g.classList.remove('active'));
+      document.getElementById(`game-${name}`)?.classList.add('active');
 
-    if (name === 'wam') this.activeGame = new WhackAMoleGame(common);
-    if (name === 'crash') this.activeGame = new CrashGame(common);
-    if (name === 'slots') this.activeGame = new SlotMachineGame(common);
-    if (name === 'nr') this.mountNeonRacer();
+      this.activeGameId = name;
 
-    if (this.activeGame?.mount) {
-      this.activeGame.mount();
-      this.renderBetPanel(name);
+      const common = {
+        mountId: `game-${name}`,
+        getBet: () => this.bet,
+        debit: amount => this.debit(amount),
+        credit: amount => this.credit(amount),
+        addHistory: (...args) => this.addHistory(...args),
+        backToLobby: () => this.backToLobby(),
+      };
+
+      if (name === 'wam') this.activeGame = new WhackAMoleGame(common);
+      if (name === 'crash') this.activeGame = new CrashGame(common);
+      if (name === 'slots') this.activeGame = new SlotMachineGame(common);
+
+      if (name === 'nr') {
+        this.mountNeonRacer();
+      } else if (this.activeGame?.mount) {
+        this.activeGame.mount();
+        this.renderBetPanel(name);
+      }
+
+      this.decorateMachineScreen(card);
+    } finally {
+      this.booting = false;
+      document.getElementById('casino-page')?.classList.remove('machine-booting');
     }
+  }
+
+  bootMachine(card) {
+    const page = document.getElementById('casino-page');
+    if (!page) return Promise.resolve();
+
+    page.classList.add('machine-booting');
+    document.getElementById('arcade-boot-overlay')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'arcade-boot-overlay';
+    overlay.className = 'arcade-boot-overlay';
+    overlay.style.setProperty('--machine-color', card.color);
+    overlay.innerHTML = `<div class="boot-frame">
+      <span class="boot-kicker">INSERT STAR TOKEN</span>
+      <strong>${card.machine}</strong>
+      <span>${card.title}</span>
+      <div class="boot-progress"><i></i></div>
+      <em>${card.controls} · ${card.meta}</em>
+    </div>`;
+    page.appendChild(overlay);
+
+    SFX.tick();
+    setTimeout(() => SFX.tick(), 180);
+    setTimeout(() => SFX.click(), 420);
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        overlay.classList.add('leaving');
+        setTimeout(() => {
+          overlay.remove();
+          resolve();
+        }, 180);
+      }, BOOT_DURATION_MS);
+    });
+  }
+
+  decorateMachineScreen(card) {
+    const game = document.getElementById(`game-${card.id}`);
+    if (!game) return;
+
+    game.style.setProperty('--machine-color', card.color);
+    game.dataset.machine = card.machine;
+    game.dataset.machineMeta = `${card.controls} / ${card.meta}`;
+
+    const header = game.querySelector('.game-header');
+    if (!header || header.querySelector('.machine-led')) return;
+    header.insertAdjacentHTML('beforeend', `<span class="machine-led">${card.attract}</span>`);
   }
 
   renderBetPanel(name) {
@@ -221,6 +359,9 @@ export class StarArcadeCore {
     this.cleanupActiveGame();
     document.querySelectorAll('.casino-game').forEach(g => g.classList.remove('active'));
     document.getElementById('view-lobby')?.style.removeProperty('display');
+    const page = document.getElementById('casino-page');
+    page?.classList.remove('in-machine', 'machine-booting');
+    if (page) delete page.dataset.activeMachine;
     this.activeGameId = null;
     this.updateCreditsDisplay();
     this.renderHistory();
@@ -299,7 +440,41 @@ export class StarArcadeCore {
   addHistory(game, bet, result, gain) {
     this.history.unshift({ game, bet, result, gain, balance: this.credits, ts: Date.now() });
     if (this.history.length > 30) this.history.pop();
+    this.trackMachineRun(this.activeGameId ?? this.resolveGameId(game), result, gain);
     this.renderHistory();
+  }
+
+  resolveGameId(game) {
+    const normalized = String(game ?? '').toUpperCase();
+    if (normalized.includes('WHACK')) return 'wam';
+    if (normalized.includes('CRASH')) return 'crash';
+    if (normalized.includes('SLOT')) return 'slots';
+    if (normalized.includes('NEON')) return 'nr';
+    return null;
+  }
+
+  trackMachineRun(id, result, net) {
+    if (!id) return;
+    const stats = { ...emptyMachineStats(), ...this.getMachineStats(id) };
+    const numericNet = Number(net) || 0;
+    stats.runs += 1;
+    if (result === 'win') stats.wins += 1;
+    stats.lastResult = result;
+    stats.lastNet = numericNet;
+    if (stats.bestNet === null || numericNet > stats.bestNet) stats.bestNet = numericNet;
+    this.machineStats[id] = stats;
+    this.saveMachineStats();
+    this.updateMachineStatCard(id);
+  }
+
+  updateMachineStatCard(id) {
+    const stats = this.getMachineStats(id);
+    const runs = document.getElementById(`stat-${id}-runs`);
+    const best = document.getElementById(`stat-${id}-best`);
+    const last = document.getElementById(`stat-${id}-last`);
+    if (runs) runs.textContent = this.format(stats.runs);
+    if (best) best.textContent = this.formatNet(stats.bestNet);
+    if (last) last.textContent = this.formatNet(stats.lastNet);
   }
 
   renderHistory() {
@@ -373,5 +548,11 @@ export class StarArcadeCore {
 
   formatWithUnit(value) {
     return `${this.format(value)} ${STAR_TOKEN_SYMBOL}`;
+  }
+
+  formatNet(value) {
+    if (value === null || value === undefined) return '—';
+    const numeric = Number(value) || 0;
+    return `${numeric > 0 ? '+' : ''}${this.format(numeric)} ${STAR_TOKEN_SYMBOL}`;
   }
 }
