@@ -244,6 +244,199 @@ body::before {
 }
 @keyframes countdown-pop { 0%{transform:scale(2);opacity:0} 40%{transform:scale(1);opacity:1} 100%{transform:scale(1);opacity:1} }
 
+/* DRONE BASH TERMINAL */
+.wam-brief {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--sp3);
+  margin-bottom:var(--sp4);
+}
+.wam-brief div {
+  border:1px solid color-mix(in oklch,var(--c-orange) 22%,var(--c-border));
+  border-radius:var(--radius-md);
+  padding:var(--sp3) var(--sp4);
+  background:rgba(255,140,0,.035);
+}
+.wam-brief strong {
+  display:block;
+  margin-bottom:4px;
+  color:var(--c-orange);
+  font-family:var(--font-display);
+  font-size:.78rem;
+  letter-spacing:.16em;
+}
+.wam-brief span {
+  display:block;
+  color:var(--c-text-muted);
+  font-size:9px;
+  letter-spacing:.06em;
+  line-height:1.55;
+}
+.wam-terminal {
+  background:
+    radial-gradient(ellipse at 50% 20%,rgba(255,140,0,.08),transparent 48%),
+    linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 28%),
+    var(--c-surface);
+}
+.wam-phase-strip {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:var(--sp3);
+  margin-bottom:var(--sp4);
+  padding:var(--sp2) var(--sp4);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--radius-md);
+  background:rgba(5,6,12,.62);
+  font-size:9px;
+  letter-spacing:.16em;
+  color:var(--c-text-faint);
+}
+.wam-phase-strip span:first-child {
+  color:var(--c-orange);
+  text-shadow:var(--glow-orange);
+}
+.wam-phase-strip strong {
+  color:var(--c-text);
+  font-family:var(--font-display);
+  font-size:.86rem;
+  letter-spacing:.14em;
+}
+.wam-phase-strip span:last-child {
+  text-align:right;
+  color:var(--c-cyan);
+}
+.wam-ratio {
+  color:var(--c-green);
+  font-size:1rem;
+  text-shadow:var(--glow-green);
+}
+.wam-effect-row {
+  display:flex;
+  justify-content:center;
+  gap:var(--sp2);
+  flex-wrap:wrap;
+  margin:0 auto var(--sp4);
+}
+.wam-effect-pill {
+  min-width:122px;
+  padding:5px 9px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+  color:var(--c-text-faint);
+  font-size:8px;
+  letter-spacing:.14em;
+  text-align:center;
+}
+.wam-effect-pill.active {
+  border-color:var(--c-cyan);
+  color:var(--c-cyan);
+  background:rgba(0,229,255,.08);
+  box-shadow:var(--glow-cyan);
+}
+.wam-terminal .wam-grid {
+  max-width:650px;
+}
+.wam-terminal .wam-hole {
+  border-radius:14px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.035),transparent 28%),
+    radial-gradient(ellipse at 50% 74%,rgba(0,0,0,.92) 34%,rgba(22,14,42,.86) 100%);
+}
+.wam-terminal .wam-hole::before {
+  content:'';
+  position:absolute;
+  inset:8px;
+  border:1px solid rgba(255,255,255,.045);
+  border-radius:10px;
+  pointer-events:none;
+}
+.wam-port-id {
+  position:absolute;
+  top:7px;
+  left:8px;
+  color:var(--c-text-faint);
+  font-size:7px;
+  letter-spacing:.12em;
+}
+.wam-target-label {
+  position:absolute;
+  left:4px;
+  right:4px;
+  bottom:7px;
+  color:var(--mole-color,var(--c-text-faint));
+  font-size:7px;
+  letter-spacing:.12em;
+  text-align:center;
+  opacity:.72;
+}
+.wam-terminal .wam-mole {
+  bottom:18px;
+  width:62%;
+}
+.wam-hole[data-type="coolant"] { --mole-color:var(--c-green); }
+.wam-hole[data-type="overclock"] { --mole-color:var(--c-purple); }
+.wam-hole[data-type="idle"] { --mole-color:var(--c-text-faint); }
+.wam-hole.coolant,
+.wam-hole.overclock {
+  animation:hole-hit .25s ease;
+}
+.wam-hole.escaped {
+  animation:drone-escaped .18s ease;
+  border-color:rgba(255,204,0,.28);
+}
+@keyframes drone-escaped {
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+  100%{transform:translateY(0)}
+}
+.drone-result-screen {
+  background:
+    radial-gradient(ellipse at 50% 34%,rgba(255,140,0,.12),transparent 45%),
+    rgba(7,8,12,.9);
+}
+.drone-result-rank {
+  font-family:var(--font-display);
+  font-size:1rem;
+  font-weight:900;
+  letter-spacing:.24em;
+  color:var(--c-cyan);
+  text-shadow:var(--glow-cyan);
+}
+.drone-result-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(72px,1fr));
+  gap:var(--sp2);
+  width:min(100%,520px);
+}
+.drone-result-grid span {
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  padding:var(--sp2);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,.035);
+  color:var(--c-text-faint);
+  font-size:8px;
+  letter-spacing:.12em;
+  text-align:center;
+}
+.drone-result-grid strong {
+  color:var(--c-amber);
+  font-family:var(--font-display);
+  font-size:1rem;
+  letter-spacing:.04em;
+  text-shadow:var(--glow-amber);
+}
+@media(max-width:620px){
+  .wam-brief,
+  .wam-phase-strip,
+  .drone-result-grid { grid-template-columns:1fr; }
+  .wam-phase-strip span:last-child { text-align:left; }
+}
+
 /* ═══════════════════════════════════════════════════════
    CRASH GAME
 ═══════════════════════════════════════════════════════ */
