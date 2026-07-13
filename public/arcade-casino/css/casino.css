@@ -727,6 +727,211 @@ body::before {
   .hyperjump-result-main { justify-self:start; }
 }
 
+/* COIN REACTOR */
+.coin-reactor {
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(255,204,0,.08),transparent 52%),
+    var(--c-surface);
+  border:1px solid rgba(255,204,0,.25);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:inset 0 0 50px rgba(0,0,0,.35);
+}
+.sl-scoreboard {
+  display:flex;
+  gap:16px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.sl-score-block {
+  min-width:110px;
+  padding:var(--sp3);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,.03);
+  text-align:center;
+}
+.sl-score-lbl {
+  display:block;
+  margin-bottom:4px;
+  color:var(--c-text-faint);
+  font-size:8px;
+  letter-spacing:.18em;
+}
+.sl-score-val {
+  color:var(--c-amber);
+  font-family:var(--font-display);
+  font-size:1.15rem;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-shadow:var(--glow-amber);
+}
+.sl-score-lines { color:var(--c-cyan); text-shadow:var(--glow-cyan); }
+.sl-score-rule {
+  color:var(--c-text-muted);
+  font-size:.86rem;
+  text-shadow:none;
+}
+.coin-reactor-core {
+  position:relative;
+  max-width:660px;
+  margin:0 auto 14px;
+}
+.slot-grid {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(56px,1fr));
+  gap:10px;
+}
+.slot-cell {
+  min-height:88px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.025);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.35);
+  transition:all .18s;
+}
+.slot-cell.active {
+  border-color:#00ff80;
+  background:rgba(0,255,128,.08);
+  box-shadow:0 0 18px rgba(0,255,128,.35),inset 0 0 20px rgba(0,0,0,.2);
+}
+.slot-symbol-emoji {
+  font-size:34px;
+  line-height:1;
+}
+.slot-symbol-label {
+  color:var(--c-text-muted);
+  font-size:9px;
+  letter-spacing:.08em;
+}
+.slot-cell img {
+  width:54px!important;
+  height:54px!important;
+  border-radius:14px;
+  object-fit:cover;
+  image-rendering:pixelated;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 0 14px rgba(0,229,255,.16);
+}
+.coin-drop {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.coin-particle {
+  position:absolute;
+  top:-18px;
+  left:var(--coin-x);
+  font-size:22px;
+  opacity:0;
+  transform:translate(-50%,0) rotate(var(--coin-tilt));
+  animation:coin-drop-fall .78s cubic-bezier(.2,.72,.24,1.02) var(--coin-delay) forwards;
+  filter:drop-shadow(0 0 8px rgba(255,204,0,.55));
+}
+.coin-particle.lose {
+  color:rgba(255,255,255,.28);
+  font-size:28px;
+  filter:none;
+}
+@keyframes coin-drop-fall {
+  0%{opacity:0;transform:translate(-50%,-20px) rotate(var(--coin-tilt)) scale(.7)}
+  16%{opacity:1}
+  74%{opacity:1;transform:translate(-50%,155px) rotate(calc(var(--coin-tilt) + 220deg)) scale(1.05)}
+  100%{opacity:0;transform:translate(-50%,205px) rotate(calc(var(--coin-tilt) + 360deg)) scale(.82)}
+}
+.slot-lines {
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.slot-line-pill {
+  border:1px solid var(--line-color);
+  color:var(--line-color);
+  border-radius:999px;
+  padding:3px 9px;
+  font-size:8px;
+  letter-spacing:.12em;
+  background:transparent;
+}
+.slot-line-pill.active {
+  background:rgba(255,255,255,.08);
+  box-shadow:0 0 12px color-mix(in oklch,var(--line-color) 30%,transparent);
+}
+.slot-paytable {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  gap:8px;
+  margin:0 auto 12px;
+  max-width:760px;
+}
+.slot-pay-symbol {
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  gap:2px 8px;
+  padding:7px 9px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,.025);
+}
+.slot-pay-symbol b {
+  grid-row:1 / span 2;
+  font-size:1.2rem;
+}
+.slot-pay-symbol img {
+  grid-row:1 / span 2;
+  width:24px;
+  height:24px;
+  border-radius:7px;
+  object-fit:cover;
+}
+.slot-pay-symbol strong {
+  color:var(--c-text);
+  font-size:9px;
+  letter-spacing:.12em;
+}
+.slot-pay-symbol em {
+  color:var(--c-text-faint);
+  font-size:8px;
+  font-style:normal;
+  letter-spacing:.06em;
+}
+.slot-breakdown {
+  min-height:34px;
+  text-align:center;
+  font-size:10px;
+  letter-spacing:.08em;
+  color:var(--c-text-muted);
+  line-height:1.7;
+}
+.sl-msg {
+  min-height:28px;
+  color:var(--c-text-muted);
+  font-family:var(--font-display);
+  font-size:1rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-align:center;
+}
+.sl-msg--win { color:var(--c-green); text-shadow:var(--glow-green); }
+.sl-msg--lose { color:var(--c-red); text-shadow:var(--glow-red); }
+.sl-msg--push { color:var(--c-amber); text-shadow:var(--glow-amber); }
+.sl-msg--neutral { color:var(--c-cyan); text-shadow:var(--glow-cyan); }
+@media(max-width:700px){
+  .slot-grid { gap:6px; }
+  .slot-cell { min-height:72px; }
+  .slot-cell img { width:42px!important;height:42px!important; }
+}
+
 /* ═══════════════════════════════════════════════════════
    JACKPOT BANNER
 ═══════════════════════════════════════════════════════ */

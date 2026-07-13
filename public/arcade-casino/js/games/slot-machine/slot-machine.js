@@ -21,6 +21,8 @@ const SYMBOLS = [
   { id:'star',   name:'STAR',   emoji:'⭐', weight:2, pay:{3:6, 4:35, 5:140} },
 ];
 
+function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+
 export class SlotMachineGame {
   constructor({ mountId, getBet, debit, credit, addHistory, backToLobby }) {
     this.mountId = mountId;
@@ -36,18 +38,22 @@ export class SlotMachineGame {
   mount() {
     const game = document.getElementById(this.mountId);
     if (!game) return;
-    game.innerHTML = `${this.header('SLOT', 'MACHINE')}
-      <div class="sl-machine" style="background:var(--c-surface);border:1px solid rgba(255,204,0,.25);border-radius:20px;padding:20px;box-shadow:inset 0 0 50px rgba(0,0,0,.35)">
-        <div class="sl-scoreboard" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:14px">
+    game.innerHTML = `${this.header('COIN', 'REACTOR')}
+      <div class="sl-machine coin-reactor">
+        <div class="sl-scoreboard">
           <div class="sl-score-block"><span class="sl-score-lbl">GAIN</span><span class="sl-score-val sl-score-gain" id="sl-gain">—</span></div>
-          <div class="sl-score-block"><span class="sl-score-lbl">LIGNES</span><span class="sl-score-val" style="color:var(--c-cyan)">5</span></div>
-          <div class="sl-score-block"><span class="sl-score-lbl">RÈGLE</span><span class="sl-score-val" style="font-size:.9rem;color:var(--c-text-muted)">3+ gauche → droite</span></div>
+          <div class="sl-score-block"><span class="sl-score-lbl">LIGNES</span><span class="sl-score-val sl-score-lines">5</span></div>
+          <div class="sl-score-block"><span class="sl-score-lbl">RÈGLE</span><span class="sl-score-val sl-score-rule">3+ gauche → droite</span></div>
         </div>
-        <div id="slot-grid" style="display:grid;grid-template-columns:repeat(5,minmax(56px,1fr));gap:10px;max-width:620px;margin:0 auto 14px"></div>
-        <div id="slot-lines" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px"></div>
-        <div id="slot-breakdown" style="min-height:34px;text-align:center;font-size:10px;letter-spacing:.08em;color:var(--c-text-muted);line-height:1.7"></div>
-        <div class="sl-msg" id="sl-msg">MISE TOTALE · 5 LIGNES ACTIVES · RTP ALPHA ~90%</div>
-        <div class="action-row"><button class="action-btn primary" id="sl-spin">🎰 LANCER</button></div>
+        <div class="coin-reactor-core">
+          <div id="slot-grid" class="slot-grid"></div>
+          <div class="coin-drop" id="coin-drop" aria-hidden="true"></div>
+        </div>
+        <div id="slot-lines" class="slot-lines"></div>
+        <div class="slot-paytable" id="slot-paytable">${this.paytable()}</div>
+        <div id="slot-breakdown" class="slot-breakdown"></div>
+        <div class="sl-msg" id="sl-msg">REACTEUR LOCAL · 5 LIGNES ACTIVES · PAYOUT INCHANGÉ</div>
+        <div class="action-row"><button class="action-btn primary" id="sl-spin">🪙 ACTIVER</button></div>
       </div>`;
     document.getElementById('game-back')?.addEventListener('click', () => this.backToLobby());
     document.getElementById('sl-spin')?.addEventListener('click', () => this.spin());
@@ -65,7 +71,7 @@ export class SlotMachineGame {
   renderLineLegend(activeIds = []) {
     const wrap = document.getElementById('slot-lines');
     if (!wrap) return;
-    wrap.innerHTML = LINES.map(line => `<span style="border:1px solid ${line.color};color:${line.color};border-radius:999px;padding:3px 9px;font-size:8px;letter-spacing:.12em;background:${activeIds.includes(line.id) ? 'rgba(255,255,255,.08)' : 'transparent'}">${line.name} ×${line.mult}</span>`).join('');
+    wrap.innerHTML = LINES.map(line => `<span class="slot-line-pill${activeIds.includes(line.id) ? ' active' : ''}" style="--line-color:${line.color}">${line.name} ×${line.mult}</span>`).join('');
   }
 
   renderGrid(grid, wins = []) {
@@ -81,7 +87,7 @@ export class SlotMachineGame {
         const sym = grid[r][c];
         const active = winCells.has(`${r}-${c}`);
         const cell = document.createElement('div');
-        cell.style.cssText = `min-height:78px;border-radius:14px;border:1px solid ${active ? '#00ff80' : 'rgba(255,255,255,.08)'};background:${active ? 'rgba(0,255,128,.08)' : 'rgba(255,255,255,.025)'};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:${active ? '0 0 18px rgba(0,255,128,.35)' : 'inset 0 0 20px rgba(0,0,0,.35)'};transition:all .18s`;
+        cell.className = `slot-cell${active ? ' active' : ''}`;
         cell.innerHTML = this.symbolHTML(sym);
         root.appendChild(cell);
       }
@@ -97,7 +103,8 @@ export class SlotMachineGame {
     if (btn) btn.disabled = true;
     document.getElementById('slot-breakdown').textContent = '';
     document.getElementById('sl-gain').textContent = '—';
-    this.setMsg('LES ROULEAUX TOURNENT…', 'neutral');
+    document.getElementById('coin-drop').innerHTML = '';
+    this.setMsg('REACTEUR EN ROTATION…', 'neutral');
 
     let grid = this.randomGrid();
     for (let t = 0; t < 20; t++) {
@@ -111,15 +118,16 @@ export class SlotMachineGame {
     const { wins, gain } = this.evaluate(grid, bet);
     this.renderGrid(grid, wins);
     this.renderLineLegend(wins.map(w => w.line.id));
+    await this.playCoinDrop(gain, wins);
 
     if (gain > 0) await this.credit(gain);
     const net = gain - bet;
     const status = net > 0 ? 'win' : net < 0 ? 'lose' : 'push';
     document.getElementById('sl-gain').textContent = gain > 0 ? `+${gain}` : '—';
     document.getElementById('slot-breakdown').innerHTML = wins.length
-      ? wins.map(w => `<span style="color:${w.line.color}">${w.line.name}</span> · ${w.count}× ${w.symbol.name} · +${w.gain} C`).join('<br>')
+      ? wins.map(w => `<span style="color:${w.line.color}">${w.line.name}</span> · ${w.count}× ${w.symbol.name} · +${w.gain} ST`).join('<br>')
       : 'Aucune ligne gagnante.';
-    this.setMsg(wins.length ? `${wins.length} ligne${wins.length > 1 ? 's' : ''} · ${net >= 0 ? '+' : ''}${net} C` : `PERDU · -${bet} C`, status);
+    this.setMsg(wins.length ? `${wins.length} ligne${wins.length > 1 ? 's' : ''} · ${net >= 0 ? '+' : ''}${net} ST` : `PERDU · -${bet} ST`, status);
     this.addHistory('SLOTS', bet, status, net);
     this.stats.spins += 1;
     this.stats.wagered += bet;
@@ -154,9 +162,36 @@ export class SlotMachineGame {
   }
 
   symbolHTML(sym) {
-    const label = `<span style="font-size:9px;letter-spacing:.08em;color:var(--c-text-muted)">${sym.name}</span>`;
-    if (sym.emoji) return `<span style="font-size:34px;line-height:1">${sym.emoji}</span>${label}`;
+    const label = `<span class="slot-symbol-label">${sym.name}</span>`;
+    if (sym.emoji) return `<span class="slot-symbol-emoji">${sym.emoji}</span>${label}`;
     return `<img src="${sym.img}" alt="${sym.name}" width="42" height="42" loading="lazy" onerror="this.style.opacity=.12">${label}`;
+  }
+
+  paytable() {
+    return SYMBOLS.map(sym => `<span class="slot-pay-symbol">
+      ${sym.emoji ? `<b>${sym.emoji}</b>` : `<img src="${sym.img}" alt="" loading="lazy" onerror="this.style.opacity=.12">`}
+      <strong>${sym.name}</strong>
+      <em>3:${sym.pay[3]}× · 4:${sym.pay[4]}× · 5:${sym.pay[5]}×</em>
+    </span>`).join('');
+  }
+
+  async playCoinDrop(gain, wins) {
+    const root = document.getElementById('coin-drop');
+    if (!root) return;
+    root.innerHTML = '';
+    const count = gain > 0 ? clamp(wins.length * 4 + Math.ceil(Math.min(gain, 400) / 40), 5, 18) : 7;
+    for (let i = 0; i < count; i++) {
+      const coin = document.createElement('span');
+      coin.className = `coin-particle${gain > 0 ? ' win' : ' lose'}`;
+      coin.textContent = gain > 0 ? '🪙' : '·';
+      coin.style.setProperty('--coin-x', `${12 + Math.random() * 76}%`);
+      coin.style.setProperty('--coin-delay', `${i * 42}ms`);
+      coin.style.setProperty('--coin-tilt', `${-30 + Math.random() * 60}deg`);
+      root.appendChild(coin);
+      if (i % 3 === 0) SFX.tick();
+      await sleep(24);
+    }
+    await sleep(720);
   }
 
   stop() {
