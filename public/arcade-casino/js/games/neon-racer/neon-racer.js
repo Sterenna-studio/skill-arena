@@ -115,7 +115,7 @@ export class NeonRacer {
     root.innerHTML = `
       <div class="game-header">
         <button class="game-back-btn" id="nr-back">← LOBBY</button>
-        <span class="game-title">NEON <span class="game-title-accent" style="--game-accent:var(--c-amber)">RACER</span></span>
+        <span class="game-title">NEON <span class="game-title-accent" style="--game-accent:var(--c-amber)">CIRCUIT</span></span>
       </div>
       <div id="nr-inner"></div>`;
     document.getElementById('nr-back')?.addEventListener('click', () => {
@@ -130,7 +130,7 @@ export class NeonRacer {
     if (!root) return;
     root.innerHTML = `
       <div class="chase-select">
-        <div class="chase-select-title">// COURSE OUT-RUN CYBERPUNK — CIRCUIT GWEN HA STAR</div>
+        <div class="chase-select-title">// CIRCUIT 2D CYBERPUNK — CAMÉRA ACCROCHÉE AU VÉHICULE</div>
         <div class="chase-vehicles-grid" id="nr-vgrid">
           ${VEHICLES.map((v, i) => `
             <div class="chase-vcard ${i === 0 ? 'selected' : ''}" data-idx="${i}" style="--vc:${v.color}">
@@ -146,20 +146,20 @@ export class NeonRacer {
           <div class="nr-hearts-row" id="nr-hearts-row">
             ${HEART_COSTS.map((cost, i) => `
               <button class="nr-heart-btn ${i === 0 ? 'active' : ''}" data-idx="${i}">
-                ${'❤️'.repeat(i + 1)}<span class="nr-heart-cost">${cost} C</span><span class="nr-heart-lives">${i + 1} crash${i > 0 ? 's' : ''} toléré${i > 0 ? 's' : ''}</span>
+                ${'❤️'.repeat(i + 1)}<span class="nr-heart-cost">${cost} ST</span><span class="nr-heart-lives">${i + 1} crash${i > 0 ? 's' : ''} toléré${i > 0 ? 's' : ''}</span>
               </button>`).join('')}
           </div>
-          <div class="nr-hearts-hint" id="nr-hearts-hint">Contrat : <strong>50 C</strong> · 1 vie · tracé à virages scriptés</div>
+          <div class="nr-hearts-hint" id="nr-hearts-hint">Contrat : <strong>50 ST</strong> · 1 vie · circuit procédural</div>
         </div>
         <div class="chase-how">
           <div class="chase-how-title">⚡ PILOTAGE ARCADE</div>
           <div class="chase-how-grid">
-            <div class="chase-how-block"><span>←→</span><span>Tourne avant le virage, pas seulement dedans.</span></div>
-            <div class="chase-how-block"><span>↑</span><span>Accélération active, vitesse maintenue façon arcade.</span></div>
-            <div class="chase-how-block"><span>↓</span><span>Freinage utile dans les épingles.</span></div>
+            <div class="chase-how-block"><span>←→</span><span>Place le véhicule dans la courbe avant le vibreur.</span></div>
+            <div class="chase-how-block"><span>↑</span><span>Accélération active, le circuit défile sous toi.</span></div>
+            <div class="chase-how-block"><span>↓</span><span>Freinage utile pour recoller à la route.</span></div>
             <div class="chase-how-block"><span>SPACE</span><span>Boost quand la jauge est pleine.</span></div>
-            <div class="chase-how-block"><span>↱↰</span><span>Le panneau annonce le prochain segment du circuit.</span></div>
-            <div class="chase-how-block"><span>DRIFT</span><span>Reste haut en vitesse et accompagne la courbe.</span></div>
+            <div class="chase-how-block"><span>↱↰</span><span>Le panneau annonce le secteur et la prochaine courbe.</span></div>
+            <div class="chase-how-block"><span>DRIFT</span><span>Accompagne la courbe à haute vitesse pour scorer.</span></div>
           </div>
         </div>
         <div class="action-row"><button class="action-btn primary" id="nr-start">▶ LANCER LA COURSE</button></div>
@@ -177,20 +177,20 @@ export class NeonRacer {
       this.heartIdx = Number(btn.dataset.idx);
       this.bet = HEART_COSTS[this.heartIdx];
       const lives = this.heartIdx + 1;
-      document.getElementById('nr-hearts-hint').innerHTML = `Contrat : <strong>${this.bet} C</strong> · ${lives} vie${lives > 1 ? 's' : ''} · tracé à virages scriptés`;
+      document.getElementById('nr-hearts-hint').innerHTML = `Contrat : <strong>${this.bet} ST</strong> · ${lives} vie${lives > 1 ? 's' : ''} · circuit procédural`;
       SFX.click();
     }));
     document.getElementById('nr-start')?.addEventListener('click', () => this.launch());
   }
 
   async launch() {
-    if (this.credits < this.bet) return this.flash('CRÉDITS INSUFFISANTS');
+    if (this.credits < this.bet) return this.flash('STAR TOKENS INSUFFISANTS');
     this.credits -= this.bet;
     await this.onCreditsChange(this.credits);
     const root = document.getElementById('nr-inner');
     if (!root) return;
     root.innerHTML = `
-      <div class="chase-arena" id="nr-arena">
+      <div class="chase-arena neon-circuit-arena" id="nr-arena">
         <canvas id="nr-canvas" width="${CW}" height="${CH}" style="width:100%;height:auto;display:block;border-radius:18px;background:#05050c"></canvas>
         <div class="chase-hud" id="nr-hud">
           <div class="chase-hud-block"><span class="chase-hud-lbl">DIST.</span><span class="chase-hud-val" id="nr-dist">0</span><span class="chase-hud-unit">m</span></div>
@@ -221,7 +221,7 @@ export class NeonRacer {
 
   startLoop() {
     this.running = true; this.distance = 0; this.score = 0; this.lives = this.heartIdx + 1;
-    this.speed = 2.6; this.roadX = 0; this.roadVX = 0; this.carX = 0; this.carVX = 0; this.steer = 0;
+    this.speed = 2.6; this.carX = 0; this.carVX = 0; this.steer = 0;
     this.curve = 0; this.targetCurve = 0; this.boost = 30; this.boosting = 0;
     this.shield = 0; this.invincible = 0; this.driftScore = 0; this.combo = 1; this.offroadHeat = 0;
     this.objects = []; this.spawnTimer = 0; this.lastT = performance.now(); this.currentSegmentId = '';
@@ -272,17 +272,12 @@ export class NeonRacer {
     if (this.boosting > 0) this.boosting -= dt;
     else this.boost = clamp(this.boost + 0.042 * dt + this.speed * 0.012 * dt, 0, 100);
 
-    const curveForce = this.curve * this.speed * 0.0075;
-    this.roadVX += curveForce * dt;
-    this.roadVX *= 0.86;
-    this.roadX += this.roadVX * dt;
-    this.roadX = clamp(this.roadX, -1.35, 1.35);
-
+    const curveForce = this.curve * this.speed * 0.0068;
     const grip = this.vehicle.handling * (down ? 1.28 : 1) * (this.boosting > 0 ? 0.92 : 1);
     this.carVX += this.steer * grip * dt;
     this.carVX *= lerp(0.80, 0.91, this.vehicle.stability);
     this.carX += this.carVX * dt;
-    this.carX -= curveForce * dt * (1.72 - this.vehicle.stability);
+    this.carX -= curveForce * dt * (1.58 - this.vehicle.stability);
     this.carX = clamp(this.carX, -MAX_ROAD_X, MAX_ROAD_X);
 
     const offroad = Math.abs(this.carX) > 1.0;
@@ -308,8 +303,8 @@ export class NeonRacer {
     this.invincible = Math.max(0, this.invincible - dt); this.shield = Math.max(0, this.shield - dt);
     this.spawnTimer -= dt;
     if (this.spawnTimer <= 0) { this.spawnObject(); this.spawnTimer = Math.max(18, 82 - this.speed * 5.4); }
-    this.objects.forEach(obj => { obj.z -= this.speed * dt * 0.0125; obj.x += this.curve * dt * 0.0032 * obj.z; });
-    this.objects = this.objects.filter(obj => obj.z > 0.03);
+    this.objects.forEach(obj => { obj.z -= this.speed * dt * 0.0125; });
+    this.objects = this.objects.filter(obj => obj.z > -0.08);
     this.checkCollisions();
   }
 
@@ -333,7 +328,7 @@ export class NeonRacer {
   checkCollisions() {
     if (this.invincible > 0) return;
     for (const obj of this.objects) {
-      if (obj.hit || obj.z > 0.13 || Math.abs(obj.x - this.carX) > obj.w + 0.09) continue;
+      if (obj.hit || obj.z > 0.065 || obj.z < -0.05 || Math.abs(obj.x - this.carX) > obj.w + 0.09) continue;
       obj.hit = true;
       if (!obj.harm) {
         this.score += (obj.score ?? 30) * this.combo; this.combo = Math.min(8, this.combo + 1);
@@ -357,76 +352,163 @@ export class NeonRacer {
     const seg = routeAt(this.distance + 180);
     const [top, mid, bottom] = seg.palette || ['#070313', '#12092a', '#05050c'];
     const sky = ctx.createLinearGradient(0, 0, 0, CH);
-    sky.addColorStop(0, top); sky.addColorStop(0.42, mid); sky.addColorStop(1, bottom);
+    sky.addColorStop(0, top); sky.addColorStop(0.48, mid); sky.addColorStop(1, bottom);
     ctx.fillStyle = sky; ctx.fillRect(0, 0, CW, CH);
-    ctx.save(); ctx.globalAlpha = seg.tunnel ? 0.22 : 0.38;
-    for (let i = 0; i < 28; i++) {
-      const parallax = this.distance * (0.015 + (i % 5) * 0.003);
-      const x = (i * 97 - parallax + Math.sin(this.distance * 0.01 + i) * 28 + CW * 2) % (CW + 80) - 40;
-      const h = 34 + ((i * 23) % 120); const y = ROAD_HORIZON - h + 25;
-      ctx.fillStyle = i % 3 === 0 ? '#181044' : '#0c1330'; ctx.fillRect(x - 18, y, 34, h);
-      ctx.fillStyle = i % 2 === 0 ? '#00e5ff' : '#ff3df2';
-      for (let wy = y + 8; wy < y + h - 4; wy += 16) ctx.fillRect(x - 10, wy, 4, 3);
+
+    ctx.save();
+    ctx.globalAlpha = seg.tunnel ? 0.18 : 0.28;
+    for (let i = 0; i < 34; i++) {
+      const parallax = this.distance * (0.02 + (i % 5) * 0.004);
+      const x = (i * 91 - parallax + Math.sin(this.distance * 0.006 + i) * 34 + CW * 2) % (CW + 100) - 50;
+      const y = 32 + ((i * 53 + Math.floor(this.distance * 0.05)) % (CH - 60));
+      const size = 1 + (i % 4 === 0 ? 2 : 0);
+      ctx.fillStyle = i % 3 === 0 ? '#00e5ff' : i % 3 === 1 ? '#ff3df2' : '#ffcc00';
+      ctx.fillRect(x, y, size, size);
     }
     ctx.restore();
-    ctx.strokeStyle = seg.tunnel ? 'rgba(255,204,0,.13)' : 'rgba(0,229,255,.12)'; ctx.lineWidth = 1;
-    for (let y = ROAD_HORIZON; y < CH; y += 34) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+
+    ctx.strokeStyle = seg.tunnel ? 'rgba(255,204,0,.1)' : 'rgba(0,229,255,.09)';
+    ctx.lineWidth = 1;
+    for (let y = -20; y < CH + 30; y += 34) {
+      const offset = (this.distance * 0.38) % 34;
+      ctx.beginPath();
+      ctx.moveTo(0, y + offset);
+      ctx.lineTo(CW, y + offset);
+      ctx.stroke();
+    }
   }
 
-  roadCenterAt(p) {
-    const curve = roadCurveAt(this.distance + (1 - p) * ROAD_LOOKAHEAD);
-    return CW / 2 + this.roadX * 105 + curve * 230 * p * p;
+  trackOffsetAt(distance) {
+    const d = wrapDistance(distance);
+    return Math.sin(d * 0.0042) * 210 + Math.sin(d * 0.009 + 1.8) * 72 + roadCurveAt(d) * 145;
+  }
+
+  trackPoint(ahead) {
+    const cameraY = CH * 0.66;
+    const x = CW / 2 + (this.trackOffsetAt(this.distance + ahead) - this.trackOffsetAt(this.distance)) * 0.9;
+    const y = cameraY - ahead * 0.58;
+    return { x, y };
+  }
+
+  trackNormalAt(ahead) {
+    const a = this.trackPoint(ahead - 12);
+    const b = this.trackPoint(ahead + 12);
+    const dx = b.x - a.x;
+    const dy = b.y - a.y || 1;
+    const len = Math.hypot(dx, dy) || 1;
+    return { x: -dy / len, y: dx / len };
   }
 
   drawRoad(ctx) {
-    for (let i = SEGMENTS; i >= 1; i--) {
-      const p1 = (i - 1) / SEGMENTS; const p2 = i / SEGMENTS;
-      const y1 = lerp(ROAD_HORIZON, ROAD_BOTTOM, easeInOut(p1)); const y2 = lerp(ROAD_HORIZON, ROAD_BOTTOM, easeInOut(p2));
-      const w1 = lerp(38, 392, p1 * p1); const w2 = lerp(38, 392, p2 * p2);
-      const cx1 = this.roadCenterAt(p1); const cx2 = this.roadCenterAt(p2);
-      const rumble = i % 2 === 0;
-      ctx.fillStyle = rumble ? '#17192a' : '#10121f';
-      ctx.beginPath(); ctx.moveTo(cx1 - w1, y1); ctx.lineTo(cx1 + w1, y1); ctx.lineTo(cx2 + w2, y2); ctx.lineTo(cx2 - w2, y2); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = rumble ? 'rgba(0,229,255,.16)' : 'rgba(255,61,242,.12)';
-      ctx.beginPath(); ctx.moveTo(cx1 - w1 - 14, y1); ctx.lineTo(cx1 - w1, y1); ctx.lineTo(cx2 - w2, y2); ctx.lineTo(cx2 - w2 - 20, y2); ctx.closePath(); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(cx1 + w1 + 14, y1); ctx.lineTo(cx1 + w1, y1); ctx.lineTo(cx2 + w2, y2); ctx.lineTo(cx2 + w2 + 20, y2); ctx.closePath(); ctx.fill();
-      if (i % 4 === 0) {
-        ctx.strokeStyle = 'rgba(255,255,255,.24)'; ctx.lineWidth = Math.max(1, p2 * 4);
-        for (const lane of [-0.33, 0.33]) { ctx.beginPath(); ctx.moveTo(cx1 + lane * w1, y1); ctx.lineTo(cx2 + lane * w2, y2); ctx.stroke(); }
-      }
-      if (i % 6 === 0) this.drawRoadside(ctx, cx2, y2, w2, p2, i);
+    const samples = [];
+    for (let ahead = -220; ahead <= 760; ahead += 28) {
+      const p = this.trackPoint(ahead);
+      if (p.y < -80 || p.y > CH + 90) continue;
+      samples.push({ ahead, ...p, normal: this.trackNormalAt(ahead) });
     }
-  }
+    if (samples.length < 2) return;
 
-  drawRoadside(ctx, cx, y, w, p, i) {
-    const scale = Math.max(0.25, p * p * 1.7);
-    const side = i % 12 === 0 ? -1 : 1;
-    const x = cx + side * (w + 42 + p * 70);
+    const roadWidth = 166;
+    const shoulder = 22;
+    const drawRibbon = (width, fill) => {
+      ctx.beginPath();
+      samples.forEach((p, i) => {
+        const x = p.x + p.normal.x * width;
+        const y = p.y + p.normal.y * width;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      });
+      [...samples].reverse().forEach(p => {
+        ctx.lineTo(p.x - p.normal.x * width, p.y - p.normal.y * width);
+      });
+      ctx.closePath();
+      ctx.fillStyle = fill;
+      ctx.fill();
+    };
+
+    drawRibbon(roadWidth / 2 + shoulder, 'rgba(0,229,255,.12)');
+    drawRibbon(roadWidth / 2, '#101522');
+
     ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(scale, scale);
-    ctx.globalAlpha = clamp(p * 1.25, 0.1, 0.92);
-    ctx.shadowColor = side < 0 ? '#00e5ff' : '#ffcc00'; ctx.shadowBlur = 10;
-    ctx.fillStyle = side < 0 ? '#00e5ff' : '#ffcc00';
-    if (i % 18 === 0) {
-      ctx.fillRect(-3, -38, 6, 38);
-      ctx.strokeStyle = ctx.fillStyle; ctx.strokeRect(-20, -58, 40, 18);
-    } else {
-      ctx.beginPath(); ctx.moveTo(0, -42); ctx.lineTo(14, -8); ctx.lineTo(0, 0); ctx.lineTo(-14, -8); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.18)';
+    ctx.lineWidth = 2;
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      samples.forEach((p, i) => {
+        const x = p.x + p.normal.x * side * roadWidth / 2;
+        const y = p.y + p.normal.y * side * roadWidth / 2;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      });
+      ctx.stroke();
     }
+
+    samples.forEach((p, i) => {
+      if (i % 3 !== 0) return;
+      ctx.strokeStyle = i % 2 === 0 ? 'rgba(0,229,255,.42)' : 'rgba(255,61,242,.36)';
+      ctx.lineWidth = 5;
+      for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(p.x + p.normal.x * side * (roadWidth / 2 + 2), p.y + p.normal.y * side * (roadWidth / 2 + 2));
+        ctx.lineTo(p.x + p.normal.x * side * (roadWidth / 2 + 18), p.y + p.normal.y * side * (roadWidth / 2 + 18));
+        ctx.stroke();
+      }
+    });
+
+    ctx.setLineDash([16, 18]);
+    ctx.strokeStyle = 'rgba(255,255,255,.22)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    samples.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    this.drawRoadside(ctx, samples, roadWidth);
     ctx.restore();
   }
 
+  drawRoadside(ctx, samples, roadWidth) {
+    samples.forEach((p, i) => {
+      if (i % 5 !== 0) return;
+      const side = i % 10 === 0 ? -1 : 1;
+      const x = p.x + p.normal.x * side * (roadWidth / 2 + 46);
+      const y = p.y + p.normal.y * side * (roadWidth / 2 + 46);
+      const scale = clamp(1.1 - Math.abs(p.ahead) / 780, 0.35, 1);
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.globalAlpha = clamp(1.2 - Math.abs(p.ahead) / 720, 0.15, 0.85);
+      ctx.shadowColor = side < 0 ? '#00e5ff' : '#ffcc00';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = side < 0 ? '#00e5ff' : '#ffcc00';
+      if (i % 15 === 0) {
+        ctx.fillRect(-3, -28, 6, 28);
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.strokeRect(-18, -44, 36, 14);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(0, -32);
+        ctx.lineTo(12, -8);
+        ctx.lineTo(0, 0);
+        ctx.lineTo(-12, -8);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+  }
+
   project(obj) {
-    const z = clamp(obj.z, 0.04, 1); const p = 1 - z;
-    const roadW = lerp(40, 390, p * p); const roadCx = this.roadCenterAt(p);
-    const y = lerp(ROAD_HORIZON, ROAD_BOTTOM - 30, easeInOut(p)); const x = roadCx + obj.x * roadW;
-    return { x, y, scale: lerp(0.35, 2.2, p * p) };
+    const z = clamp(obj.z, 0.04, 1);
+    const ahead = z * ROAD_LOOKAHEAD;
+    const p = this.trackPoint(ahead);
+    const scale = clamp(1.12 - z * 0.42, 0.52, 1.1);
+    const roadW = 166 * 0.58;
+    return { x: p.x + obj.x * roadW, y: p.y, scale, visible: p.y > -60 && p.y < CH + 60 };
   }
 
   drawObjects(ctx) {
     [...this.objects].sort((a, b) => b.z - a.z).forEach(obj => {
       if (obj.hit) return; const p = this.project(obj);
+      if (!p.visible) return;
       ctx.save(); ctx.globalAlpha = clamp(1 - obj.z * 0.2, 0.15, 1);
       ctx.font = `${Math.round(26 * p.scale)}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = obj.harm ? '#ff4757' : '#00e5ff'; ctx.shadowBlur = 10 * p.scale; ctx.fillText(obj.label, p.x, p.y); ctx.restore();
@@ -434,13 +516,13 @@ export class NeonRacer {
   }
 
   drawPlayer(ctx) {
-    const y = CH - 76; const x = CW / 2 + this.carX * 240;
+    const y = CH * 0.66; const x = CW / 2 + this.carX * 118;
     ctx.save(); if (this.invincible > 0) ctx.globalAlpha = Math.sin(performance.now() / 50) > 0 ? 0.4 : 1;
-    ctx.fillStyle = 'rgba(0,0,0,.38)'; ctx.beginPath(); ctx.ellipse(x, y + 27, 54, 13, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,.38)'; ctx.beginPath(); ctx.ellipse(x, y + 25, 52, 12, 0, 0, Math.PI * 2); ctx.fill();
     if (this.shield > 0) { ctx.strokeStyle = 'rgba(0,229,255,.7)'; ctx.lineWidth = 3; ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 18; ctx.beginPath(); ctx.ellipse(x, y, 62, 34, 0, 0, Math.PI * 2); ctx.stroke(); }
-    ctx.translate(x, y); ctx.rotate(-this.steer * 0.16 + this.curve * 0.10 + this.carVX * 0.22); ctx.shadowColor = this.vehicle.color; ctx.shadowBlur = 22;
+    ctx.translate(x, y); ctx.rotate(this.carVX * 0.22 + this.curve * 0.26 + this.steer * 0.08); ctx.shadowColor = this.vehicle.color; ctx.shadowBlur = 22;
     if (this.vehicleImg.complete && this.vehicleImg.naturalWidth > 0) {
-      const ratio = this.vehicleImg.naturalWidth / this.vehicleImg.naturalHeight; const h = 56; const w = h * ratio;
+      const ratio = this.vehicleImg.naturalWidth / this.vehicleImg.naturalHeight; const h = 62; const w = h * ratio;
       ctx.drawImage(this.vehicleImg, -w / 2, -h / 2, w, h);
     } else { ctx.font = '44px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🏎️', 0, 0); }
     ctx.restore();
@@ -475,7 +557,7 @@ export class NeonRacer {
     this.credits += gain; await this.onCreditsChange(this.credits);
     const arena = document.getElementById('nr-arena'); if (!arena) return;
     const res = document.createElement('div'); res.className = 'wam-result-screen';
-    res.innerHTML = `<div class="wam-result-title">COURSE TERMINÉE</div><div class="wam-result-score">${dist} m</div><div class="wam-result-gain">CONTRAT ${this.bet} C → GAIN <strong>${gain} C</strong> <span style="color:${net >= 0 ? 'var(--c-green)' : 'var(--c-red)'}">${net >= 0 ? '+' : ''}${net} C</span></div><div style="font-size:11px;letter-spacing:.12em;color:var(--c-text-faint)">SCORE : ${Math.floor(this.score)} · DRIFT : ${Math.floor(this.driftScore)} · BOOST : ${Math.floor(this.boost)}%</div><button class="action-btn primary" id="nr-retry" style="margin-top:16px">↺ REJOUER</button>`;
+    res.innerHTML = `<div class="wam-result-title">NEON CIRCUIT TERMINÉ</div><div class="wam-result-score">${dist} m</div><div class="wam-result-gain">CONTRAT ${this.bet} ST → GAIN <strong>${gain} ST</strong> <span style="color:${net >= 0 ? 'var(--c-green)' : 'var(--c-red)'}">${net >= 0 ? '+' : ''}${net} ST</span></div><div style="font-size:11px;letter-spacing:.12em;color:var(--c-text-faint)">SCORE : ${Math.floor(this.score)} · DRIFT : ${Math.floor(this.driftScore)} · BOOST : ${Math.floor(this.boost)}%</div><button class="action-btn primary" id="nr-retry" style="margin-top:16px">↺ REJOUER</button>`;
     arena.appendChild(res);
     document.getElementById('nr-retry')?.addEventListener('click', () => { res.remove(); this.renderSelect(); });
     document.dispatchEvent(new CustomEvent('neon-racer:result', { detail: { bet: this.bet, result, net, dist } }));

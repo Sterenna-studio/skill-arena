@@ -85,3 +85,28 @@
   z-index: 20;
 }
 .nr-axis-flash.visible { opacity: 1; }
+
+.neon-circuit-arena {
+  padding: 12px;
+  border: 1px solid rgba(255,204,0,.16);
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,204,0,.08), transparent 48%),
+    rgba(5,6,12,.58);
+  box-shadow: inset 0 0 44px rgba(0,0,0,.36);
+}
+.neon-circuit-arena canvas {
+  border-color: rgba(255,204,0,.22);
+  background: #05050c;
+  image-rendering: auto;
+}
+.neon-circuit-arena .chase-hud {
+  border-color: rgba(255,204,0,.18);
+  background:
+    linear-gradient(90deg, rgba(255,204,0,.045), rgba(0,229,255,.035)),
+    rgba(8,10,18,.88);
+}
+.neon-circuit-arena .chase-hud-val {
+  color: var(--c-amber, #ffcc00);
+  text-shadow: 0 0 12px rgba(255,204,0,.46);
+}
