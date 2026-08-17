@@ -3,6 +3,15 @@ import { GAMES, CATEGORY_LABELS } from '@/lib/games'
 
 const FULLGAMES = [
   {
+    slug: 'dungeon-elf-sound',
+    title: 'Dungeon Elf',
+    desc: 'Action-RPG sonore — tranche les projectiles, trace des runes et donne ta propre voix à tes sortilèges. Franchis les donjons pour faire progresser ton mage.',
+    icon: '🧝',
+    tag: 'ACTION RPG',
+    tagColor: '--c-purple',
+    external: '/arena/games/dungeon-elf-sound/',
+  },
+  {
     slug: 'mg-airship',
     title: 'MG Airship',
     desc: 'Pilote ton dirigeable steampunk — abats tes ennemis, collecte des engrenages et améliore ton navire.',

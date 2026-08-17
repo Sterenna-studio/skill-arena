@@ -11,6 +11,7 @@ et ajoute une entrée dans `src/lib/games.ts` + `src/app/page.tsx`.
 
 | Jeu | Dossier source | Slug hub | Branché ? | Stack | Notes |
 |---|---|---|---|---|---|
+| Dungeon Elf | `dungeon_elf_sound/` | `dungeon-elf-sound` | ✅ Oui | Vanilla JS / Canvas 2D / Web Audio | Jeu autonome ; voix de sort personnalisable via le micro |
 | BZH Breach Storm | `bzh-breach-storm/` | `bzh-breach-storm` | ✅ Oui | Vanilla JS / Canvas 2D | Un lien cassé a été corrigé (voir plus bas) |
 | BZH Nemeton Lockdown | `bzh-nemeton-lockdown/` | `bzh-nemeton-lockdown` | ✅ Oui | Vanilla JS / DOM + Canvas | RAS |
 | Spirit Overdrive | `spirit-overdrive/` | `spirit-overdrive` | ✅ Oui | Vanilla JS / ESM | RAS |

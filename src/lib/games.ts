@@ -13,6 +13,17 @@ export interface GameMeta {
 
 export const GAMES: GameMeta[] = [
   {
+    slug: 'dungeon-elf-sound',
+    title: 'Dungeon Elf',
+    description: 'Action-RPG sonore — tranche les projectiles, trace des runes et personnalise la voix de tes sortilèges.',
+    icon: '🧝',
+    category: 'arcade',
+    unit: 'niveau',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/games/dungeon-elf-sound/',
+  },
+  {
     slug: 'mg-airship',
     title: 'MG Airship',
     description: 'Pilote ton dirigeable et survive le plus longtemps possible.',
