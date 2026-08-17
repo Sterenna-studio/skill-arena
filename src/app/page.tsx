@@ -65,6 +65,33 @@ const FULLGAMES = [
     tagColor: '--c-amber',
     external: '/arena/games/magnet-maze/',
   },
+  {
+    slug: 'escape-game-manager',
+    title: 'Escape Game Manager',
+    desc: 'Gère un escape game en temps réel — accueille les groupes, arbitre les salles, chouchoute la satisfaction et investis dans la boutique.',
+    icon: '🗝️',
+    tag: 'GESTION',
+    tagColor: '--c-amber',
+    external: '/arena/games/escape-game-manager/',
+  },
+  {
+    slug: 'sniky',
+    title: 'Sniky',
+    desc: 'Infiltration biopunk en vue du dessus — repère les cônes de vision des drones, dash entre les patrouilles et vole un maximum de fragments.',
+    icon: '🥷',
+    tag: 'INFILTRATION',
+    tagColor: '--c-purple',
+    external: '/arena/games/sniky/',
+  },
+  {
+    slug: 'tank-protocol',
+    title: 'Tank Protocol',
+    desc: 'Shooter de vagues — pilote ton tank, encaisse les assauts de drones et enchaîne les rounds au clavier ou à la manette.',
+    icon: '🛡️',
+    tag: 'SHOOTER',
+    tagColor: '--c-red',
+    external: '/arena/games/tank-protocol/',
+  },
 ]
 
 export default function HomePage() {

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Tankgame V1.1 — BioArcade</title>
+  <link rel="stylesheet" href="shared/base.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="bg">
+  <header class="topbar">
+    <a class="btn small ghost" href="/arena/" data-sfx>← Hub</a>
+    <div class="title">Tankgame V1.1</div>
+    <div class="spacer"></div>
+    <button id="mute" class="btn small" data-sfx>Mute</button>
+  </header>
+<script type="module">import { applySkinToDocument } from "./shared/skins.js"; applySkinToDocument();</script>
+
+
+  <main class="wrap">
+    <canvas id="game" width="960" height="540" aria-label="Tankgame"></canvas>
+
+    <aside class="panel hud">
+      <div class="hud-row">
+        <div class="k">HP</div><div id="hp" class="v mono">5</div>
+      </div>
+      <div class="hud-row">
+        <div class="k">Score</div><div id="score" class="v mono">0</div>
+      </div>
+      <div class="hud-row">
+        <div class="k">Wave</div><div id="wave" class="v mono">1</div>
+      </div>
+
+      <div class="sep"></div>
+      <div class="mini">
+        <b>Contrôles</b><br/>
+        Clavier: WASD/Flèches (déplacement), <b>Espace</b> (tir), <b>Shift</b> (dash).<br/>
+        Manette: Stick gauche (déplacement), <b>A</b> (tir), <b>B</b> (dash).<br/>
+        <b>P</b> pause, <b>R</b> restart.
+      </div>
+    </aside>
+  </main>
+
+  <div id="overlay" class="overlay hidden">
+  <div class="panel modal">
+    <div id="ovTitle" class="ov-title">Paused</div>
+    <div id="ovText" class="mini">Press P to resume.</div>
+
+    <div class="ov-settings">
+      </div>
+
+    <div class="ov-actions">
+      <button id="btnResume" class="btn" data-sfx>Resume</button>
+      <button id="btnRestart" class="btn ghost" data-sfx>Restart</button>
+      <button id="btnBack" class="btn ghost" data-sfx>Return Hub</button>
+    </div>
+
+    <div class="mini" style="opacity:.7;margin-top:10px">
+      Shortcuts: <span class="mono">P</span> pause • <span class="mono">F</span> toggle autofire
+    </div>
+  </div>
+</div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

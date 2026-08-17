@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Escape Game Manager — Web</title>
+  <link rel="stylesheet" href="shared/base.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <div class="title">Escape Game Manager</div>
+        <div class="subtitle">Prototype web (canvas) — gestion de groupes & salles</div>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <a class="btn" href="/arena/" data-sfx data-sfx>← Hub</a>
+      <button id="btnPause" class="btn">⏸ Pause</button>
+      <button id="btnReset" class="btn btn-danger">↻ Reset</button>
+    </div>
+  </header>
+<script type="module">import { applySkinToDocument } from "./shared/skins.js"; applySkinToDocument();</script>
+
+
+  <main class="layout">
+    <section class="stage">
+      <canvas id="game" width="960" height="600" aria-label="Jeu"></canvas>
+      <div class="hint" id="hint"></div>
+    </section>
+
+    <aside class="panel">
+      <div class="card">
+        <div class="card-title">HUD</div>
+        <div class="grid">
+          <div class="kpi"><div class="k">Jour</div><div class="v" id="hudDay">1</div></div>
+          <div class="kpi"><div class="k">Argent</div><div class="v" id="hudMoney">0</div></div>
+          <div class="kpi"><div class="k">Groupes servis</div><div class="v" id="hudServed">0</div></div>
+          <div class="kpi"><div class="k">Objectif</div><div class="v" id="hudNeeded">0</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Contrôles</div>
+        <ul class="list">
+          <li><span class="key">WASD</span> / <span class="key">↑↓←→</span> : déplacer l’agent</li>
+          <li><span class="key">E</span> : prendre / déposer un groupe</li>
+          <li><span class="key">Shift</span> : sprinter (drain d’endurance léger)</li>
+          <li><span class="key">P</span> : pause</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Améliorations (shop)</div>
+        <div class="shop-row">
+          <button id="btnBuyRoom" class="btn btn-primary">Acheter une salle (50€)</button>
+          <div class="shop-note" id="shopNote">Disponible en fin de journée</div>
+        </div>
+        <div class="divider"></div>
+        <label class="row">
+          <span>Vitesse spawn</span>
+          <input id="spawnRate" type="range" min="2" max="20" value="8" />
+        </label>
+        <label class="row">
+          <span>Perte satisfaction</span>
+          <input id="satLoss" type="range" min="0" max="10" value="2" />
+        </label>
+        <div class="tiny">Ces sliders modifient la partie en temps réel (utile pour équilibrage).</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Sauvegarde</div>
+        <div class="shop-row">
+          <button id="btnSave" class="btn">💾 Sauver</button>
+          <button id="btnLoad" class="btn">📂 Charger</button>
+        </div>
+        <div class="tiny">Stockage local (localStorage). Aucun serveur.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Debug</div>
+        <div class="tiny" id="debug"></div>
+      </div>
+
+    </aside>
+  </main>
+
+  <dialog id="modal" class="modal">
+    <div class="modal-inner">
+      <div class="modal-title" id="modalTitle">Fin de journée</div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions">
+        <button id="modalPrimary" class="btn btn-primary">Continuer</button>
+        <button id="modalSecondary" class="btn">Fermer</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sniky — Web Beta • BioArcade</title>
+  <link rel="stylesheet" href="shared/base.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="sig" aria-hidden="true"></div>
+          <div>
+            <h1>Sniky — Web Beta</h1>
+            <div class="subtitle">Infiltration biopunk • drones • dash • score</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <a class="btn" href="/arena/" data-sfx>← Hub</a>
+          <button class="btn" id="btnPause">Pause (P)</button>
+          <button class="btn btn-primary" id="btnRestart">Restart</button>
+        </div>
+      </div>
+    </header>
+<script type="module">import { applySkinToDocument } from "./shared/skins.js"; applySkinToDocument();</script>
+
+
+    <main class="main">
+      <section class="layout">
+        <div class="card stage">
+          <canvas id="c" width="960" height="540" aria-label="Sniky Beta canvas"></canvas>
+          <div class="hint">
+            <span class="tag"><span class="dot"></span> WASD / Flèches</span>
+            <span class="tag"><span class="dot"></span> Shift = Dash</span>
+            <span class="tag warn"><span class="dot"></span> Évite les cônes</span>
+          </div>
+        </div>
+
+        <aside class="card panel">
+          <div class="panel-head">
+            <div class="mono small">MISSION</div>
+            <h2>Voler 9 fragments</h2>
+            <p class="small">Les drones patrouillent. Si tu es vu : tu perds 1 intégrité et tu es “rejeté”.</p>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="k">Fragments</div>
+              <div class="v"><span id="frag">0</span>/9</div>
+            </div>
+            <div class="stat">
+              <div class="k">Intégrité</div>
+              <div class="v"><span id="hp">3</span></div>
+            </div>
+            <div class="stat">
+              <div class="k">Dash</div>
+              <div class="v"><span id="dash">OK</span></div>
+            </div>
+            <div class="stat">
+              <div class="k">Score</div>
+              <div class="v"><span id="score">0</span></div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="small mono">
+            Best score: <span id="best">—</span><br/>
+            Dernier run: <span id="last">—</span>
+          </div>
+
+          <div class="hr"></div>
+
+          <details class="small">
+            <summary>Règles (beta)</summary>
+            <ul>
+              <li>Collecte tous les fragments pour extraire.</li>
+              <li>Si un drone te voit: -1 intégrité + reset position.</li>
+              <li>Dash: micro burst, cooldown.</li>
+              <li>Score: fragments + bonus de temps + intégrité restante.</li>
+            </ul>
+          </details>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

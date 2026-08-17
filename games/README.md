@@ -17,9 +17,42 @@ et ajoute une entrée dans `src/lib/games.ts` + `src/app/page.tsx`.
 | Gold Garden Pro | `lab_garden/` | `lab-garden` | ✅ Oui | Vanilla JS, 100% localStorage | Ex-Supabase, migré ([voir README](lab_garden/README.md)) |
 | Cyber Cellules v3 | `lab_roguelite/` | `lab-roguelite` | ✅ Oui | Vanilla JS / Canvas | RAS |
 | Magnet Maze | `magnet-maze/` | `magnet-maze` | ✅ Oui (v12 seulement) | Vanilla JS | 2 versions restantes (v12 + v134), voir [magnet-maze/README.md](magnet-maze/README.md) |
+| Escape Game Manager | *(hors repo, voir note)* | `escape-game-manager` | ✅ Oui | Vanilla JS / Canvas 2D | Import direct 2026-08-17, voir plus bas |
+| Sniky | *(hors repo, voir note)* | `sniky` | ✅ Oui | Vanilla JS / ESM / Canvas 2D | Import direct 2026-08-17, voir plus bas |
+| Tank Protocol | *(hors repo, voir note)* | `tank-protocol` | ✅ Oui | Vanilla JS / ESM / Canvas 2D | Import direct 2026-08-17, voir plus bas |
 
 Tous les jeux de ce dossier sont désormais accessibles depuis la section
 « 01 · JEUX COMPLETS » de la home ([src/app/page.tsx](../src/app/page.tsx)).
+
+## Import — 2026-08-17 (BioArcade Hub)
+
+`escape-game-manager`, `sniky` et `tank-protocol` viennent d'un hub externe
+(`bzh_bioarcade_hub_v5_1`, projet "BZH Chronicles — BioArcade Hub", hors de ce
+repo) qui regroupait plusieurs prototypes derrière un `shared/` commun
+(`sfx.js`, `audio.js`, `audio_manifest.js`, `progress.js`, `skins.js`,
+`base.css`) référencé en `../../shared/...`. Contrairement aux autres jeux de
+ce tableau, il n'y a pas eu d'étape de staging dans `games/` : la curation
+s'est faite directement depuis le dossier téléchargé vers `public/games/<slug>/`.
+
+Deux prototypes du hub source n'ont pas été repris : `rpg/` (écran "module en
+préparation", aucun gameplay) et `sniky-alpha/` (mini-loop antérieur,
+explicitement remplacé par `sniky-beta` — devenu ici `sniky` — d'après son
+propre texte in-jeu).
+
+Chaque jeu importé est rendu **autonome** : les 6 fichiers `shared/` utilisés
+ont été copiés dans `public/games/<slug>/shared/` (imports réécrits en
+`./shared/...`) et les sons dans `public/games/<slug>/assets/audio/`, plutôt
+que de pointer vers un `shared/` commun à la racine de `public/`. Ça évite de
+reproduire la duplication imbriquée déjà rencontrée avec `bzh-breach-storm`
+(voir plus haut) si une prochaine app venait un jour changer sa structure.
+
+Effet de bord utile : dans le hub d'origine, `shared/audio.js` résout ses
+fichiers via un chemin relatif (`assets/audio/...`) résolu contre l'URL de la
+page — correct pour le hub à la racine, mais cassé pour une page à
+`games/<slug>/index.html` (2 niveaux plus bas, sans `assets/` local). Le lien
+« ← Hub » de chaque jeu pointe désormais vers `/arena/` (il n'y a plus de hub
+BioArcade importé) et le bouton mute de `tank-protocol` (`main.js`, ex-ligne
+597) charge `./shared/audio.js` en dynamique au lieu de `../../shared/audio.js`.
 
 ## Bug trouvé et corrigé pendant l'audit
 
