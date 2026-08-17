@@ -15,7 +15,7 @@ export const GAMES: GameMeta[] = [
   {
     slug: 'dungeon-elf-sound',
     title: 'Dungeon Elf',
-    description: 'Action-RPG sonore — tranche les projectiles, trace des runes et personnalise la voix de tes sortilèges.',
+    description: 'Charge tes sorts, entraîne-toi ou pars en chasse, et fais progresser ton mage. 3 versions jouables au choix.',
     icon: '🧝',
     category: 'arcade',
     unit: 'niveau',

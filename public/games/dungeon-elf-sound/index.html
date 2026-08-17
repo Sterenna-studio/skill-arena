@@ -10,11 +10,14 @@
   <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
-  <select id="version-switch" aria-label="Version du jeu" onchange="location.href=this.value" style="position:fixed;top:6px;right:6px;z-index:99999;background:#0d0520;color:#e8c97a;border:1px solid #4a2a7a;font:11px 'Courier New',monospace;padding:3px 6px;border-radius:3px;cursor:pointer;">
-    <option value="legacy/">Dungeon Elf — Original</option>
-    <option value="v3/">Dungeon Elf Sound — v3</option>
-    <option value="./" selected>Dungeon Elf Sound — v4 (actuelle)</option>
-  </select>
+  <div style="position:fixed;top:6px;right:6px;z-index:99999;display:flex;gap:6px;align-items:center;font:11px 'Courier New',monospace;">
+    <a href="/arena/" style="color:#e8c97a;text-decoration:none;background:#0d0520;border:1px solid #4a2a7a;padding:3px 8px;border-radius:3px;">← Arena</a>
+    <select id="version-switch" aria-label="Version du jeu" onchange="location.href=this.value" style="background:#0d0520;color:#e8c97a;border:1px solid #4a2a7a;font:11px 'Courier New',monospace;padding:3px 6px;border-radius:3px;cursor:pointer;">
+      <option value="legacy/">Dungeon Elf — Original</option>
+      <option value="v3/">Dungeon Elf Sound — v3</option>
+      <option value="./" selected>Dungeon Elf Sound — v4 (actuelle)</option>
+    </select>
+  </div>
   <a class="skip-link" href="#game-root">Aller au jeu</a>
   <main id="game-root" class="app-shell">
     <section class="game-frame" aria-label="Zone de jeu">

@@ -5,7 +5,7 @@ const FULLGAMES = [
   {
     slug: 'dungeon-elf-sound',
     title: 'Dungeon Elf',
-    desc: 'Action-RPG sonore — tranche les projectiles, trace des runes et donne ta propre voix à tes sortilèges. Franchis les donjons pour faire progresser ton mage.',
+    desc: 'Action-RPG rétro — charge tes sorts, améliore ton équipement en boutique et enchaîne entraînements et chasses pour faire progresser ton mage. 3 versions jouables, sélecteur en jeu.',
     icon: '🧝',
     tag: 'ACTION RPG',
     tagColor: '--c-purple',
