@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dungeon Elf</title>
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+<canvas id="c"></canvas>
+<canvas id="arc-canvas"></canvas>
+<div id="village">
+  <canvas id="vc" class="inline-001"></canvas>
+  <div class="inline-002">
+    <div class="inline-003">✦ VILLAGE DES MAGES ✦</div>
+    <div class="inline-004">❤️ <b id="v-hp">100</b>/<b id="v-mhp">100</b> &nbsp;💰 <b id="v-gold">30</b> &nbsp;Niv.<b id="v-lvl">1</b></div>
+    <div class="inline-005">
+      <button class="btn btn-gold" data-action="quests">📜 Quêtes</button>
+      <button class="btn" data-action="inventory">🎒 Inventaire</button>
+      <button class="btn" data-action="manual">📖 Manuel du Sorcier</button>
+      <button class="btn" data-action="training">🗡 Entraînement (5💰)</button>
+    </div>
+    <div class="inline-006">— BOUTIQUES —</div>
+    <div class="inline-005">
+      <button class="btn" data-action="shop-wands">🪄 Mordecai</button>
+      <button class="btn" data-action="shop-hats">🎩 Mme Fripouille</button>
+      <button class="btn" data-action="shop-robes">👗 Séraphin</button>
+      <button class="btn inline-007" data-action="shop-owl">🦉 Lulu Berlu</button>
+    </div>
+  </div>
+</div>
+<div id="combat-ui">
+  <div id="attack-timer-bar"><div id="attack-timer-fill"></div></div>
+  <div id="status-bar"></div>
+  <div id="hurt-vignette"></div>
+  <canvas id="rune-canvas"></canvas>
+  <div id="rune-results"></div>
+  <div id="charge-bar-wrap">
+    <div class="inline-008">
+      <span>CHARGE</span> &nbsp;<span id="cb-pct" class="inline-009">0%</span>
+      <span id="cb-super" class="inline-010"> ✦ SURCHARGE</span>
+    </div>
+    <div class="inline-011">
+      <div id="cb-fill" class="inline-012"></div>
+      <div id="cb-fill2" class="inline-013"></div>
+      <div class="inline-014"></div>
+    </div>
+    <div class="inline-015" id="phase-hint">Défléchissez les attaques</div>
+  </div>
+</div>
+<div id="gameover-screen" class="inline-016">
+  <div class="inline-017">✦ DÉFAITE ✦</div>
+  <div id="go-msg" class="inline-018"></div>
+  <button class="btn btn-gold inline-019" id="retry-button">↩ Réessayer</button>
+</div>
+<div id="victory-screen" class="inline-016">
+  <div class="inline-020">✦ VICTOIRE ✦</div>
+  <div id="vic-msg" class="inline-021"></div>
+  <button class="btn btn-green inline-019" id="village-button">🏘 Village</button>
+</div>
+<div id="loot-screen" class="inline-016">
+  <div class="inline-022">💎 LOOT</div>
+  <div id="loot-items" class="inline-023"></div>
+  <button class="btn btn-gold inline-019" id="loot-continue-button">Continuer →</button>
+</div>
+<div id="dialogue-box">
+  <div id="dialogue-portrait"></div>
+  <div id="dialogue-name"></div>
+  <div id="dialogue-text"></div>
+  <div class="inline-024">Cliquez pour passer</div>
+</div>
+<div id="sound-indicator" id="sound-toggle-button">🔊 Son</div>
+<div id="hud">
+  <div>❤️ <div id="hp-bar" class="inline-025"><div id="hp-fill"></div></div> <b id="h-hp">100</b>/<b id="h-mhp">100</b></div>
+  <div>🪄 <b id="h-staff" class="inline-026">Baguette</b></div>
+  <div>💰 <b id="h-gold">30</b></div>
+  <div class="hud-r" id="hud-r"></div>
+</div>
+<div id="modal-overlay" class="modal inline-027">
+  <div class="modal-box">
+    <button class="close-btn">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+  <script src="./assets/game.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dungeon Elf Sound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+  <select id="version-switch" aria-label="Version du jeu" onchange="location.href=this.value" style="position:fixed;top:6px;right:6px;z-index:99999;background:#0d0520;color:#e8c97a;border:1px solid #4a2a7a;font:11px 'Courier New',monospace;padding:3px 6px;border-radius:3px;cursor:pointer;">
+    <option value="../legacy/">Dungeon Elf — Original</option>
+    <option value="./" selected>Dungeon Elf Sound — v3</option>
+    <option value="../">Dungeon Elf Sound — v4 (actuelle)</option>
+  </select>
+  <a class="skip-link" href="#game-root">Aller au jeu</a>
+  <main id="game-root" class="app-shell">
+    <section class="game-frame" aria-label="Zone de jeu">
+      <canvas id="game-canvas" width="960" height="540" aria-hidden="true"></canvas>
+
+      <header class="hud-panel">
+        <div class="hud-group hud-group-status">
+          <div class="stat-card">
+            <span class="stat-label">Vie</span>
+            <strong id="hud-hp">100 / 100</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Or</span>
+            <strong id="hud-gold">30</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Niveau</span>
+            <strong id="hud-level">1</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Équipement</span>
+            <strong id="hud-weapon">Baguette novice</strong>
+          </div>
+        </div>
+        <div class="hud-group hud-group-actions">
+          <button class="btn btn-ghost" type="button" data-action="toggle-sound">🔊 Son</button>
+        </div>
+      </header>
+
+      <section id="village-screen" class="screen screen-active screen-village" aria-labelledby="village-title">
+        <div class="panel panel-village">
+          <p class="eyebrow">Village des mages</p>
+          <h1 id="village-title" class="screen-title">Dungeon Elf Sound</h1>
+          <p class="screen-copy">Un mini dungeon crawler rétro avec entraînement, loot, boutiques et progression légère.</p>
+
+          <div class="action-grid">
+            <button class="btn btn-primary" type="button" data-action="start-training">🗡 Entraînement</button>
+            <button class="btn btn-secondary" type="button" data-action="open-quests">📜 Quêtes</button>
+            <button class="btn btn-secondary" type="button" data-action="open-inventory">🎒 Inventaire</button>
+            <button class="btn btn-secondary" type="button" data-action="open-manual">📖 Manuel</button>
+          </div>
+
+          <div class="shop-section">
+            <p class="section-label">Boutiques</p>
+            <div class="shop-grid">
+              <button class="btn btn-shop" type="button" data-action="shop-wands">🪄 Mordecai</button>
+              <button class="btn btn-shop" type="button" data-action="shop-hats">🎩 Mme Fripouille</button>
+              <button class="btn btn-shop" type="button" data-action="shop-robes">👗 Séraphin</button>
+              <button class="btn btn-shop" type="button" data-action="shop-owl">🦉 Lulu Berlu</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="battle-screen" class="screen screen-battle" aria-labelledby="battle-title" hidden>
+        <div class="battle-layout">
+          <div class="battle-stage panel">
+            <p class="eyebrow">Arène</p>
+            <h2 id="battle-title" class="screen-subtitle">Entraînement magique</h2>
+            <p id="battle-log" class="battle-log">Charge ton sort et déclenche-le au bon moment.</p>
+            <div class="enemy-card">
+              <span class="enemy-label">Cible</span>
+              <strong id="enemy-name">Fantôme d'entraînement</strong>
+              <div class="enemy-bar"><div id="enemy-bar-fill" class="enemy-bar-fill"></div></div>
+              <span id="enemy-hp" class="enemy-hp">40 / 40</span>
+            </div>
+          </div>
+
+          <aside class="battle-controls panel" aria-label="Contrôles de combat">
+            <div class="charge-block">
+              <div class="charge-meta">
+                <span>Charge</span>
+                <strong id="charge-value">0%</strong>
+              </div>
+              <div class="charge-bar"><div id="charge-fill" class="charge-fill"></div></div>
+              <p class="hint-text">Attends la zone dorée pour un sort critique.</p>
+            </div>
+            <div class="combat-actions">
+              <button class="btn btn-primary" type="button" data-action="charge-spell">Canaliser</button>
+              <button class="btn btn-gold" type="button" data-action="cast-spell">Lancer le sort</button>
+              <button class="btn btn-ghost" type="button" data-action="return-village">Fuir au village</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="modal-layer" class="modal-layer" aria-live="polite"></section>
+
+      <section id="result-screen" class="screen screen-result" hidden>
+        <div class="panel panel-result">
+          <p id="result-kicker" class="eyebrow">Résultat</p>
+          <h2 id="result-title" class="screen-title">Victoire</h2>
+          <p id="result-copy" class="screen-copy">Le combat est terminé.</p>
+          <div id="result-rewards" class="reward-list"></div>
+          <div class="result-actions">
+            <button class="btn btn-primary" type="button" data-action="result-primary">Continuer</button>
+            <button class="btn btn-secondary" type="button" data-action="retry-battle">Rejouer</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script type="module" src="./assets/main.js"></script>
+</body>
+</html>

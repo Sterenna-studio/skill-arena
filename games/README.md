@@ -11,7 +11,7 @@ et ajoute une entrée dans `src/lib/games.ts` + `src/app/page.tsx`.
 
 | Jeu | Dossier source | Slug hub | Branché ? | Stack | Notes |
 |---|---|---|---|---|---|
-| Dungeon Elf | `dungeon_elf_sound/` | `dungeon-elf-sound` | ✅ Oui | Vanilla JS / Canvas 2D / Web Audio | Jeu autonome ; voix de sort personnalisable via le micro |
+| Dungeon Elf | `dungeon_elf_sound/` | `dungeon-elf-sound` | ✅ Oui | Vanilla JS / Canvas 2D / Web Audio | 3 versions sélectionnables (Original/v3/v4), voir plus bas |
 | BZH Breach Storm | `bzh-breach-storm/` | `bzh-breach-storm` | ✅ Oui | Vanilla JS / Canvas 2D | Un lien cassé a été corrigé (voir plus bas) |
 | BZH Nemeton Lockdown | `bzh-nemeton-lockdown/` | `bzh-nemeton-lockdown` | ✅ Oui | Vanilla JS / DOM + Canvas | RAS |
 | Spirit Overdrive | `spirit-overdrive/` | `spirit-overdrive` | ✅ Oui | Vanilla JS / ESM | RAS |
@@ -54,6 +54,37 @@ page — correct pour le hub à la racine, mais cassé pour une page à
 « ← Hub » de chaque jeu pointe désormais vers `/arena/` (il n'y a plus de hub
 BioArcade importé) et le bouton mute de `tank-protocol` (`main.js`, ex-ligne
 597) charge `./shared/audio.js` en dynamique au lieu de `../../shared/audio.js`.
+
+## Multi-version — 2026-08-17 (Dungeon Elf)
+
+`dungeon_elf_sound/` a reçu trois versions distinctes en staging
+(`dungeon_elf_sound_full/`, `dungeon_elf_sound_v3/`, `dungeon_elf_sound_v4/`) —
+pas des itérations d'un même fichier mais trois implémentations différentes
+(l'originale, puis une refonte avec système audio dédié en v3, v4 ajoutant
+mana/sorts/XP/mode chasse par-dessus v3). Déployées en parallèle plutôt que la
+dernière remplaçant les précédentes :
+
+```txt
+public/games/dungeon-elf-sound/
+├── index.html + assets/   ← v4 (chargée par défaut sur /arena/games/dungeon-elf-sound/)
+├── v3/                    ← ex-dungeon_elf_sound_v3
+└── legacy/                ← ex-dungeon_elf_sound_full (version originale, "Dungeon Elf")
+```
+
+Un `<select>` flottant (`#version-switch`, injecté en haut de chaque `<body>`,
+`onchange="location.href=this.value"`) permet de changer de version ; chemins
+relatifs entre les 3 dossiers, pas de dépendance à un `shared/` externe.
+
+**Bugs trouvés en vérifiant** : `content.js` (v4), et `battle.js` / `content.js`
+/ `shops.js` (v3) contenaient des apostrophes françaises non échappées dans des
+chaînes `'...'` (ex. `'Fantôme d'entraînement'`), ce qui cassait le parsing ES
+module (`SyntaxError: Unexpected identifier`) et empêchait tout le script de
+s'exécuter — silencieux à l'œil, seulement visible dans la console. Corrigé en
+alignant sur l'apostrophe typographique (’) déjà utilisée correctement ailleurs
+dans ces mêmes fichiers. Les 24 fichiers JS des 3 versions sont depuis passés
+au crible avec `node --input-type=module --check < fichier.js` (le seul mode
+qui valide vraiment la syntaxe ES module — `node --check` seul ne suffit pas
+ici) : plus aucune erreur.
 
 ## Bug trouvé et corrigé pendant l'audit
 
