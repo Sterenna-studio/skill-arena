@@ -62,6 +62,7 @@ function RoomContent() {
   return (
     <div className="max-w-xl mx-auto px-6 py-12">
       <div className="mb-10 text-center">
+        <p className="section-label" style={{ textAlign: 'center' }}>// DUELS TEMPS RÉEL</p>
         <h1 className="text-4xl font-bold mb-2">🎮 Multijoueur</h1>
         <p style={{ color: 'var(--muted)' }}>Crée ou rejoins une room privée.</p>
       </div>

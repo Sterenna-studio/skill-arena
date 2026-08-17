@@ -38,7 +38,7 @@ export default function ReactionRace({ onScore }: Props) {
     }
   }, [phase, onScore])
 
-  const bg = phase === 'ready' ? 'var(--success)' : '#1a1a2e'
+  const bg = phase === 'ready' ? 'var(--success)' : '#170f28'
 
   return (
     <div className="flex flex-col gap-4">

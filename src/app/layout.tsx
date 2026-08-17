@@ -11,8 +11,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className="h-full antialiased">
       <body className="min-h-full flex flex-col" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+        <div className="starfield" aria-hidden="true" />
+        <div className="scanlines" aria-hidden="true" />
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1" style={{ position: 'relative', zIndex: 1 }}>{children}</main>
       </body>
     </html>
   )

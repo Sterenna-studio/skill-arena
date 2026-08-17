@@ -97,27 +97,39 @@ const FULLGAMES = [
 export default function HomePage() {
   const skillGames = GAMES.filter(g => g.available && !g.external)
   const comingGames = GAMES.filter(g => !g.available)
+  const totalGames = FULLGAMES.length + skillGames.length + 5
 
   return (
     <>
-      <div className="scanlines" aria-hidden="true" />
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
-        {/* ── HERO ── */}
-        <section style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <p className="section-label">// STERENNA STUDIO · NITRO PLATFORM</p>
-          <h1 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(3.5rem, 2rem + 6vw, 7rem)',
-            color: 'var(--c-text)',
-            letterSpacing: '0.05em',
-            marginBottom: '1rem',
-          }}>
-            SKILL <span style={{ color: 'var(--c-primary)', textShadow: '0 0 20px rgba(57,255,20,0.6)' }}>ARENA</span>
-          </h1>
-          <p style={{ color: 'var(--c-text-muted)', maxWidth: '52ch', margin: '0 auto', lineHeight: 1.6 }}>
-            Hub de jeux Sterenna Studio — teste tes skills, bats tes records, défie la communauté.
-          </p>
+        {/* ── HERO / RETROSPACE DASHBOARD ── */}
+        <section style={{ marginBottom: '3.5rem' }}>
+          <div className="panel" style={{ padding: 'clamp(1.5rem, 1rem + 2vw, 2.75rem)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1 1 380px' }}>
+                <p className="section-label">// STERENNA STUDIO · NITRO PLATFORM</p>
+                <h1 style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(3rem, 1.6rem + 6vw, 6.5rem)',
+                  color: 'var(--c-text)',
+                  letterSpacing: '0.05em',
+                  marginBottom: '0.75rem',
+                }}>
+                  SKILL <span style={{ color: 'var(--c-primary)', textShadow: '0 0 16px rgba(255,79,216,0.55), 0 0 34px rgba(41,227,255,0.20)' }}>ARENA</span>
+                </h1>
+                <p style={{ color: 'var(--c-text-muted)', maxWidth: '52ch', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+                  Hub de jeux Sterenna Studio — teste tes skills, bats tes records, défie la communauté.
+                </p>
+                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <span className="pill"><span className="led on" /> SYSTEM ONLINE</span>
+                  <span className="pill">NODE <b style={{ color: 'var(--c-text)', marginLeft: 4 }}>SKILL-ARENA</b></span>
+                  <span className="pill">JEUX <b style={{ color: 'var(--c-cyan)', marginLeft: 4 }}>{totalGames}</b></span>
+                </div>
+              </div>
+              <div className="orb hero-orb" aria-hidden="true" />
+            </div>
+          </div>
         </section>
 
         {/* ── 01 · JEUX COMPLETS ── */}

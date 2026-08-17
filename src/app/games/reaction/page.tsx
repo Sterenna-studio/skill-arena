@@ -44,7 +44,7 @@ export default function ReactionGame() {
   const avg = results.length > 0 ? Math.round(results.reduce((a, b) => a + b, 0) / results.length) : null
   const best = results.length > 0 ? Math.min(...results) : null
 
-  const bg = phase === 'ready' ? 'var(--success)' : phase === 'waiting' ? '#1a1a2e' : 'var(--surface2)'
+  const bg = phase === 'ready' ? 'var(--success)' : phase === 'waiting' ? '#170f28' : 'var(--surface2)'
   const label =
     phase === 'idle' ? 'Clique pour commencer' :
     phase === 'waiting' ? 'Attends...' :
