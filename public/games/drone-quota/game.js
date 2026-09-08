@@ -14,6 +14,15 @@
 
   const SAVE_KEY = 'drone-quota:v1';
 
+  // La couche sensorielle est optionnelle : si fx.js n'a pas chargé, le jeu
+  // doit rester jouable en silence plutôt que planter au premier clic.
+  const FX = window.DQFX ?? {
+    sfx: new Proxy({}, { get: () => () => {} }),
+    hum() {}, setMuted() { return true; }, isMuted: () => true, unlock() {},
+    attach() {}, resize() {}, burst() {}, tracer() {}, shake() {}, clear() {},
+    scar() {}, clearScars() {}, centerOf: () => ({ x: 0, y: 0 }),
+  };
+
   const BALANCE = {
     roundSeconds: 26,
     quotaBase: 520,
@@ -365,6 +374,7 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.className = `node ${state.status}${mode === 'readonly' ? ' readonly' : ''}`;
+        button.dataset.node = node.id;
         button.innerHTML = `
           <span class="node-head">
             <span class="node-name">${node.name}</span>
@@ -393,7 +403,15 @@
     save.tree[node.id] = state.level + 1;
     persist();
     stats = deriveStats(save.tree);
+    FX.sfx.buy();
     renderShop();
+    // L'atelier est re-rendu : on retrouve le nœud pour lui donner son accusé
+    // de réception, sinon l'achat ne se voit pas.
+    const fresh = document.querySelector(`#shop-tree .node[data-node="${node.id}"]`);
+    if (fresh) {
+      fresh.classList.add('just-bought');
+      setTimeout(() => fresh.classList.remove('just-bought'), 480);
+    }
   }
 
   // ── atelier ─────────────────────────────────────────────────────────────
@@ -452,7 +470,9 @@
       button.type = 'button';
       button.className = 'port';
       button.innerHTML = `<span class="id">P${String(i + 1).padStart(2, '0')}</span>`
-        + `<span class="icon">⬡</span><span class="name">IDLE</span>`;
+        + `<span class="socket"><span class="shaft"></span>`
+        + `<span class="riser"><span class="icon"></span></span></span>`
+        + `<span class="scars"></span><span class="name">IDLE</span>`;
       const port = { index: i, el: button, target: null, ttlTimer: null };
       button.addEventListener('click', () => onPortClick(port));
       grid.appendChild(button);
@@ -464,12 +484,17 @@
     }
   }
 
+  /** Panoramique stéréo d'un port : la colonne 0 sonne à gauche. */
+  function panOf(port) {
+    return ((port.index % COLS) / (COLS - 1)) * 1.6 - 0.8;
+  }
+
   function clearPort(port) {
     if (port.ttlTimer) clearTimeout(port.ttlTimer);
     port.ttlTimer = null;
     port.target = null;
     port.el.className = 'port';
-    port.el.querySelector('.icon').textContent = '⬡';
+    port.el.querySelector('.icon').textContent = '';
     port.el.querySelector('.name').textContent = 'IDLE';
   }
 
@@ -507,6 +532,10 @@
     updateHud();
     setMsg('Frappe tout ce qui bouge.', '');
     show('scr-round');
+    FX.clear();
+    FX.clearScars();
+    FX.resize();
+    FX.hum(true);
 
     countdown(() => {
       round.running = true;
@@ -519,21 +548,23 @@
 
   function countdown(done) {
     const steps = ['3', '2', '1', 'GO'];
+    const overlay = $('boot');
+    const label = $('boot-text');
     let i = 0;
-    const node = document.createElement('div');
-    node.className = 'countdown';
-    document.body.appendChild(node);
+    overlay.hidden = false;
 
     const step = () => {
       if (i >= steps.length) {
-        node.remove();
+        overlay.hidden = true;
         done();
         return;
       }
-      node.textContent = steps[i++];
-      node.style.animation = 'none';
-      void node.offsetWidth;
-      node.style.animation = '';
+      const text = steps[i++];
+      label.textContent = text;
+      label.style.animation = 'none';
+      void label.offsetWidth;
+      label.style.animation = '';
+      text === 'GO' ? FX.sfx.go() : FX.sfx.tick();
       setTimeout(step, 480);
     };
     step();
@@ -571,7 +602,8 @@
     if (!positive) return;
     round.combo = 1;
     port.el.classList.add('gone');
-    setTimeout(() => port.el.classList.remove('gone'), 200);
+    setTimeout(() => port.el.classList.remove('gone'), 240);
+    FX.sfx.escape();
     updateHud();
   }
 
@@ -585,6 +617,9 @@
       round.combo = 1;
       popText(port, 'RATÉ', 'neg');
       setMsg('Coup dans le vide — combo perdu.', 'bad');
+      FX.sfx.miss(panOf(port));
+      FX.scar(port.el, 'miss');
+      FX.shake(cabinet(), 2);
       updateHud();
       return;
     }
@@ -596,6 +631,8 @@
       round.combo = Math.min(stats.comboCap, round.combo + 1);
       round.maxCombo = Math.max(round.maxCombo, round.combo);
       popText(port, type.effect === 'coolant' ? 'FLUX -' : 'POINTS ×2', 'turret');
+      FX.burst(port.el, 'bonus', 1.1);
+      FX.sfx.bonus(type.effect);
       flashPort(port, 'hit');
       updateHud();
       return;
@@ -649,7 +686,28 @@
     round.gain += points;
 
     popText(port, `+${fmt(points)}`, crit ? 'crit' : viaTurret ? 'turret' : '');
+
+    const pan = panOf(port);
+    if (viaTurret) {
+      FX.burst(port.el, 'turret', 0.8);
+    } else if (crit) {
+      FX.burst(port.el, 'crit', 1.4);
+      FX.sfx.crit(pan);
+      FX.shake(cabinet(), 7);
+    } else {
+      // L'intensité suit le combo : une chaîne longue doit s'entendre et se
+      // voir monter, c'est là que le joueur sent qu'il tient quelque chose.
+      const ratio = (round.combo - 1) / Math.max(1, stats.comboCap - 1);
+      FX.burst(port.el, 'hit', 0.85 + ratio * 0.7);
+      FX.sfx.hit(ratio, pan);
+      FX.shake(cabinet(), 2 + ratio * 2.5);
+    }
+    FX.scar(port.el, crit ? 'crit' : 'hit');
     flashPort(port, viaTurret ? 'turret-hit' : 'hit');
+  }
+
+  function cabinet() {
+    return $('cabinet');
   }
 
   function hitVirus(port, type) {
@@ -664,6 +722,17 @@
     round.combo = 1;
 
     popText(port, shielded ? 'PARE-FEU' : `-${fmt(malus)}`, 'neg');
+    const pan = panOf(port);
+    FX.burst(port.el, 'bad', shielded ? 0.9 : 1.5);
+    FX.scar(port.el, 'bad');
+    if (shielded) {
+      FX.sfx.shield(pan);
+      FX.shake(cabinet(), 4);
+    } else {
+      FX.sfx.virus(pan);
+      FX.shake(cabinet(), 11);
+      if (round.lives === 1) FX.sfx.lowLife();
+    }
     flashPort(port, 'bad');
     setMsg(
       shielded ? 'Virus absorbé par le pare-feu.' : `Virus — ${round.lives} vie${round.lives > 1 ? 's' : ''} restante${round.lives > 1 ? 's' : ''}.`,
@@ -737,6 +806,8 @@
       led.classList.add('firing');
       setTimeout(() => led.classList.remove('firing'), 160);
     });
+    FX.tracer(side.flank, target.el);
+    FX.sfx.turret(side.col === 0 ? -0.85 : 0.85);
 
     if (target.target.pts < 0) {
       // Tourelle aveugle : elle peut se prendre un virus. Ça coûte des points,
@@ -745,6 +816,8 @@
       run.bank = Math.max(0, run.bank - malus);
       round.gain -= malus;
       popText(target, `-${fmt(malus)}`, 'neg');
+      FX.burst(target.el, 'bad', 1);
+      FX.scar(target.el, 'bad');
       flashPort(target, 'bad');
       updateHud();
       return;
@@ -770,6 +843,9 @@
     fill.style.transform = `scaleX(${left / BALANCE.roundSeconds})`;
     fill.classList.toggle('urgent', left <= 6);
 
+    const heat = left <= 8 ? 1 - left / 8 : 0;
+    cabinet()?.style.setProperty('--time-heat', heat.toFixed(3));
+
     updateEffectPills();
     if (left <= 0) endRound('temps');
   }
@@ -783,6 +859,9 @@
     const combo = $('hud-combo');
     combo.textContent = `×${round.combo}`;
     combo.classList.toggle('combo-hot', round.combo >= stats.comboCap);
+
+    const heat = Math.max(0, Math.min(1, (round.combo - 1) / Math.max(1, stats.comboCap - 1)));
+    cabinet()?.style.setProperty('--combo-heat', heat.toFixed(3));
 
     const ratio = Math.min(1, run.bank / round.quota);
     $('quota-fill').style.width = `${ratio * 100}%`;
@@ -821,6 +900,8 @@
     round.spawnTimer = null;
     disarmTurrets();
     ports.forEach(clearPort);
+    FX.hum(false);
+    cabinet()?.style.setProperty('--time-heat', '0');
   }
 
   function endRound(cause) {
@@ -834,6 +915,7 @@
         `Quota réglé — ${fmt(round.quota)} prélevés, il reste ${fmt(run.bank)} en banque.`,
         'good',
       );
+      FX.sfx.paid();
       if (run.round > save.bestRound) {
         save.bestRound = run.round;
         persist();
@@ -849,6 +931,8 @@
         : `Temps écoulé — il manquait ${fmt(round.quota - run.bank)}.`,
       'bad',
     );
+    FX.sfx.failed();
+    FX.shake(cabinet(), 13);
     setTimeout(() => gameOver(cause), 1500);
   }
 
@@ -911,6 +995,40 @@
   });
 
   window.addEventListener('beforeunload', stopRound);
+
+  FX.attach($('fx-layer'), $('arena'));
+
+  const muteBtn = $('btn-mute');
+  const paintMute = () => {
+    const muted = FX.isMuted();
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+    muteBtn.setAttribute('aria-pressed', String(muted));
+    muteBtn.title = muted ? 'Rétablir le son' : 'Couper le son';
+  };
+  muteBtn.addEventListener('click', () => {
+    FX.setMuted(!FX.isMuted());
+    paintMute();
+    if (!FX.isMuted()) {
+      FX.unlock();
+      FX.sfx.tick();
+      if (round.running) FX.hum(true);
+    }
+  });
+  paintMute();
+
+  // Les navigateurs n'autorisent l'audio qu'après un geste : on ouvre le
+  // contexte au premier contact, quel qu'il soit.
+  const unlockOnce = () => {
+    FX.unlock();
+    window.removeEventListener('pointerdown', unlockOnce);
+    window.removeEventListener('keydown', unlockOnce);
+  };
+  window.addEventListener('pointerdown', unlockOnce);
+  window.addEventListener('keydown', unlockOnce);
+
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('click', () => FX.sfx.tick());
+  });
 
   renderMenu();
 

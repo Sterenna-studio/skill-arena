@@ -8,14 +8,19 @@
 </head>
 <body>
 
-<a class="back-link" href="/arena/">← Arena</a>
+<div class="corner-tools">
+  <button class="tool" id="btn-mute" type="button" aria-pressed="false" title="Couper le son">🔊</button>
+  <a class="tool" href="/arena/">← Arena</a>
+</div>
 
 <div class="shell">
 
   <!-- ══ ACCUEIL ══ -->
   <section class="screen active" id="scr-menu">
     <header class="title-block">
+      <div class="plate" aria-hidden="true"></div>
       <h1>DRONE<span>QUOTA</span></h1>
+      <p class="serial">TERMINAL DE MAINTENANCE · MOD. DQ-12</p>
       <p class="tagline">Le terminal réclame son quota. Chaque round, la facture monte.</p>
     </header>
 
@@ -27,7 +32,7 @@
     </div>
 
     <div class="rules">
-      <div class="rule"><b>1</b><span>Frappe les drones sur les 12 ports. Le combo monte à chaque touche, et tombe si tu frappes dans le vide.</span></div>
+      <div class="rule"><b>1</b><span>Frappe les drones qui sortent des 12 ports. Le combo monte à chaque touche, et tombe si tu frappes dans le vide.</span></div>
       <div class="rule"><b>2</b><span>À la fin du round, le quota est prélevé sur ta banque. S'il manque un seul point, la run s'arrête.</span></div>
       <div class="rule"><b>3</b><span>Toucher un virus coûte une vie. Trois virus et le round se coupe net, quota ou pas.</span></div>
       <div class="rule"><b>4</b><span>Entre deux rounds, la banque achète des nœuds. Ils sont <em>définitifs</em> — mais ce que tu dépenses ne paiera pas la facture suivante.</span></div>
@@ -75,30 +80,60 @@
 
   <!-- ══ ROUND ══ -->
   <section class="screen" id="scr-round">
-    <div class="hud">
-      <div class="hud-cell"><span>ROUND</span><strong id="hud-round">1</strong></div>
-      <div class="hud-cell wide"><span>BANQUE / QUOTA</span><strong id="hud-bank">0 / 520</strong></div>
-      <div class="hud-cell"><span>COMBO</span><strong id="hud-combo">×1</strong></div>
-      <div class="hud-cell"><span>VIES</span><strong id="hud-lives">♥♥♥</strong></div>
-      <div class="hud-cell"><span>TEMPS</span><strong id="hud-time">26</strong></div>
+    <div class="cabinet" id="cabinet">
+
+      <div class="marquee">
+        <span class="bulbs" aria-hidden="true"></span>
+        <strong>DRONE QUOTA</strong>
+        <span class="marquee-sub">MAINTENANCE · DQ-12</span>
+        <span class="bulbs" aria-hidden="true"></span>
+      </div>
+
+      <div class="bezel">
+        <span class="screw tl" aria-hidden="true"></span>
+        <span class="screw tr" aria-hidden="true"></span>
+        <span class="screw bl" aria-hidden="true"></span>
+        <span class="screw br" aria-hidden="true"></span>
+
+        <div class="glass">
+          <div class="hud">
+            <div class="hud-cell"><span>ROUND</span><strong id="hud-round">1</strong></div>
+            <div class="hud-cell wide"><span>BANQUE / QUOTA</span><strong id="hud-bank">0 / 520</strong></div>
+            <div class="hud-cell"><span>COMBO</span><strong id="hud-combo">×1</strong></div>
+            <div class="hud-cell"><span>VIES</span><strong id="hud-lives">♥♥♥</strong></div>
+            <div class="hud-cell"><span>TEMPS</span><strong id="hud-time">26</strong></div>
+          </div>
+
+          <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">0 %</em></div>
+
+          <div class="effects">
+            <span class="pill" id="pill-coolant">COOLANT</span>
+            <span class="pill" id="pill-overclock">OVERCLOCK</span>
+            <span class="pill" id="pill-turrets">TOURELLES OFF</span>
+          </div>
+
+          <div class="arena" id="arena">
+            <div class="flank left" id="flank-left" aria-hidden="true"></div>
+            <div class="grid" id="grid"></div>
+            <div class="flank right" id="flank-right" aria-hidden="true"></div>
+            <canvas class="fx-layer" id="fx-layer" aria-hidden="true"></canvas>
+          </div>
+
+          <div class="timebar"><i id="time-fill"></i></div>
+          <p class="round-msg" id="round-msg">Frappe tout ce qui bouge.</p>
+
+          <div class="glare" aria-hidden="true"></div>
+          <div class="boot" id="boot" hidden><span id="boot-text">3</span></div>
+        </div>
+      </div>
+
+      <div class="deck">
+        <span class="grille" aria-hidden="true"></span>
+        <span class="deck-label" aria-hidden="true">STERENNA · SÉRIE DQ</span>
+        <span class="grille" aria-hidden="true"></span>
+      </div>
+
     </div>
-
-    <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">0 %</em></div>
-
-    <div class="effects">
-      <span class="pill" id="pill-coolant">COOLANT</span>
-      <span class="pill" id="pill-overclock">OVERCLOCK</span>
-      <span class="pill" id="pill-turrets">TOURELLES OFF</span>
-    </div>
-
-    <div class="arena">
-      <div class="flank left" id="flank-left" aria-hidden="true"></div>
-      <div class="grid" id="grid"></div>
-      <div class="flank right" id="flank-right" aria-hidden="true"></div>
-    </div>
-
-    <div class="timebar"><i id="time-fill"></i></div>
-    <p class="round-msg" id="round-msg">Frappe tout ce qui bouge.</p>
   </section>
 
   <!-- ══ ATELIER (entre deux rounds) ══ -->
@@ -139,6 +174,7 @@
 
 </div>
 
+<script src="fx.js"></script>
 <script src="game.js"></script>
 </body>
 </html>
