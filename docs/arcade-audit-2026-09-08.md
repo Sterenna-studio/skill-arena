@@ -84,17 +84,20 @@ a pas de bandes de rouleaux. Le RTP « ~90% » annoncé dans le README n'a jamai
 
 ## Ce qui bloque la jouabilité
 
-### Correctif — la mise est relue à la fin de la run
+### ~~La mise est relue à la fin de la run~~ — corrigé (`31f9f45`)
 
-`crash.js:131`, `crash.js:158`, `whack-a-mole.js:284` appellent `getBet()` au
-moment du résultat, pas au lancement. Le bet panel reste cliquable pendant la
-partie : on mise 1, on monte à 100 avant la fin, on encaisse sur 100.
+Drone Bash et Hyperjump relisaient `getBet()` au moment du résultat alors que
+le panneau restait cliquable : on lançait à 1 ST, on montait à 100 avant la
+fin, le gain tombait sur 100. Vérifié en jeu avant correctif — les six presets
+répondaient en pleine phase WARMUP.
 
-Vérifié en jeu : run Drone Bash lancée à 10 ST, les 6 presets (jusqu'à 100)
-répondent toujours pendant la phase WARMUP.
+Les deux jeux capturent désormais le montant prélevé dans `stake` au
+lancement, et le core expose `lockBet()` : les handlers testent `betLocked` en
+plus de `disabled`, donc un panneau re-rendu ne rouvre pas une mise payée.
+Hyperjump attend la rupture plutôt que le cashout pour lever le verrou.
 
-Correctif : capturer la mise dans `launch()` / `start()` et désactiver le
-panneau tant que `running`.
+Coin Reactor capturait déjà sa mise dans `spin()` ; il a reçu le verrou pour
+la cohérence.
 
 ### Perf — le hack de renommage tourne à 60 fps
 
@@ -104,11 +107,11 @@ chaque mutation relance un `createTreeWalker` sur tout le document
 et Hyperjump écrivent du texte de HUD à chaque frame → parcours complet de
 l'arbre à chaque frame.
 
-Correctif : corriger les chaînes à la source et supprimer l'observer. Restent
-à reprendre : `slot-machine.js:100` (« CRÉDITS INSUFFISANTS »),
-`star-arcade-core.js:177` et `:190`. Ces deux dernières donnent d'ailleurs
+Correctif : corriger les chaînes à la source et supprimer l'observer. Reste à
+reprendre `star-arcade-core.js:179` et `:192`, qui donnent d'ailleurs
 « CONVERSION STAR TOKENS PLUS TARD » et « STAR TOKENS BLOQUÉS » après
-remplacement — des phrases qui ne veulent plus rien dire.
+remplacement — des phrases qui ne veulent plus rien dire. `slot-machine.js`
+est déjà passé aux Star Tokens.
 
 ### Tactile — absent partout
 
@@ -183,8 +186,11 @@ côté, l'arcade se lance quand même mais sans thème ni sprites.
 ## Ordre proposé
 
 1. ~~Harnais local~~ — fait.
-2. Capturer la mise au lancement, verrouiller le bet panel pendant la run.
+2. ~~Capturer la mise au lancement, verrouiller le bet panel pendant la run~~
+   — fait (`31f9f45`).
 3. Supprimer l'observer de renommage en corrigeant les chaînes à la source.
+   Reste `star-arcade-core.js:179` et `:192` — `slot-machine.js` est déjà
+   passé aux Star Tokens.
 4. Contrôles tactiles partagés, Neon Circuit en premier.
 5. Finir Neon Circuit : tours, checkpoints, objectifs, wallet du core.
 6. Coin Reactor : modules roguelite, puis simulateur RTP.
