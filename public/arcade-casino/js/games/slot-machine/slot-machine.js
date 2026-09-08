@@ -24,9 +24,10 @@ const SYMBOLS = [
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 
 export class SlotMachineGame {
-  constructor({ mountId, getBet, debit, credit, addHistory, backToLobby }) {
+  constructor({ mountId, getBet, debit, credit, addHistory, backToLobby, lockBet }) {
     this.mountId = mountId;
     this.getBet = getBet;
+    this.lockBet = lockBet ?? (() => {});
     this.debit = debit;
     this.credit = credit;
     this.addHistory = addHistory;
@@ -97,8 +98,9 @@ export class SlotMachineGame {
   async spin() {
     if (this.spinning) return;
     const bet = this.getBet();
-    if (!(await this.debit(bet))) return this.setMsg('CRÉDITS INSUFFISANTS', 'lose');
+    if (!(await this.debit(bet))) return this.setMsg('STAR TOKENS INSUFFISANTS', 'lose');
     this.spinning = true;
+    this.lockBet(true);
     const btn = document.getElementById('sl-spin');
     if (btn) btn.disabled = true;
     document.getElementById('slot-breakdown').textContent = '';
@@ -135,6 +137,7 @@ export class SlotMachineGame {
     if (wins.some(w => w.symbol.id === 'star' && w.count >= 5)) SFX.jackpot();
     else status === 'win' ? SFX.win() : SFX.lose();
     this.spinning = false;
+    this.lockBet(false);
     if (btn) btn.disabled = false;
   }
 

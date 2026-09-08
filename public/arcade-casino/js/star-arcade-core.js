@@ -92,6 +92,8 @@ export class StarArcadeCore {
     this.nrBack = null;
     this.machineStats = {};
     this.booting = false;
+    this.betLocked = false;
+    this.refreshBetPanel = null;
   }
 
   storageKey() {
@@ -270,6 +272,10 @@ export class StarArcadeCore {
         credit: amount => this.credit(amount),
         addHistory: (...args) => this.addHistory(...args),
         backToLobby: () => this.backToLobby(),
+        // Une run se joue sur la mise débitée à son lancement. Les jeux
+        // verrouillent le panneau le temps de la partie pour que l'affichage
+        // ne puisse plus contredire ce qui a été prélevé.
+        lockBet: locked => this.setBetLocked(name, locked),
       };
 
       if (name === 'wam') this.activeGame = new WhackAMoleGame(common);
@@ -370,6 +376,8 @@ export class StarArcadeCore {
   cleanupActiveGame() {
     if (this.activeGame?.stop) this.activeGame.stop();
     this.activeGame = null;
+    this.betLocked = false;
+    this.refreshBetPanel = null;
     this.cleanupNeonRacer();
   }
 
@@ -396,19 +404,29 @@ export class StarArcadeCore {
       const val = document.getElementById(`${id}-bet-val`);
       if (val) val.textContent = this.bet;
 
+      const panel = document.querySelector(`#game-${id} .bet-panel`);
+      panel?.classList.toggle('locked', this.betLocked);
+
+      document.getElementById(`${id}-bet-down`)?.toggleAttribute('disabled', this.betLocked);
+      document.getElementById(`${id}-bet-up`)?.toggleAttribute('disabled', this.betLocked);
+
       document.querySelectorAll(`#game-${id} .bet-preset`).forEach(btn => {
         btn.classList.toggle('active', Number(btn.dataset.preset) === this.bet);
-        btn.disabled = Number(btn.dataset.preset) > this.credits;
+        btn.disabled = this.betLocked || Number(btn.dataset.preset) > this.credits;
       });
     };
 
+    this.refreshBetPanel = update;
+
     document.getElementById(`${id}-bet-down`)?.addEventListener('click', () => {
+      if (this.betLocked) return;
       SFX.click();
       this.bet = Math.max(1, this.bet - (this.bet > 10 ? 5 : 1));
       update();
     });
 
     document.getElementById(`${id}-bet-up`)?.addEventListener('click', () => {
+      if (this.betLocked) return;
       SFX.click();
       this.bet += this.bet >= 10 ? 5 : 1;
       update();
@@ -416,6 +434,7 @@ export class StarArcadeCore {
 
     document.querySelectorAll(`#game-${id} .bet-preset`).forEach(btn => {
       btn.addEventListener('click', () => {
+        if (this.betLocked) return;
         SFX.click();
         this.bet = Number(btn.dataset.preset);
         update();
@@ -423,6 +442,17 @@ export class StarArcadeCore {
     });
 
     update();
+  }
+
+  /**
+   * Verrouille la mise pendant une run. Les handlers testent `betLocked` en
+   * plus de l'attribut `disabled` : un panneau re-rendu ou un clic simulé ne
+   * doit pas pouvoir changer la mise d'une partie déjà payée.
+   */
+  setBetLocked(id, locked) {
+    this.betLocked = Boolean(locked);
+    if (this.refreshBetPanel) this.refreshBetPanel();
+    else document.querySelector(`#game-${id} .bet-panel`)?.classList.toggle('locked', this.betLocked);
   }
 
   async debit(amount) {

@@ -18,9 +18,11 @@ const PHASES = [
 ];
 
 export class WhackAMoleGame {
-  constructor({ mountId, getBet, debit, credit, addHistory, backToLobby }) {
+  constructor({ mountId, getBet, debit, credit, addHistory, backToLobby, lockBet }) {
     this.mountId = mountId;
     this.getBet = getBet;
+    this.lockBet = lockBet ?? (() => {});
+    this.stake = null;
     this.debit = debit;
     this.credit = credit;
     this.addHistory = addHistory;
@@ -87,6 +89,10 @@ export class WhackAMoleGame {
     if (this.running || this.starting) return;
     const bet = this.getBet();
     if (!(await this.debit(bet))) return this.setMsg('STAR TOKENS INSUFFISANTS', 'lose');
+    // La run se joue sur ce montant, pas sur ce que le panneau affichera
+    // ensuite : c'est lui qui a été prélevé.
+    this.stake = bet;
+    this.lockBet(true);
     this.starting = true;
     const token = ++this.launchToken;
     this.resetRun();
@@ -96,6 +102,10 @@ export class WhackAMoleGame {
     if (btn) btn.disabled = true;
     await this.countdown();
     if (token !== this.launchToken || !document.getElementById(this.mountId)?.classList.contains('active')) {
+      // Run avortée avant le premier drone : on rembourse et on rouvre la mise.
+      await this.credit(this.stake ?? bet);
+      this.stake = null;
+      this.lockBet(false);
       this.starting = false;
       const start = document.getElementById('wam-start');
       if (start) start.disabled = false;
@@ -281,7 +291,9 @@ export class WhackAMoleGame {
 
   async end() {
     this.stop();
-    const bet = this.getBet();
+    const bet = this.stake ?? this.getBet();
+    this.stake = null;
+    this.lockBet(false);
     const gain = Math.max(0, Math.round(bet * this.score / 12));
     const net = gain - bet;
     if (gain > 0) await this.credit(gain);

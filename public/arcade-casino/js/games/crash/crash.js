@@ -13,9 +13,11 @@ function clamp(value, min, max) {
 }
 
 export class CrashGame {
-  constructor({ mountId, getBet, debit, credit, addHistory, backToLobby }) {
+  constructor({ mountId, getBet, debit, credit, addHistory, backToLobby, lockBet }) {
     this.mountId = mountId;
     this.getBet = getBet;
+    this.lockBet = lockBet ?? (() => {});
+    this.stake = null;
     this.debit = debit;
     this.credit = credit;
     this.addHistory = addHistory;
@@ -83,6 +85,10 @@ export class CrashGame {
     if (this.running) return;
     const bet = this.getBet();
     if (!(await this.debit(bet))) return this.setMsg('STAR TOKENS INSUFFISANTS', 'lose');
+    // Le saut se joue sur ce montant : le cashout ne doit pas pouvoir être
+    // encaissé sur une mise remontée en cours de run.
+    this.stake = bet;
+    this.lockBet(true);
     this.running = true;
     this.cashed = false;
     this.cashout = null;
@@ -128,7 +134,7 @@ export class CrashGame {
   async eject(auto = false) {
     if (!this.running || this.cashed) return;
     this.cashed = true;
-    const bet = this.getBet();
+    const bet = this.stake ?? this.getBet();
     const gain = Math.round(bet * this.mult);
     const net = gain - bet;
     this.cashout = { auto, bet, gain, net, mult: this.mult };
@@ -155,7 +161,7 @@ export class CrashGame {
     const cat = this.mult < 1.5 ? 'danger' : this.mult < 3 ? 'risky' : 'safe';
     this.addPill(this.mult, cat);
     if (!this.cashed) {
-      const bet = this.getBet();
+      const bet = this.stake ?? this.getBet();
       this.addHistory('CRASH', bet, 'lose', -bet);
       this.setMsg(`RUPTURE MOTEUR ×${this.mult.toFixed(2)} · -${bet} ST`, 'lose');
       this.showResult({ result: 'lose', bet, gain: 0, net: -bet, mult: this.mult, crashedAt: this.mult });
@@ -167,6 +173,8 @@ export class CrashGame {
     document.getElementById('cr-start').disabled = false;
     document.getElementById('cr-start').textContent = '↺ RELANCER';
     document.getElementById('cr-eject').disabled = true;
+    this.stake = null;
+    this.lockBet(false);
   }
 
   addPill(mult, cat) {
@@ -204,7 +212,7 @@ export class CrashGame {
   }
 
   updateHud(mult) {
-    const bet = this.getBet();
+    const bet = this.stake ?? this.getBet();
     const stability = this.stabilityFor(mult);
     const stage = this.stageFor(mult);
     const potential = Math.round(bet * mult) - bet;
