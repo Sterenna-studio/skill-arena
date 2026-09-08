@@ -1,10 +1,15 @@
 /**
  * Drone Quota — whack-a-mole roguelite à quotas.
  *
- * Boucle : un round de 26 s sur 12 ports, un quota prélevé sur la banque à la
- * fin, trois vies perdues sur les virus. Le quota monte à chaque round ; la
- * banque sert à la fois à le payer et à acheter des nœuds définitifs. Toute la
- * tension est là — investir, c'est reculer sur la facture suivante.
+ * Structure : un round dure quelques dizaines de secondes et se termine sur un
+ * palier à régler. Trois rounds forment une manche ; entre deux rounds d'une
+ * même manche il n'y a qu'un souffle, et l'atelier n'ouvre qu'en fin de manche.
+ * Pas de vies : la pression, c'est le temps et le quota. Se tromper coûte des
+ * secondes, jamais un compteur de cœurs.
+ *
+ * La banque paie le palier *et* achète les nœuds de l'arbre, qui sont
+ * définitifs. Tout le dilemme est là — investir, c'est reculer sur la facture
+ * suivante.
  *
  * Autonome : aucune dépendance, aucun appel réseau, progression en
  * localStorage. Rien à voir avec le wallet Star Tokens de l'arcade.
@@ -25,32 +30,68 @@
 
   const BALANCE = {
     roundSeconds: 26,
-    quotaBase: 520,
-    // Croissance geometrique, pas polynomiale : le revenu d'un round est a peu
-    // pres constant, donc un quota quasi lineaire finit toujours par etre
-    // depasse pour de bon et la run ne s'arrete jamais. En x1.5 par round, la
+    roundsPerManche: 3,
+    interludeMs: 4000,
+
+    // Calé sur un modèle de budget de frappes : le facteur limitant est la
+    // main du joueur, pas le débit des ports. Un débutant sans arbre qui tape
+    // une fois par cible fait ~3 900 par round, un bon joueur qui mène ses
+    // chaînes jusqu'au bout ~16 000. À 1 500, l'arbre vide mure au round 5
+    // pour le premier, au 10 pour le second, et l'arbre plein tient jusqu'au
+    // 14-17. C'est la croissance géométrique qui fait le tri, pas la base.
+    quotaBase: 1500,
+    // Croissance géométrique, pas polynomiale : le revenu d'un round est à peu
+    // près constant, donc un palier quasi linéaire finit toujours par être
+    // dépassé pour de bon et la run ne s'arrête jamais. En ×1.5 par round, la
     // facture rattrape n'importe quel revenu — la question est juste quand.
     quotaGrowth: 1.5,
+
     spawnBaseMs: 340,
     spawnVarianceMs: 300,
     coolantSlowFactor: 1.55,
     coolantMs: 3200,
     overclockMs: 4200,
-    baseLives: 3,
     baseComboCap: 6,
     baseMaxActive: 2,
+
+    // Chaîne d'étourdissement : une cible frappée reste sonnée sur le port et
+    // rapporte de plus en plus tant qu'on l'enchaîne. Chaque coup l'étourdit
+    // moins longtemps, donc la fenêtre se referme d'elle-même.
+    stunBaseMs: 560,
+    stunFalloff: 0.74,
+    chainMax: 5,
+    chainStep: 0.45,
+
+    // Cibles blindées : le bouclier encaisse des coups, chacun prolonge
+    // l'étourdissement pour garder la fenêtre ouverte.
+    shieldStunMs: 320,
+    shieldBonus: 2.2,
+
+    // Parade : frapper une sentinelle déclenche un duel court. Le chrono du
+    // round continue pendant — sinon rater la parade deviendrait un abri où
+    // souffler quand le plateau déborde.
+    qteSweepMs: 1450,
+    qteZone: 0.24,
+    playerStunMs: 1000,
+    parryBonus: 2.8,
+
     turretIntervalMs: [0, 2600, 1800, 1200],
     turretPointShare: 0.6,
   };
 
-  /** Types de cible. `pts` négatif = virus. `effect` = bonus sans points. */
+  /**
+   * Types de cible.
+   * `effect` = bonus sans points. `shield` = coups à encaisser avant de
+   * marquer. `parry` = déclenche le duel quand le joueur la frappe.
+   */
   const TARGETS = [
-    { id: 'drone', icon: '🤖', name: 'DRONE', pts: 6, weight: 46, ttl: 900 },
-    { id: 'scout', icon: '⚡', name: 'SCOUT', pts: 12, weight: 20, ttl: 560 },
+    { id: 'drone', icon: '🤖', name: 'DRONE', pts: 6, weight: 40, ttl: 900 },
+    { id: 'scout', icon: '⚡', name: 'SCOUT', pts: 12, weight: 18, ttl: 560 },
     { id: 'core', icon: '⭐', name: 'CORE', pts: 30, weight: 7, ttl: 700 },
-    { id: 'coolant', icon: '🔋', name: 'COOLANT', pts: 0, weight: 7, ttl: 760, effect: 'coolant' },
-    { id: 'overclock', icon: '💠', name: 'OVERCLOCK', pts: 0, weight: 6, ttl: 720, effect: 'overclock' },
-    { id: 'virus', icon: '💣', name: 'VIRUS', pts: -20, weight: 14, ttl: 950 },
+    { id: 'coolant', icon: '🔋', name: 'COOLANT', pts: 0, weight: 6, ttl: 760, effect: 'coolant' },
+    { id: 'overclock', icon: '💠', name: 'OVERCLOCK', pts: 0, weight: 5, ttl: 720, effect: 'overclock' },
+    { id: 'blinde', icon: '🛡️', name: 'BLINDÉ', pts: 14, weight: 10, ttl: 1500, shield: 3 },
+    { id: 'sentinelle', icon: '⚔️', name: 'SENTINELLE', pts: 18, weight: 14, ttl: 1300, parry: true },
   ];
 
   const ROWS = 3;
@@ -59,7 +100,7 @@
 
   // ── arbre de compétences ────────────────────────────────────────────────
   //
-  // Permanent : les niveaux achetés survivent à la mort. Le quota monte pour
+  // Permanent : les niveaux achetés survivent à la mort. Le palier monte pour
   // compenser. Chaque nœud écrit directement dans l'objet de stats dérivé.
 
   const TREE = [
@@ -76,9 +117,13 @@
         },
         {
           id: 'combo', name: 'COMBO ÉTENDU', max: 3, costs: [440, 1100, 2400],
-          requires: {},
           desc: lvl => `Combo plafonné à ×${BALANCE.baseComboCap + lvl * 2} au lieu de ×${BALANCE.baseComboCap}.`,
           apply: (s, lvl) => { s.comboCap += 2 * lvl; },
+        },
+        {
+          id: 'etourdi', name: 'MARTEAU LOURD', max: 3, costs: [700, 1750, 3600],
+          desc: lvl => `Les cibles restent sonnées ${lvl * 22}% plus longtemps : plus de coups dans la chaîne.`,
+          apply: (s, lvl) => { s.stunMult += 0.22 * lvl; },
         },
         {
           id: 'critique', name: 'FRAPPE CRITIQUE', max: 3, costs: [560, 1300, 2700],
@@ -143,8 +188,8 @@
           id: 'ciblage', name: 'CIBLAGE SMART', max: 2, costs: [2200, 4700],
           requires: { tourelleG: 1 },
           desc: lvl => lvl === 1
-            ? 'Les tourelles ne tirent plus sur les virus.'
-            : 'Les tourelles évitent les virus et visent la cible la plus chère.',
+            ? 'Les tourelles ne gaspillent plus leurs tirs sur les sentinelles.'
+            : 'Les tourelles évitent les sentinelles et visent la cible la plus chère.',
           apply: (s, lvl) => { s.turretSmart = lvl; },
         },
         {
@@ -161,21 +206,26 @@
       id: 'vital',
       name: 'VITAL',
       color: '#ffbe3c',
-      blurb: 'Tenir plus longtemps, et payer moins cher.',
+      blurb: 'Gagner du temps, et payer moins cher.',
       nodes: [
         {
-          id: 'vie', name: 'REDONDANCE', max: 3, costs: [900, 2400, 5000],
-          desc: lvl => `${BALANCE.baseLives + lvl} vies par round au lieu de ${BALANCE.baseLives}.`,
-          apply: (s, lvl) => { s.lives += lvl; },
+          id: 'rallonge', name: 'RALLONGE', max: 3, costs: [900, 2400, 5000],
+          desc: lvl => `+${lvl * 2} secondes par round.`,
+          apply: (s, lvl) => { s.roundBonusSeconds += 2 * lvl; },
         },
         {
-          id: 'bouclier', name: 'PARE-FEU', max: 2, costs: [1300, 3200],
-          desc: lvl => `${lvl === 1 ? 'Le premier virus' : 'Les deux premiers virus'} touché${lvl > 1 ? 's' : ''} du round ne coûte${lvl > 1 ? 'nt' : ''} pas de vie.`,
-          apply: (s, lvl) => { s.virusShield += lvl; },
+          id: 'reflexe', name: 'RÉFLEXE', max: 2, costs: [1300, 3200],
+          desc: lvl => `Fenêtre de parade ${lvl * 22}% plus large.`,
+          apply: (s, lvl) => { s.qteZoneMult += 0.22 * lvl; },
+        },
+        {
+          id: 'amorti', name: 'AMORTISSEUR', max: 2, costs: [1500, 3600],
+          desc: lvl => `Parade ratée : tu restes étourdi ${lvl * 25}% moins longtemps.`,
+          apply: (s, lvl) => { s.playerStunMult -= 0.25 * lvl; },
         },
         {
           id: 'negoce', name: 'NÉGOCIATION', max: 3, costs: [1900, 4500, 8500],
-          desc: lvl => `Quota réduit de ${lvl * 6}%.`,
+          desc: lvl => `Palier réduit de ${lvl * 6}%.`,
           apply: (s, lvl) => { s.quotaDiscount += 0.06 * lvl; },
         },
       ],
@@ -199,8 +249,9 @@
       if (!raw) return emptySave();
       const parsed = JSON.parse(raw);
       const save = { ...emptySave(), ...parsed };
-      // On ne garde que des nœuds connus, bornés à leur max : une sauvegarde
-      // d'une version précédente ne doit pas injecter de niveau fantôme.
+      // On ne garde que des nœuds connus, bornés à leur max. C'est aussi ce qui
+      // fait qu'une sauvegarde d'avant la refonte perd proprement les nœuds
+      // supprimés (REDONDANCE, PARE-FEU) au lieu d'injecter un niveau fantôme.
       const tree = {};
       for (const [id, lvl] of Object.entries(save.tree ?? {})) {
         const node = NODES.get(id);
@@ -237,12 +288,14 @@
       spawnScale: 1,
       coreWeightMult: 1,
       ttlMult: 1,
+      stunMult: 1,
       turretLeft: 0,
       turretRight: 0,
       turretSmart: 0,
       turretCombo: 0,
-      lives: BALANCE.baseLives,
-      virusShield: 0,
+      roundBonusSeconds: 0,
+      qteZoneMult: 1,
+      playerStunMult: 1,
       quotaDiscount: 0,
     };
     for (const branch of TREE) {
@@ -259,6 +312,14 @@
     const discount = stats ? stats.quotaDiscount : 0;
     return Math.max(1, Math.round(raw * (1 - Math.min(0.6, discount))));
   }
+
+  function roundSecondsFor(stats) {
+    return BALANCE.roundSeconds + (stats?.roundBonusSeconds ?? 0);
+  }
+
+  const mancheOf = r => Math.floor((r - 1) / BALANCE.roundsPerManche) + 1;
+  const stepInManche = r => ((r - 1) % BALANCE.roundsPerManche) + 1;
+  const isMancheEnd = r => stepInManche(r) === BALANCE.roundsPerManche;
 
   function nodeState(node, tree, bank) {
     const level = tree[node.id] ?? 0;
@@ -280,28 +341,28 @@
 
   let save = loadSave();
   let stats = deriveStats(save.tree);
+  let interludeTimer = null;
 
-  const run = {
-    active: false,
-    round: 1,
-    bank: 0,
-    totalScore: 0,
-  };
+  const run = { active: false, round: 1, bank: 0, totalScore: 0 };
 
   const round = {
     running: false,
+    paused: false,
     endsAt: 0,
-    lives: 0,
+    seconds: BALANCE.roundSeconds,
+    quota: 0,
     combo: 1,
     maxCombo: 1,
     gain: 0,
     hits: 0,
     misses: 0,
-    virusHits: 0,
-    shieldLeft: 0,
+    chainBest: 0,
+    parries: 0,
+    parriesWon: 0,
     coolantUntil: 0,
     overclockUntil: 0,
-    quota: 0,
+    playerStunUntil: 0,
+    qte: null,
     clock: null,
     spawnTimer: null,
     turretTimers: [],
@@ -313,7 +374,7 @@
 
   const $ = id => document.getElementById(id);
   const fmt = value => Math.round(value).toLocaleString('fr-FR');
-  const hearts = n => n > 0 ? '♥'.repeat(n) : '—';
+  const cabinet = () => $('cabinet');
 
   function show(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === screenId));
@@ -359,7 +420,7 @@
 
         let footer;
         if (state.status === 'maxed') {
-          footer = `<span class="node-cost">—</span><span class="node-state">MAX</span>`;
+          footer = '<span class="node-cost">—</span><span class="node-state">MAX</span>';
         } else if (state.status === 'locked') {
           footer = `<span class="node-cost">${fmt(state.cost)}</span>`
             + `<span class="node-state">REQUIERT ${state.blockedBy.name} ${state.reqLvl}</span>`;
@@ -414,11 +475,12 @@
     }
   }
 
-  // ── atelier ─────────────────────────────────────────────────────────────
+  // ── atelier (fin de manche) ─────────────────────────────────────────────
 
   function renderShop() {
     const next = quotaFor(run.round, stats);
     $('shop-next-round').textContent = run.round;
+    $('shop-next-manche').textContent = mancheOf(run.round);
     $('shop-next-quota').textContent = fmt(next);
     $('shop-bank').textContent = fmt(run.bank);
 
@@ -428,13 +490,13 @@
     // mais chaque achat t'en rapproche.
     if (short > 0) {
       warning.className = 'shop-warning danger';
-      warning.innerHTML = `Il te manque <strong>${fmt(short)}</strong> pour le quota du round ${run.round}. `
-        + `Tout ce que tu dépenses ici, il faudra le regagner sur les ports.`;
+      warning.innerHTML = `Il te manque <strong>${fmt(short)}</strong> pour le palier du round ${run.round}. `
+        + 'Tout ce que tu dépenses ici, il faudra le regagner sur les ports.';
     } else {
       warning.className = 'shop-warning';
-      warning.innerHTML = `Ta banque couvre le quota du round ${run.round} `
+      warning.innerHTML = `Ta banque couvre le palier du round ${run.round} `
         + `(<strong>${fmt(next)}</strong>), avec ${fmt(-short)} d'avance. `
-        + `Investir maintenant, c'est repasser sous la barre.`;
+        + 'Investir maintenant, c\'est repasser sous la barre.';
     }
 
     renderTree($('shop-tree'), 'shop');
@@ -445,17 +507,17 @@
   function renderBrief() {
     const quota = quotaFor(run.round, stats);
     $('brief-round').textContent = run.round;
+    $('brief-manche').textContent = `MANCHE ${mancheOf(run.round)} · ROUND ${stepInManche(run.round)}/${BALANCE.roundsPerManche}`;
     $('brief-quota').textContent = fmt(quota);
     $('brief-bank').textContent = fmt(run.bank);
     $('brief-missing').textContent = fmt(Math.max(0, quota - run.bank));
-    $('brief-lives').textContent = hearts(stats.lives);
-    $('brief-duration').textContent = `${BALANCE.roundSeconds}s`;
+    $('brief-duration').textContent = `${roundSecondsFor(stats)}s`;
 
     const owned = ownedNodeCount(save.tree);
     $('brief-hint').innerHTML = owned
       ? `Tu démarres avec <strong>${owned}</strong> niveau${owned > 1 ? 'x' : ''} d'arbre déjà acquis. `
-        + `Le quota, lui, ne se souvient de rien.`
-      : `Aucun nœud pour l'instant : encaisse le premier round, puis va dépenser à l'atelier.`;
+        + 'Le palier, lui, ne se souvient de rien.'
+      : 'Aucun nœud pour l\'instant : encaisse la première manche, puis va dépenser à l\'atelier.';
   }
 
   // ── grille ──────────────────────────────────────────────────────────────
@@ -470,10 +532,15 @@
       button.type = 'button';
       button.className = 'port';
       button.innerHTML = `<span class="id">P${String(i + 1).padStart(2, '0')}</span>`
-        + `<span class="socket"><span class="shaft"></span>`
-        + `<span class="riser"><span class="icon"></span></span></span>`
-        + `<span class="scars"></span><span class="name">IDLE</span>`;
-      const port = { index: i, el: button, target: null, ttlTimer: null };
+        + '<span class="socket"><span class="shaft"></span>'
+        + '<span class="riser"><span class="icon"></span></span></span>'
+        + '<span class="shieldbar" aria-hidden="true"></span>'
+        + '<span class="scars"></span><span class="name">IDLE</span>';
+      const port = {
+        index: i, el: button, target: null,
+        ttlTimer: null, ttlLeft: 0, ttlArmedAt: 0,
+        stunTimer: null, chain: 0, shieldLeft: 0,
+      };
       button.addEventListener('click', () => onPortClick(port));
       grid.appendChild(button);
       ports.push(port);
@@ -491,11 +558,17 @@
 
   function clearPort(port) {
     if (port.ttlTimer) clearTimeout(port.ttlTimer);
+    if (port.stunTimer) clearTimeout(port.stunTimer);
     port.ttlTimer = null;
+    port.stunTimer = null;
+    port.ttlLeft = 0;
     port.target = null;
+    port.chain = 0;
+    port.shieldLeft = 0;
     port.el.className = 'port';
     port.el.querySelector('.icon').textContent = '';
     port.el.querySelector('.name').textContent = 'IDLE';
+    port.el.style.removeProperty('--shield');
   }
 
   function popText(port, text, kind) {
@@ -513,22 +586,56 @@
     setTimeout(() => el.classList.remove(cls), 220);
   }
 
+  /** Arme la disparition d'une cible, en mémorisant le reste à courir. */
+  function armTtl(port, ms) {
+    if (port.ttlTimer) clearTimeout(port.ttlTimer);
+    port.ttlLeft = ms;
+    port.ttlArmedAt = performance.now();
+    port.ttlTimer = setTimeout(() => escape(port), ms);
+  }
+
+  /** Suspend toutes les disparitions pendant un duel. */
+  function freezeTtls() {
+    const now = performance.now();
+    for (const port of ports) {
+      if (!port.ttlTimer) continue;
+      clearTimeout(port.ttlTimer);
+      port.ttlTimer = null;
+      port.ttlLeft = Math.max(80, port.ttlLeft - (now - port.ttlArmedAt));
+    }
+  }
+
+  function thawTtls() {
+    for (const port of ports) {
+      if (!port.target || port.ttlTimer || port.ttlLeft <= 0) continue;
+      armTtl(port, port.ttlLeft);
+    }
+  }
+
   // ── round ───────────────────────────────────────────────────────────────
 
   function startRound() {
     round.quota = quotaFor(run.round, stats);
-    round.lives = stats.lives;
+    round.seconds = roundSecondsFor(stats);
     round.combo = 1;
     round.maxCombo = 1;
     round.gain = 0;
     round.hits = 0;
     round.misses = 0;
-    round.virusHits = 0;
-    round.shieldLeft = stats.virusShield;
+    round.chainBest = 0;
+    round.parries = 0;
+    round.parriesWon = 0;
     round.coolantUntil = 0;
     round.overclockUntil = 0;
+    round.playerStunUntil = 0;
+    round.paused = false;
+
+    if (interludeTimer) clearTimeout(interludeTimer);
+    interludeTimer = null;
 
     buildGrid();
+    closeQte();
+    $('interlude').hidden = true;
     updateHud();
     setMsg('Frappe tout ce qui bouge.', '');
     show('scr-round');
@@ -539,7 +646,7 @@
 
     countdown(() => {
       round.running = true;
-      round.endsAt = performance.now() + BALANCE.roundSeconds * 1000;
+      round.endsAt = performance.now() + round.seconds * 1000;
       round.clock = setInterval(tick, 100);
       scheduleSpawn();
       armTurrets();
@@ -573,10 +680,12 @@
   function scheduleSpawn() {
     if (!round.running) return;
 
-    const free = ports.filter(p => !p.target);
-    const activeCount = ports.length - free.length;
-    if (free.length && activeCount < stats.maxActive) {
-      spawn(free[Math.floor(Math.random() * free.length)]);
+    if (!round.paused) {
+      const free = ports.filter(p => !p.target);
+      const activeCount = ports.length - free.length;
+      if (free.length && activeCount < stats.maxActive) {
+        spawn(free[Math.floor(Math.random() * free.length)]);
+      }
     }
 
     const slow = performance.now() < round.coolantUntil ? BALANCE.coolantSlowFactor : 1;
@@ -584,22 +693,33 @@
     round.spawnTimer = setTimeout(scheduleSpawn, delay);
   }
 
-  function spawn(port) {
-    const type = weightedPick(TARGETS, t => t.id === 'core' ? t.weight * stats.coreWeightMult : t.weight);
+  function dressPort(port, type) {
     port.target = type;
+    port.chain = 0;
+    port.shieldLeft = type.shield ?? 0;
     port.el.className = `port up ${type.id}`;
     port.el.querySelector('.icon').textContent = type.icon;
     port.el.querySelector('.name').textContent = type.name;
+    if (port.shieldLeft) paintShield(port);
+  }
 
-    const ttl = type.ttl * stats.ttlMult;
-    port.ttlTimer = setTimeout(() => escape(port), ttl);
+  function spawn(port) {
+    const type = weightedPick(TARGETS, t => t.id === 'core' ? t.weight * stats.coreWeightMult : t.weight);
+    dressPort(port, type);
+    armTtl(port, type.ttl * stats.ttlMult);
+  }
+
+  function paintShield(port) {
+    const total = port.target?.shield ?? 0;
+    port.el.style.setProperty('--shield', total ? port.shieldLeft / total : 0);
+    port.el.classList.toggle('shielded', port.shieldLeft > 0);
   }
 
   function escape(port) {
     if (!port.target) return;
-    const positive = port.target.pts > 0;
+    const scoring = port.target.pts > 0 && !port.target.effect;
     clearPort(port);
-    if (!positive) return;
+    if (!scoring) return;
     round.combo = 1;
     port.el.classList.add('gone');
     setTimeout(() => port.el.classList.remove('gone'), 240);
@@ -607,8 +727,19 @@
     updateHud();
   }
 
+  // ── frappe ──────────────────────────────────────────────────────────────
+
   function onPortClick(port) {
     if (!round.running) return;
+
+    // Duel en cours : le plateau est figé, c'est le panneau de parade qui prend
+    // les clics.
+    if (round.paused) return;
+
+    if (performance.now() < round.playerStunUntil) {
+      FX.sfx.miss(panOf(port));
+      return;
+    }
 
     if (!port.target) {
       // Frapper dans le vide casse le combo : sans ça, le spam de clics est
@@ -628,8 +759,7 @@
 
     if (type.effect) {
       applyEffect(type.effect);
-      round.combo = Math.min(stats.comboCap, round.combo + 1);
-      round.maxCombo = Math.max(round.maxCombo, round.combo);
+      bumpCombo();
       popText(port, type.effect === 'coolant' ? 'FLUX -' : 'POINTS ×2', 'turret');
       FX.burst(port.el, 'bonus', 1.1);
       FX.sfx.bonus(type.effect);
@@ -638,21 +768,91 @@
       return;
     }
 
-    if (type.pts < 0) {
-      hitVirus(port, type);
+    // Sentinelle encore sur ses gardes : elle pare, et le duel commence.
+    if (type.parry && port.chain === 0) {
+      openQte(port);
       return;
     }
 
-    scoreHit(port, type, 1, false);
-    // L'onde part avant l'incrément : les éclats appartiennent à la frappe qui
-    // les a produits, ils ne doivent pas encaisser le combo qu'elle vient de
-    // gagner.
-    if (stats.splash > 0) splash(port);
+    // Blindé : le bouclier encaisse, et chaque coup prolonge l'étourdissement
+    // pour que la fenêtre reste ouverte.
+    if (port.shieldLeft > 0) {
+      port.shieldLeft -= 1;
+      paintShield(port);
+      const broken = port.shieldLeft === 0;
+      popText(port, broken ? 'BRISÉ' : `${port.shieldLeft}/${type.shield}`, broken ? 'crit' : 'turret');
+      FX.burst(port.el, broken ? 'crit' : 'turret', broken ? 1.3 : 0.7);
+      broken ? FX.sfx.crit(panOf(port)) : FX.sfx.shield(panOf(port));
+      FX.shake(cabinet(), broken ? 6 : 3);
+      FX.scar(port.el, 'hit');
+      stunTarget(port, BALANCE.shieldStunMs);
+      // Pas de combo sur un coup absorbé : rien n'a touché. Engager un blindé
+      // coûte donc de l'élan, sinon les trois coups de bouclier montaient le
+      // combo gratuitement et la cible payait presque un palier à elle seule.
+      updateHud();
+      return;
+    }
+
+    strike(port, type);
+  }
+
+  /** Frappe qui marque : score, chaîne d'étourdissement, onde. */
+  function strike(port, type) {
+    const chainIndex = port.chain;
+    const chainMult = 1 + chainIndex * BALANCE.chainStep;
+    const kindMult = type.parry ? BALANCE.parryBonus : type.shield ? BALANCE.shieldBonus : 1;
+
+    scoreHit(port, type, chainMult * kindMult, false, { keep: true, chainIndex });
+
+    // L'onde part avant l'incrément de combo : les éclats appartiennent à la
+    // frappe qui les a produits, ils ne doivent pas encaisser le combo qu'elle
+    // vient de gagner. Et seulement au premier coup, sinon une chaîne arrose
+    // les voisins cinq fois.
+    if (stats.splash > 0 && chainIndex === 0) splash(port);
 
     round.hits += 1;
+    port.chain += 1;
+    round.chainBest = Math.max(round.chainBest, port.chain);
+    bumpCombo();
+
+    if (port.chain >= BALANCE.chainMax) {
+      popText(port, 'HORS SERVICE', 'crit');
+      flashPort(port, 'hit');
+      updateHud();
+      return;
+    }
+
+    stunTarget(port, BALANCE.stunBaseMs * Math.pow(BALANCE.stunFalloff, port.chain - 1));
+    updateHud();
+  }
+
+  /**
+   * Laisse la cible sonnée sur le port : on peut la reprendre pour de plus en
+   * plus de points, jusqu'à ce que la fenêtre se referme.
+   */
+  function stunTarget(port, ms) {
+    if (!port.target) return;
+    const duration = Math.max(120, ms * stats.stunMult);
+    port.el.classList.add('stunned');
+    port.el.style.setProperty('--stun-ms', `${Math.round(duration)}ms`);
+    if (port.stunTimer) clearTimeout(port.stunTimer);
+    port.stunTimer = setTimeout(() => {
+      if (!port.target) return;
+      port.el.classList.remove('stunned');
+      escape(port);
+    }, duration);
+    // Tant qu'elle est sonnée, elle ne s'échappe pas d'elle-même : c'est la
+    // fenêtre d'étourdissement qui décide.
+    if (port.ttlTimer) {
+      clearTimeout(port.ttlTimer);
+      port.ttlTimer = null;
+      port.ttlLeft = 0;
+    }
+  }
+
+  function bumpCombo() {
     round.combo = Math.min(stats.comboCap, round.combo + 1);
     round.maxCombo = Math.max(round.maxCombo, round.combo);
-    updateHud();
   }
 
   function splash(origin) {
@@ -662,15 +862,20 @@
     if (col < COLS - 1) neighbours.push(ports[origin.index + 1]);
 
     for (const port of neighbours) {
-      // L'onde ne déclenche pas les bonus et ne fait pas exploser les virus :
-      // sinon le nœud se retourne contre son acheteur.
+      // L'onde ne déclenche pas les bonus, ne réveille pas les sentinelles et
+      // n'entame pas les boucliers : sinon le nœud se retourne contre son
+      // acheteur.
       if (!port.target || port.target.pts <= 0 || port.target.effect) continue;
-      scoreHit(port, port.target, stats.splash, false);
+      if (port.target.parry || port.shieldLeft > 0) continue;
+      scoreHit(port, port.target, stats.splash, false, { keep: false });
     }
   }
 
-  /** Marque une touche et vide le port. `share` < 1 pour l'onde de choc. */
-  function scoreHit(port, type, share, viaTurret) {
+  /**
+   * Marque une touche. `keep` laisse la cible en place (chaîne d'étourdissement)
+   * au lieu de vider le port.
+   */
+  function scoreHit(port, type, share, viaTurret, { keep = false, chainIndex = 0 } = {}) {
     const overclock = performance.now() < round.overclockUntil;
     const comboFactor = viaTurret && !stats.turretCombo ? 1 : round.combo;
     const crit = !viaTurret && Math.random() < stats.critChance;
@@ -685,7 +890,8 @@
     run.totalScore += points;
     round.gain += points;
 
-    popText(port, `+${fmt(points)}`, crit ? 'crit' : viaTurret ? 'turret' : '');
+    const suffix = chainIndex > 0 ? ` ×${(1 + chainIndex * BALANCE.chainStep).toFixed(1)}` : '';
+    popText(port, `+${fmt(points)}${suffix}`, crit ? 'crit' : viaTurret ? 'turret' : '');
 
     const pan = panOf(port);
     if (viaTurret) {
@@ -695,52 +901,16 @@
       FX.sfx.crit(pan);
       FX.shake(cabinet(), 7);
     } else {
-      // L'intensité suit le combo : une chaîne longue doit s'entendre et se
-      // voir monter, c'est là que le joueur sent qu'il tient quelque chose.
+      // L'intensité suit le combo et la chaîne : une série longue doit
+      // s'entendre et se voir monter.
       const ratio = (round.combo - 1) / Math.max(1, stats.comboCap - 1);
-      FX.burst(port.el, 'hit', 0.85 + ratio * 0.7);
-      FX.sfx.hit(ratio, pan);
-      FX.shake(cabinet(), 2 + ratio * 2.5);
+      FX.burst(port.el, 'hit', 0.85 + ratio * 0.7 + chainIndex * 0.15);
+      FX.sfx.hit(Math.min(1, ratio + chainIndex * 0.12), pan);
+      FX.shake(cabinet(), 2 + ratio * 2.5 + chainIndex);
     }
     FX.scar(port.el, crit ? 'crit' : 'hit');
-    flashPort(port, viaTurret ? 'turret-hit' : 'hit');
-  }
 
-  function cabinet() {
-    return $('cabinet');
-  }
-
-  function hitVirus(port, type) {
-    round.virusHits += 1;
-    const shielded = round.shieldLeft > 0;
-    if (shielded) round.shieldLeft -= 1;
-    else round.lives -= 1;
-
-    const malus = Math.max(1, Math.round(Math.abs(type.pts) * stats.pointMult));
-    run.bank = Math.max(0, run.bank - malus);
-    round.gain -= malus;
-    round.combo = 1;
-
-    popText(port, shielded ? 'PARE-FEU' : `-${fmt(malus)}`, 'neg');
-    const pan = panOf(port);
-    FX.burst(port.el, 'bad', shielded ? 0.9 : 1.5);
-    FX.scar(port.el, 'bad');
-    if (shielded) {
-      FX.sfx.shield(pan);
-      FX.shake(cabinet(), 4);
-    } else {
-      FX.sfx.virus(pan);
-      FX.shake(cabinet(), 11);
-      if (round.lives === 1) FX.sfx.lowLife();
-    }
-    flashPort(port, 'bad');
-    setMsg(
-      shielded ? 'Virus absorbé par le pare-feu.' : `Virus — ${round.lives} vie${round.lives > 1 ? 's' : ''} restante${round.lives > 1 ? 's' : ''}.`,
-      'bad',
-    );
-    updateHud();
-
-    if (round.lives <= 0) endRound('vies');
+    if (!keep) flashPort(port, viaTurret ? 'turret-hit' : 'hit');
   }
 
   function applyEffect(effect) {
@@ -752,6 +922,117 @@
       round.overclockUntil = Math.max(round.overclockUntil, now + BALANCE.overclockMs);
       setMsg('Overclock armé — points doublés.', 'good');
     }
+  }
+
+  // ── parade ──────────────────────────────────────────────────────────────
+
+  /**
+   * La sentinelle pare : le plateau se fige, la dalle zoome sur le port et le
+   * joueur a une passe pour placer son coup. Le chrono du round, lui, continue
+   * de tourner : le duel n'est pas un abri.
+   */
+  function openQte(port) {
+    round.parries += 1;
+    round.paused = true;
+    freezeTtls();
+
+    const zone = Math.min(0.7, BALANCE.qteZone * stats.qteZoneMult);
+    const start = Math.random() * (1 - zone);
+    round.qte = { port, startedAt: performance.now(), zoneStart: start, zoneWidth: zone, done: false, timeout: null };
+
+    const panel = $('qte');
+    panel.hidden = false;
+    panel.classList.remove('win', 'lose');
+    panel.style.setProperty('--zone-start', `${start * 100}%`);
+    panel.style.setProperty('--zone-width', `${zone * 100}%`);
+    panel.style.setProperty('--sweep-ms', `${BALANCE.qteSweepMs}ms`);
+    $('qte-verdict').textContent = '';
+
+    const cursor = $('qte-cursor');
+    cursor.style.removeProperty('animation-play-state');
+    cursor.style.animation = 'none';
+    void cursor.offsetWidth;
+    cursor.style.animation = '';
+
+    // Zoom sur le port paré : c'est la cassure. L'origine du transform suit le
+    // port pour que le zoom parte de lui et pas du centre de la grille.
+    const rect = port.el.getBoundingClientRect();
+    const gridRect = $('grid').getBoundingClientRect();
+    const grid = $('grid');
+    grid.style.setProperty('--zoom-x', `${((rect.left + rect.width / 2) - gridRect.left) / gridRect.width * 100}%`);
+    grid.style.setProperty('--zoom-y', `${((rect.top + rect.height / 2) - gridRect.top) / gridRect.height * 100}%`);
+    $('glass-inner').classList.add('duel');
+    port.el.classList.add('parrying');
+
+    FX.sfx.virus(panOf(port));
+    FX.shake(cabinet(), 8);
+    setMsg('PARADE — place ton coup.', 'bad');
+
+    round.qte.timeout = setTimeout(() => resolveQte(false), BALANCE.qteSweepMs);
+  }
+
+  /** Le balayage est lu au temps écoulé, pas à la position CSS : testable. */
+  function attemptQte() {
+    const qte = round.qte;
+    if (!qte || qte.done) return;
+    const progress = (performance.now() - qte.startedAt) / BALANCE.qteSweepMs;
+    resolveQte(progress >= qte.zoneStart && progress <= qte.zoneStart + qte.zoneWidth);
+  }
+
+  function resolveQte(won) {
+    const qte = round.qte;
+    if (!qte || qte.done) return;
+    qte.done = true;
+    clearTimeout(qte.timeout);
+
+    const panel = $('qte');
+    panel.classList.add(won ? 'win' : 'lose');
+    $('qte-verdict').textContent = won ? 'OUVERTURE' : 'CONTRE';
+    $('qte-cursor').style.animationPlayState = 'paused';
+
+    const port = qte.port;
+
+    if (won) {
+      round.parriesWon += 1;
+      FX.sfx.crit(panOf(port));
+      FX.shake(cabinet(), 9);
+      setMsg('Garde brisée — enchaîne pendant qu\'elle est sonnée.', 'good');
+    } else {
+      round.playerStunUntil = performance.now() + BALANCE.playerStunMs * stats.playerStunMult;
+      FX.sfx.virus(panOf(port));
+      FX.shake(cabinet(), 12);
+      setMsg('Contre encaissé — tu es étourdi.', 'bad');
+    }
+
+    setTimeout(() => {
+      closeQte();
+      if (!round.running) return;
+      round.paused = false;
+      thawTtls();
+
+      if (won && port.target) {
+        // La garde est ouverte : la sentinelle devient une cible sonnée qu'on
+        // peut enchaîner.
+        port.chain = 0;
+        strike(port, port.target);
+      } else if (port.target) {
+        escape(port);
+      }
+      updateHud();
+    }, won ? 420 : 640);
+  }
+
+  function closeQte() {
+    const panel = $('qte');
+    if (panel) {
+      panel.hidden = true;
+      panel.classList.remove('win', 'lose');
+      $('qte-cursor')?.style.removeProperty('animation-play-state');
+    }
+    $('glass-inner')?.classList.remove('duel');
+    document.querySelectorAll('.port.parrying').forEach(el => el.classList.remove('parrying'));
+    if (round.qte?.timeout) clearTimeout(round.qte.timeout);
+    round.qte = null;
   }
 
   // ── tourelles ───────────────────────────────────────────────────────────
@@ -772,8 +1053,7 @@
       if (side.level <= 0) continue;
       armed += 1;
       side.flank.classList.add('armed');
-      const interval = BALANCE.turretIntervalMs[side.level];
-      round.turretTimers.push(setInterval(() => fireTurret(side), interval));
+      round.turretTimers.push(setInterval(() => fireTurret(side), BALANCE.turretIntervalMs[side.level]));
     }
 
     const pill = $('pill-turrets');
@@ -789,10 +1069,10 @@
   }
 
   function fireTurret(side) {
-    if (!round.running) return;
+    if (!round.running || round.paused) return;
 
     let candidates = ports.filter(p => p.target && p.index % COLS === side.col && !p.target.effect);
-    if (stats.turretSmart >= 1) candidates = candidates.filter(p => p.target.pts > 0);
+    if (stats.turretSmart >= 1) candidates = candidates.filter(p => !p.target.parry);
     if (!candidates.length) return;
 
     let target;
@@ -809,25 +1089,27 @@
     FX.tracer(side.flank, target.el);
     FX.sfx.turret(side.col === 0 ? -0.85 : 0.85);
 
-    if (target.target.pts < 0) {
-      // Tourelle aveugle : elle peut se prendre un virus. Ça coûte des points,
-      // jamais une vie — une tourelle ne doit pas tuer son propriétaire.
-      const malus = Math.max(1, Math.round(Math.abs(target.target.pts) * 0.5));
-      run.bank = Math.max(0, run.bank - malus);
-      round.gain -= malus;
-      popText(target, `-${fmt(malus)}`, 'neg');
-      FX.burst(target.el, 'bad', 1);
-      FX.scar(target.el, 'bad');
-      flashPort(target, 'bad');
-      updateHud();
+    // Une sentinelle sur ses gardes pare le tir sans déclencher de duel : le
+    // joueur n'a pas frappé, il ne doit pas être puni. La tourelle perd sa
+    // passe, c'est tout.
+    if (target.target.parry && target.chain === 0) {
+      popText(target, 'PARÉ', 'neg');
+      FX.burst(target.el, 'bad', 0.7);
       return;
     }
 
-    scoreHit(target, target.target, 1, true);
-    if (stats.turretCombo) {
-      round.combo = Math.min(stats.comboCap, round.combo + 1);
-      round.maxCombo = Math.max(round.maxCombo, round.combo);
+    // Sur un blindé, le tir entame le bouclier au lieu de marquer.
+    if (target.shieldLeft > 0) {
+      target.shieldLeft -= 1;
+      paintShield(target);
+      popText(target, target.shieldLeft === 0 ? 'BRISÉ' : `${target.shieldLeft}/${target.target.shield}`, 'turret');
+      FX.burst(target.el, 'turret', 0.7);
+      stunTarget(target, BALANCE.shieldStunMs);
+      return;
     }
+
+    scoreHit(target, target.target, 1, true, { keep: false });
+    if (stats.turretCombo) bumpCombo();
     updateHud();
   }
 
@@ -840,21 +1122,21 @@
     $('hud-time').textContent = Math.ceil(left);
     $('hud-time').classList.toggle('urgent', left <= 6);
     const fill = $('time-fill');
-    fill.style.transform = `scaleX(${left / BALANCE.roundSeconds})`;
+    fill.style.transform = `scaleX(${left / round.seconds})`;
     fill.classList.toggle('urgent', left <= 6);
 
     const heat = left <= 8 ? 1 - left / 8 : 0;
     cabinet()?.style.setProperty('--time-heat', heat.toFixed(3));
+    $('glass-inner')?.classList.toggle('stunned', performance.now() < round.playerStunUntil);
 
     updateEffectPills();
-    if (left <= 0) endRound('temps');
+    if (left <= 0) endRound();
   }
 
   function updateHud() {
     $('hud-round').textContent = run.round;
     $('hud-bank').textContent = `${fmt(run.bank)} / ${fmt(round.quota)}`;
-    $('hud-lives').textContent = hearts(round.lives);
-    $('hud-lives').classList.toggle('urgent', round.lives <= 1);
+    $('hud-manche').textContent = `M${mancheOf(run.round)} · ${stepInManche(run.round)}/${BALANCE.roundsPerManche}`;
 
     const combo = $('hud-combo');
     combo.textContent = `×${round.combo}`;
@@ -894,49 +1176,89 @@
 
   function stopRound() {
     round.running = false;
+    round.paused = false;
     if (round.clock) clearInterval(round.clock);
     round.clock = null;
     if (round.spawnTimer) clearTimeout(round.spawnTimer);
     round.spawnTimer = null;
     disarmTurrets();
+    closeQte();
     ports.forEach(clearPort);
     FX.hum(false);
     cabinet()?.style.setProperty('--time-heat', '0');
+    $('glass-inner')?.classList.remove('stunned');
   }
 
-  function endRound(cause) {
+  function endRound() {
     if (!round.running) return;
     stopRound();
 
-    const paid = run.bank >= round.quota;
-    if (paid) {
-      run.bank -= round.quota;
-      setMsg(
-        `Quota réglé — ${fmt(round.quota)} prélevés, il reste ${fmt(run.bank)} en banque.`,
-        'good',
-      );
-      FX.sfx.paid();
-      if (run.round > save.bestRound) {
-        save.bestRound = run.round;
-        persist();
-      }
-      run.round += 1;
-      setTimeout(() => { renderShop(); show('scr-shop'); }, 1500);
+    if (run.bank < round.quota) {
+      setMsg(`Palier manqué — il manquait ${fmt(round.quota - run.bank)}.`, 'bad');
+      FX.sfx.failed();
+      FX.shake(cabinet(), 13);
+      setTimeout(gameOver, 1500);
       return;
     }
 
-    setMsg(
-      cause === 'vies'
-        ? `Ports verrouillés — plus de vies, et il manquait ${fmt(round.quota - run.bank)}.`
-        : `Temps écoulé — il manquait ${fmt(round.quota - run.bank)}.`,
-      'bad',
-    );
-    FX.sfx.failed();
-    FX.shake(cabinet(), 13);
-    setTimeout(() => gameOver(cause), 1500);
+    run.bank -= round.quota;
+    setMsg(`Palier réglé — ${fmt(round.quota)} prélevés, il reste ${fmt(run.bank)} en banque.`, 'good');
+    FX.sfx.paid();
+    if (run.round > save.bestRound) {
+      save.bestRound = run.round;
+      persist();
+    }
+
+    const finishedManche = isMancheEnd(run.round);
+    run.round += 1;
+
+    if (finishedManche) setTimeout(() => { renderShop(); show('scr-shop'); }, 1500);
+    else setTimeout(showInterlude, 1100);
   }
 
-  function gameOver(cause) {
+  /**
+   * Souffle entre deux rounds d'une même manche : quelques secondes, pas
+   * d'atelier. Ça enchaîne tout seul, ou tout de suite si le joueur clique.
+   */
+  function showInterlude() {
+    const quota = quotaFor(run.round, stats);
+    const short = Math.max(0, quota - run.bank);
+
+    $('inter-title').textContent = `ROUND ${stepInManche(run.round)} / ${BALANCE.roundsPerManche}`;
+    $('inter-manche').textContent = `MANCHE ${mancheOf(run.round)}`;
+    $('inter-quota').textContent = fmt(quota);
+    $('inter-bank').textContent = fmt(run.bank);
+    $('inter-missing').textContent = fmt(short);
+    $('inter-note').textContent = short > 0
+      ? `Il te manque ${fmt(short)} — l'atelier n'ouvre qu'en fin de manche.`
+      : 'Le palier est déjà couvert : ce round est du rab pour l\'atelier.';
+
+    $('interlude').hidden = false;
+    show('scr-round');
+
+    let left = Math.ceil(BALANCE.interludeMs / 1000);
+    $('inter-count').textContent = left;
+
+    const step = () => {
+      left -= 1;
+      $('inter-count').textContent = Math.max(0, left);
+      if (left > 0) {
+        interludeTimer = setTimeout(step, 1000);
+        return;
+      }
+      goNextRound();
+    };
+    interludeTimer = setTimeout(step, 1000);
+  }
+
+  function goNextRound() {
+    if (interludeTimer) clearTimeout(interludeTimer);
+    interludeTimer = null;
+    $('interlude').hidden = true;
+    startRound();
+  }
+
+  function gameOver() {
     const missing = Math.max(0, round.quota - run.bank);
     run.active = false;
 
@@ -944,8 +1266,8 @@
     if (run.totalScore > save.bestScore) save.bestScore = run.totalScore;
     persist();
 
-    $('over-kicker').textContent = cause === 'vies' ? 'TROIS VIRUS DE TROP' : 'QUOTA NON RÉGLÉ';
-    $('over-round').textContent = `ROUND ${run.round}`;
+    $('over-kicker').textContent = 'PALIER NON RÉGLÉ';
+    $('over-round').textContent = `MANCHE ${mancheOf(run.round)} · ROUND ${run.round}`;
     $('over-missing').textContent = fmt(missing);
     $('over-score').textContent = fmt(run.totalScore);
     $('over-best').textContent = save.bestRound ? `#${save.bestRound}` : '—';
@@ -954,7 +1276,7 @@
     const owned = ownedNodeCount(save.tree);
     $('over-hint').innerHTML = owned
       ? `L'arbre est <strong>conservé</strong> : la prochaine run repart avec ${owned} niveau${owned > 1 ? 'x' : ''} acquis, banque à zéro.`
-      : `L'arbre est permanent — la prochaine run gardera tout ce que tu achètes à l'atelier.`;
+      : 'L\'arbre est permanent — la prochaine run gardera tout ce que tu achètes à l\'atelier.';
 
     renderMenu();
     show('scr-over');
@@ -978,6 +1300,8 @@
   $('btn-retry').addEventListener('click', newRun);
   $('btn-start-round').addEventListener('click', startRound);
   $('btn-next-round').addEventListener('click', startRound);
+  $('btn-inter-go').addEventListener('click', goNextRound);
+  $('qte').addEventListener('click', attemptQte);
 
   $('btn-view-tree').addEventListener('click', () => {
     renderTree($('tree-view'), 'readonly');
@@ -992,6 +1316,13 @@
     stats = deriveStats(save.tree);
     persist();
     renderMenu();
+  });
+
+  // Barre d'espace pendant un duel : le clavier doit pouvoir parer aussi.
+  window.addEventListener('keydown', event => {
+    if (event.code !== 'Space' || !round.qte || round.qte.done) return;
+    event.preventDefault();
+    attemptQte();
   });
 
   window.addEventListener('beforeunload', stopRound);
@@ -1032,24 +1363,24 @@
 
   renderMenu();
 
-  // Couture de mise au point : vérifier la courbe de quota, l'effet des nœuds
-  // et les chemins pilotés par minuteur (virus, tourelles) sans avoir à jouer
-  // vingt rounds à la main. `forceSpawn` et `fireTurretNow` court-circuitent
-  // uniquement l'attente, jamais les règles.
+  // Couture de mise au point : vérifier la courbe de palier, l'effet des nœuds
+  // et les chemins pilotés par minuteur (parade, tourelles, chaîne) sans avoir
+  // à jouer vingt rounds à la main. Ces crochets court-circuitent uniquement
+  // l'attente, jamais les règles.
   window.__droneQuota = {
     BALANCE, TARGETS, TREE, NODES, ports,
-    quotaFor, deriveStats, run, round,
+    quotaFor, deriveStats, roundSecondsFor, mancheOf, stepInManche, isMancheEnd,
+    run, round,
     get save() { return save; },
+    get stats() { return stats; },
 
     forceSpawn(index, typeId) {
       const port = ports[index];
       const type = TARGETS.find(t => t.id === typeId);
-      if (!port || !type) return null;
+      if (!port) return null;
       clearPort(port);
-      port.target = type;
-      port.el.className = `port up ${type.id}`;
-      port.el.querySelector('.icon').textContent = type.icon;
-      port.el.querySelector('.name').textContent = type.name;
+      if (!type) return null;
+      dressPort(port, type);
       return type.id;
     },
 
@@ -1057,6 +1388,13 @@
       const side = turretSides()[sideIndex];
       if (!side || side.level <= 0) return false;
       fireTurret(side);
+      return true;
+    },
+
+    /** Force l'issue du duel en cours, sans dépendre du balayage. */
+    resolveQteNow(won) {
+      if (!round.qte || round.qte.done) return false;
+      resolveQte(won);
       return true;
     },
   };

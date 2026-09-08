@@ -21,7 +21,7 @@
       <div class="plate" aria-hidden="true"></div>
       <h1>DRONE<span>QUOTA</span></h1>
       <p class="serial">TERMINAL DE MAINTENANCE · MOD. DQ-12</p>
-      <p class="tagline">Le terminal réclame son quota. Chaque round, la facture monte.</p>
+      <p class="tagline">Le terminal réclame son palier. Chaque round, la facture monte.</p>
     </header>
 
     <div class="menu-stats">
@@ -32,10 +32,12 @@
     </div>
 
     <div class="rules">
-      <div class="rule"><b>1</b><span>Frappe les drones qui sortent des 12 ports. Le combo monte à chaque touche, et tombe si tu frappes dans le vide.</span></div>
-      <div class="rule"><b>2</b><span>À la fin du round, le quota est prélevé sur ta banque. S'il manque un seul point, la run s'arrête.</span></div>
-      <div class="rule"><b>3</b><span>Toucher un virus coûte une vie. Trois virus et le round se coupe net, quota ou pas.</span></div>
-      <div class="rule"><b>4</b><span>Entre deux rounds, la banque achète des nœuds. Ils sont <em>définitifs</em> — mais ce que tu dépenses ne paiera pas la facture suivante.</span></div>
+      <div class="rule"><b>1</b><span>Frappe ce qui sort des 12 ports. Le combo monte à chaque touche, et tombe si tu frappes dans le vide.</span></div>
+      <div class="rule"><b>2</b><span>Une cible frappée reste <em>sonnée</em> sur son port. Enchaîne-la : chaque coup de la chaîne vaut plus cher que le précédent.</span></div>
+      <div class="rule"><b>3</b><span>Les <em>blindés</em> 🛡️ encaissent trois coups avant de payer — mais chaque coup les sonne plus longtemps.</span></div>
+      <div class="rule"><b>4</b><span>Frapper une <em>sentinelle</em> ⚔️ déclenche une parade. Place ton coup dans la fenêtre, ou tu restes étourdi une seconde. Le chrono, lui, ne s'arrête pas.</span></div>
+      <div class="rule"><b>5</b><span>En fin de round, le palier est prélevé sur ta banque. S'il manque un point, la run s'arrête. <em>Trois rounds font une manche</em>, et l'atelier n'ouvre qu'entre deux manches.</span></div>
+      <div class="rule"><b>6</b><span>Les nœuds achetés à l'atelier sont <em>définitifs</em> — mais ce que tu dépenses ne paiera pas la facture suivante.</span></div>
     </div>
 
     <div class="actions">
@@ -59,15 +61,14 @@
   <!-- ══ BRIEFING DE ROUND ══ -->
   <section class="screen" id="scr-brief">
     <header class="title-block small">
-      <p class="kicker">ROUND <span id="brief-round">1</span></p>
-      <h2 class="quota-figure" id="brief-quota">520</h2>
-      <p class="tagline">quota à régler en fin de round</p>
+      <p class="kicker" id="brief-manche">MANCHE 1 · ROUND 1/3</p>
+      <h2 class="quota-figure" id="brief-quota">1500</h2>
+      <p class="tagline">palier à régler en fin de round · round <span id="brief-round">1</span></p>
     </header>
 
     <div class="menu-stats">
       <div class="stat"><span>BANQUE</span><strong id="brief-bank">0</strong></div>
-      <div class="stat"><span>À TROUVER</span><strong id="brief-missing">520</strong></div>
-      <div class="stat"><span>VIES</span><strong id="brief-lives">♥♥♥</strong></div>
+      <div class="stat"><span>À TROUVER</span><strong id="brief-missing">1500</strong></div>
       <div class="stat"><span>DURÉE</span><strong id="brief-duration">26s</strong></div>
     </div>
 
@@ -96,34 +97,61 @@
         <span class="screw br" aria-hidden="true"></span>
 
         <div class="glass">
-          <div class="hud">
-            <div class="hud-cell"><span>ROUND</span><strong id="hud-round">1</strong></div>
-            <div class="hud-cell wide"><span>BANQUE / QUOTA</span><strong id="hud-bank">0 / 520</strong></div>
-            <div class="hud-cell"><span>COMBO</span><strong id="hud-combo">×1</strong></div>
-            <div class="hud-cell"><span>VIES</span><strong id="hud-lives">♥♥♥</strong></div>
-            <div class="hud-cell"><span>TEMPS</span><strong id="hud-time">26</strong></div>
+          <div class="glass-inner" id="glass-inner">
+            <div class="hud">
+              <div class="hud-cell"><span>ROUND</span><strong id="hud-round">1</strong></div>
+              <div class="hud-cell wide"><span>BANQUE / PALIER</span><strong id="hud-bank">0 / 1 500</strong></div>
+              <div class="hud-cell"><span>COMBO</span><strong id="hud-combo">×1</strong></div>
+              <div class="hud-cell"><span>MANCHE</span><strong id="hud-manche">M1 · 1/3</strong></div>
+              <div class="hud-cell"><span>TEMPS</span><strong id="hud-time">26</strong></div>
+            </div>
+
+            <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">0 %</em></div>
+
+            <div class="effects">
+              <span class="pill" id="pill-coolant">COOLANT</span>
+              <span class="pill" id="pill-overclock">OVERCLOCK</span>
+              <span class="pill" id="pill-turrets">TOURELLES OFF</span>
+            </div>
+
+            <div class="arena" id="arena">
+              <div class="flank left" id="flank-left" aria-hidden="true"></div>
+              <div class="grid" id="grid"></div>
+              <div class="flank right" id="flank-right" aria-hidden="true"></div>
+              <canvas class="fx-layer" id="fx-layer" aria-hidden="true"></canvas>
+            </div>
+
+            <div class="timebar"><i id="time-fill"></i></div>
+            <p class="round-msg" id="round-msg">Frappe tout ce qui bouge.</p>
           </div>
-
-          <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">0 %</em></div>
-
-          <div class="effects">
-            <span class="pill" id="pill-coolant">COOLANT</span>
-            <span class="pill" id="pill-overclock">OVERCLOCK</span>
-            <span class="pill" id="pill-turrets">TOURELLES OFF</span>
-          </div>
-
-          <div class="arena" id="arena">
-            <div class="flank left" id="flank-left" aria-hidden="true"></div>
-            <div class="grid" id="grid"></div>
-            <div class="flank right" id="flank-right" aria-hidden="true"></div>
-            <canvas class="fx-layer" id="fx-layer" aria-hidden="true"></canvas>
-          </div>
-
-          <div class="timebar"><i id="time-fill"></i></div>
-          <p class="round-msg" id="round-msg">Frappe tout ce qui bouge.</p>
 
           <div class="glare" aria-hidden="true"></div>
+
           <div class="boot" id="boot" hidden><span id="boot-text">3</span></div>
+
+          <!-- Duel de parade : au-dessus du zoom, donc jamais agrandi lui-même. -->
+          <div class="qte" id="qte" hidden>
+            <span class="qte-label">PARADE</span>
+            <div class="qte-track">
+              <i class="qte-zone" aria-hidden="true"></i>
+              <i class="qte-cursor" id="qte-cursor" aria-hidden="true"></i>
+            </div>
+            <span class="qte-hint">Clique ou ESPACE quand le curseur est dans la zone</span>
+            <strong class="qte-verdict" id="qte-verdict"></strong>
+          </div>
+
+          <!-- Souffle entre deux rounds d'une même manche. -->
+          <div class="interlude" id="interlude" hidden>
+            <span class="inter-manche" id="inter-manche">MANCHE 1</span>
+            <strong class="inter-title" id="inter-title">ROUND 2 / 3</strong>
+            <div class="inter-grid">
+              <span>PALIER<b id="inter-quota">780</b></span>
+              <span>BANQUE<b id="inter-bank">0</b></span>
+              <span>À TROUVER<b id="inter-missing">0</b></span>
+            </div>
+            <p class="inter-note" id="inter-note"></p>
+            <button class="btn primary" id="btn-inter-go">CONTINUER · <span id="inter-count">4</span></button>
+          </div>
         </div>
       </div>
 
@@ -136,25 +164,25 @@
     </div>
   </section>
 
-  <!-- ══ ATELIER (entre deux rounds) ══ -->
+  <!-- ══ ATELIER (entre deux manches) ══ -->
   <section class="screen" id="scr-shop">
     <header class="bar">
       <h2>ATELIER</h2>
-      <span class="bar-note">Round <span id="shop-next-round">2</span> · prochain quota <strong id="shop-next-quota">780</strong></span>
+      <span class="bar-note">Manche <span id="shop-next-manche">2</span> · round <span id="shop-next-round">4</span> · palier <strong id="shop-next-quota">1755</strong></span>
       <span class="bank-chip">BANQUE <strong id="shop-bank">0</strong></span>
     </header>
     <p class="shop-warning" id="shop-warning"></p>
     <div class="tree" id="shop-tree"></div>
     <div class="actions sticky">
-      <button class="btn primary" id="btn-next-round">ROUND SUIVANT →</button>
+      <button class="btn primary" id="btn-next-round">MANCHE SUIVANTE →</button>
     </div>
   </section>
 
   <!-- ══ FIN DE RUN ══ -->
   <section class="screen" id="scr-over">
     <header class="title-block small">
-      <p class="kicker" id="over-kicker">QUOTA NON RÉGLÉ</p>
-      <h2 id="over-round">ROUND 4</h2>
+      <p class="kicker" id="over-kicker">PALIER NON RÉGLÉ</p>
+      <h2 id="over-round">MANCHE 2 · ROUND 4</h2>
     </header>
 
     <div class="menu-stats">
