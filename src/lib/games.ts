@@ -13,6 +13,17 @@ export interface GameMeta {
 
 export const GAMES: GameMeta[] = [
   {
+    slug: 'drone-quota',
+    title: 'Drone Quota',
+    description: 'Whack-a-mole roguelite — règle un quota qui monte à chaque round, trois vies par round, arbre de compétences permanent.',
+    icon: '🔨',
+    category: 'arcade',
+    unit: 'round',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/games/drone-quota/',
+  },
+  {
     slug: 'dungeon-elf-sound',
     title: 'Dungeon Elf',
     description: 'Charge tes sorts, entraîne-toi ou pars en chasse, et fais progresser ton mage. 3 versions jouables au choix.',

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drone Quota</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a class="back-link" href="/arena/">← Arena</a>
+
+<div class="shell">
+
+  <!-- ══ ACCUEIL ══ -->
+  <section class="screen active" id="scr-menu">
+    <header class="title-block">
+      <h1>DRONE<span>QUOTA</span></h1>
+      <p class="tagline">Le terminal réclame son quota. Chaque round, la facture monte.</p>
+    </header>
+
+    <div class="menu-stats">
+      <div class="stat"><span>MEILLEUR ROUND</span><strong id="menu-best-round">—</strong></div>
+      <div class="stat"><span>MEILLEUR SCORE</span><strong id="menu-best-score">—</strong></div>
+      <div class="stat"><span>RUNS</span><strong id="menu-runs">0</strong></div>
+      <div class="stat"><span>NŒUDS ACQUIS</span><strong id="menu-nodes">0</strong></div>
+    </div>
+
+    <div class="rules">
+      <div class="rule"><b>1</b><span>Frappe les drones sur les 12 ports. Le combo monte à chaque touche, et tombe si tu frappes dans le vide.</span></div>
+      <div class="rule"><b>2</b><span>À la fin du round, le quota est prélevé sur ta banque. S'il manque un seul point, la run s'arrête.</span></div>
+      <div class="rule"><b>3</b><span>Toucher un virus coûte une vie. Trois virus et le round se coupe net, quota ou pas.</span></div>
+      <div class="rule"><b>4</b><span>Entre deux rounds, la banque achète des nœuds. Ils sont <em>définitifs</em> — mais ce que tu dépenses ne paiera pas la facture suivante.</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="btn-play">▶ LANCER UNE RUN</button>
+      <button class="btn" id="btn-view-tree">ARBRE DE COMPÉTENCES</button>
+    </div>
+
+    <button class="btn danger tiny" id="btn-wipe">Réinitialiser la progression</button>
+  </section>
+
+  <!-- ══ ARBRE (consultation depuis l'accueil) ══ -->
+  <section class="screen" id="scr-tree">
+    <header class="bar">
+      <button class="btn tiny" id="btn-tree-back">← RETOUR</button>
+      <h2>ARBRE DE COMPÉTENCES</h2>
+      <span class="bar-note">Progression permanente</span>
+    </header>
+    <div class="tree" id="tree-view"></div>
+  </section>
+
+  <!-- ══ BRIEFING DE ROUND ══ -->
+  <section class="screen" id="scr-brief">
+    <header class="title-block small">
+      <p class="kicker">ROUND <span id="brief-round">1</span></p>
+      <h2 class="quota-figure" id="brief-quota">520</h2>
+      <p class="tagline">quota à régler en fin de round</p>
+    </header>
+
+    <div class="menu-stats">
+      <div class="stat"><span>BANQUE</span><strong id="brief-bank">0</strong></div>
+      <div class="stat"><span>À TROUVER</span><strong id="brief-missing">520</strong></div>
+      <div class="stat"><span>VIES</span><strong id="brief-lives">♥♥♥</strong></div>
+      <div class="stat"><span>DURÉE</span><strong id="brief-duration">26s</strong></div>
+    </div>
+
+    <p class="brief-hint" id="brief-hint"></p>
+
+    <div class="actions">
+      <button class="btn primary" id="btn-start-round">▶ OUVRIR LES PORTS</button>
+    </div>
+  </section>
+
+  <!-- ══ ROUND ══ -->
+  <section class="screen" id="scr-round">
+    <div class="hud">
+      <div class="hud-cell"><span>ROUND</span><strong id="hud-round">1</strong></div>
+      <div class="hud-cell wide"><span>BANQUE / QUOTA</span><strong id="hud-bank">0 / 520</strong></div>
+      <div class="hud-cell"><span>COMBO</span><strong id="hud-combo">×1</strong></div>
+      <div class="hud-cell"><span>VIES</span><strong id="hud-lives">♥♥♥</strong></div>
+      <div class="hud-cell"><span>TEMPS</span><strong id="hud-time">26</strong></div>
+    </div>
+
+    <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">0 %</em></div>
+
+    <div class="effects">
+      <span class="pill" id="pill-coolant">COOLANT</span>
+      <span class="pill" id="pill-overclock">OVERCLOCK</span>
+      <span class="pill" id="pill-turrets">TOURELLES OFF</span>
+    </div>
+
+    <div class="arena">
+      <div class="flank left" id="flank-left" aria-hidden="true"></div>
+      <div class="grid" id="grid"></div>
+      <div class="flank right" id="flank-right" aria-hidden="true"></div>
+    </div>
+
+    <div class="timebar"><i id="time-fill"></i></div>
+    <p class="round-msg" id="round-msg">Frappe tout ce qui bouge.</p>
+  </section>
+
+  <!-- ══ ATELIER (entre deux rounds) ══ -->
+  <section class="screen" id="scr-shop">
+    <header class="bar">
+      <h2>ATELIER</h2>
+      <span class="bar-note">Round <span id="shop-next-round">2</span> · prochain quota <strong id="shop-next-quota">780</strong></span>
+      <span class="bank-chip">BANQUE <strong id="shop-bank">0</strong></span>
+    </header>
+    <p class="shop-warning" id="shop-warning"></p>
+    <div class="tree" id="shop-tree"></div>
+    <div class="actions sticky">
+      <button class="btn primary" id="btn-next-round">ROUND SUIVANT →</button>
+    </div>
+  </section>
+
+  <!-- ══ FIN DE RUN ══ -->
+  <section class="screen" id="scr-over">
+    <header class="title-block small">
+      <p class="kicker" id="over-kicker">QUOTA NON RÉGLÉ</p>
+      <h2 id="over-round">ROUND 4</h2>
+    </header>
+
+    <div class="menu-stats">
+      <div class="stat"><span>MANQUAIT</span><strong id="over-missing">—</strong></div>
+      <div class="stat"><span>SCORE TOTAL</span><strong id="over-score">0</strong></div>
+      <div class="stat"><span>MEILLEUR ROUND</span><strong id="over-best">—</strong></div>
+      <div class="stat"><span>NŒUDS ACQUIS</span><strong id="over-nodes">0</strong></div>
+    </div>
+
+    <p class="brief-hint" id="over-hint"></p>
+
+    <div class="actions">
+      <button class="btn primary" id="btn-retry">▶ NOUVELLE RUN</button>
+      <button class="btn" id="btn-home">ACCUEIL</button>
+    </div>
+  </section>
+
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>

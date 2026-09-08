@@ -3,6 +3,15 @@ import { GAMES, CATEGORY_LABELS } from '@/lib/games'
 
 const FULLGAMES = [
   {
+    slug: 'drone-quota',
+    title: 'Drone Quota',
+    desc: 'Whack-a-mole roguelite — frappe les drones sur 12 ports, règle un quota qui monte à chaque round et remonte un arbre de compétences permanent.',
+    icon: '🔨',
+    tag: 'ROGUELITE',
+    tagColor: '--c-red',
+    external: '/arena/games/drone-quota/',
+  },
+  {
     slug: 'dungeon-elf-sound',
     title: 'Dungeon Elf',
     desc: 'Action-RPG rétro — charge tes sorts, améliore ton équipement en boutique et enchaîne entraînements et chasses pour faire progresser ton mage. 3 versions jouables, sélecteur en jeu.',
