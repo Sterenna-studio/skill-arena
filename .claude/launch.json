@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "arcade",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:arcade"],
+      "port": 4173
     }
   ]
 }
