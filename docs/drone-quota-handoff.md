@@ -4,7 +4,7 @@ Tout ce qu'il faut pour reprendre le jeu sans contexte préalable : ce qu'il
 est, comment le lancer, ce sur quoi il repose, ce qui est vérifié, ce qui ne
 l'est pas, et par où continuer.
 
-Écrit le 2026-09-09, à jour du commit `2c3538f`.
+Écrit le 2026-09-09, à jour de l'issue #6.
 
 ---
 
@@ -14,7 +14,7 @@ Un whack-a-mole roguelite autonome, servi en statique dans le catalogue Skill
 Arena. Le joueur frappe ce qui sort de douze ports pendant un round chronométré
 et doit avoir assez en banque à la fin pour régler un **palier**. Le palier
 monte géométriquement. Entre deux manches, la banque achète des nœuds d'un
-arbre de compétences **permanent** — et c'est le dilemme central : la banque
+arbre de compétences **persistant** — et c'est le dilemme central : la banque
 paie la facture *et* achète les nœuds, donc investir, c'est reculer sur le
 palier suivant.
 
@@ -59,9 +59,9 @@ qu'on le demande.
 
 ```txt
 public/games/drone-quota/
-├── index.html   210 l.  structure : écrans, meuble, HUD, panneau de parade
-├── style.css   1087 l.  meuble, orifices, états de port, duel, interlude
-├── game.js     1635 l.  règles, économie, arbre, machine à états
+├── index.html   250 l.  structure : écrans, meuble, HUD, parade, prestige
+├── style.css   1221 l.  meuble, ports, duel, arbre, prestige, responsive
+├── game.js     1970 l.  règles, économie, arbre, prestige, machine à états
 └── fx.js        633 l.  son, particules, secousses, traces d'usure
 ```
 
@@ -115,8 +115,8 @@ dans `game.js`.
 ### Écrans
 
 `#scr-menu` → `#scr-brief` → `#scr-round` → (`#interlude` | `#scr-shop`) →
-`#scr-round` … → `#scr-over`. Plus `#scr-tree` en consultation depuis
-l'accueil. Un seul porte `.active` à la fois (`show(id)`).
+`#scr-round` … → `#scr-over`. Plus `#scr-tree` et `#scr-prestige` en
+consultation depuis l'accueil. Un seul porte `.active` à la fois (`show(id)`).
 
 ### Cibles
 
@@ -173,7 +173,7 @@ curseur : l'issue est donc vérifiable sans dépendre du rendu.
 Une tourelle qui tire sur une sentinelle intacte se fait parer **sans**
 déclencher de duel — le joueur n'a pas frappé, il n'a pas à être puni.
 
-### Arbre — 17 nœuds, permanent
+### Arbre — 17 nœuds persistants
 
 Acheté avec la banque, conservé d'une run à l'autre. Les quatre branches sont
 maintenant de vrais arbres stricts : un nœud principal a zéro ou un parent,
@@ -191,9 +191,9 @@ Les racines sont les quatre seuls nœuds principaux visibles sur un arbre vide.
 Le tier 3 exige aussi **trois niveaux investis dans sa branche**. Les trois
 spécialisations flottantes exigent une profondeur 2 et trois niveaux investis.
 Avant leur premier achat, leur emplacement et leur condition sont lisibles,
-mais leur icône et leurs statistiques restent opaques. `unlockCheck()` accepte
-déjà une exigence `unlock.prestige` sur un nœud ou sa branche, et un contexte
-`prestigeTokens` ; aucun jeton n'est créé, compté ou sauvegardé ici (issue #6).
+mais leur icône et leurs statistiques restent opaques. Leur ouverture dépend
+uniquement de la profondeur et de l'investissement : les jetons de prestige ne
+gâtent jamais l'arbre de score.
 
 Le rendu est une grille CSS explicite par branche. Un SVG créé dans le DOM,
 en `pointer-events: none`, relie uniquement les nœuds principaux révélés. Sous
@@ -201,7 +201,8 @@ en `pointer-events: none`, relie uniquement les nœuds principaux révélés. So
 Les nœuds restent tous des `<button>`.
 
 Chaque nœud écrit dans l'objet de stats via `apply(stats, lvl)`, et
-`deriveStats(tree)` fait une passe unique sur nœuds principaux et flottants.
+`deriveStats(tree, loadout)` applique ensuite les constantes de structure et
+les buffs du loadout de prestige.
 
 `loadSave()` filtre les identifiants inconnus, borne les niveaux au `max`, puis
 appelle `normalizeTree()`. Si une sauvegarde historique possède un descendant
@@ -210,13 +211,48 @@ C'est le choix de migration sans perte : un achat ancien ne devient ni
 invisible ni inactif, au prix d'un petit cadeau ponctuel de niveaux parents.
 
 L'atelier est transactionnel. `enterShop()` prend un instantané `{ tree,
-bank }`; `buy()` ne persiste plus. « ANNULER LES ACHATS » restaure l'instantané,
-et « MANCHE SUIVANTE » appelle `validateShop()`, qui écrit avant de figer les
+bank, credit }`; `buy()` consomme d'abord le crédit de reconstruction, puis la
+banque, sans persister. « ANNULER LES ACHATS » restaure les trois valeurs, et
+« MANCHE SUIVANTE » appelle `validateShop()`, qui écrit avant de figer les
 achats. Un rechargement ou le lien Arena appelle `discardShopChanges()` : un
 état à moitié acheté ne rejoint jamais `localStorage`.
 
 Sauvegarde : `localStorage['drone-quota:v1']` =
-`{ tree, bestRound, bestScore, runs }`. Sourdine : `drone-quota:mute:v1`.
+`{ tree, bestRound, bestManche, bestScore, runs, loadout, credit, prestiges }`.
+Sourdine : `drone-quota:mute:v1`. La clé n'a pas changé ; une sauvegarde sans
+les nouveaux champs reçoit leurs valeurs par défaut. Pour une sauvegarde
+ancienne, `bestManche` est amorcé à `floor(bestRound / 3)`.
+
+### Prestige — jetons dérivés et loadout réversible
+
+Une **manche record terminée** accorde implicitement un jeton. Aucun solde
+n'est stocké : `total = bestManche` et `disponibles = total - coût(loadout)`.
+Le panneau `#scr-prestige`, accessible seulement depuis le menu entre deux
+runs, permet d'affecter et retirer librement ces jetons. « TOUT DÉSAFFECTER »
+agit immédiatement, sans confirmation, puisque l'opération est gratuite et
+réversible.
+
+Les six points permanents changent des constantes que l'arbre ne modifie pas :
+
+- `CHAÎNE PROFONDE` : chaîne 5 → 8, un coup par point ;
+- `BLINDAGE LÉGER` : un bouclier de blindé en moins par point ;
+- `GARDE LUE` : une traversée de parade en plus par point ;
+- `AVANCE` : +300 de banque de départ par point ;
+- `ÉLAN` : combo ×2 au début de chaque round ;
+- `RÉCUPÉRATION` : crédit de reconstruction 60 → 70 %, +5 % par point.
+
+Les six buffs de départ présentent toujours l'avantage et sa contrepartie avec
+le même poids visuel : `BRÈCHE` (blindage −1 / CORE ×0,5), `SURTENSION`
+(chaîne ≥7 / étourdissement −30 %), `RESPIRATION` (+4 s / plafond de combo −2),
+`PROTOCOLE CALME` (aucune sentinelle / paliers +15 %), `PREMIÈRE HEURE`
+(points ×2 en manche 1 / paliers +10 % dès la manche 2) et `SURCHARGE`
+(deux cibles de plus / TTL −20 %).
+
+Le reset de l'arbre reste dans `#scr-tree` et demande confirmation. Il efface
+uniquement l'arbre, incrémente `prestiges`, puis rend 60 % du score investi
+(jusqu'à 70 % avec `RÉCUPÉRATION`) dans une poche `credit` séparée. Ce crédit
+ne règle jamais un palier et ne finance rien d'autre qu'un nœud. Le reset
+global du pied de menu reste la seule action qui efface toute la progression.
 
 ---
 
@@ -279,14 +315,20 @@ const dq = window.__droneQuota;
 
 dq.BALANCE                    // mutable à chaud
 dq.TARGETS, dq.TREE, dq.NODES
+dq.PRESTIGE_STATS, dq.PRESTIGE_BUFFS
 dq.ports                      // les 12 objets de port
 dq.run, dq.round, dq.save, dq.stats
 dq.quotaFor(r, stats)
-dq.deriveStats(tree)
+dq.deriveStats(tree, loadout)
 dq.normalizeTree(tree)
 dq.branchInvestment(branch, tree), dq.branchDepth(branch, tree)
-dq.unlockCheck(node, tree, progression), dq.nodeState(node, tree, bank)
+dq.unlockCheck(node, tree), dq.nodeState(node, tree, bank, credit)
 dq.enterShop(), dq.cancelShopPurchases(), dq.validateShop()
+dq.emptyLoadout(), dq.normalizeLoadout(loadout, budget)
+dq.loadoutCost(loadout), dq.tokenSummary(save)
+dq.treeInvestedScore(tree), dq.resetTree()
+dq.setStatPoint(id, -1|1), dq.togglePrestigeBuff(id), dq.clearLoadout()
+dq.recordClearedRound(round)
 dq.mancheOf(r), dq.stepInManche(r), dq.isMancheEnd(r)
 
 dq.forceSpawn(index, typeId)  // place une cible précise sur un port
@@ -330,18 +372,37 @@ en fin de manche, ports atteignables par le hit-testing réel du navigateur.
 
 Pour l'arbre de l'issue #5 : quatre racines seules sur une sauvegarde vide,
 révélation parentale, seuil de tier 3, condition combinée des spécialisations,
-point d'extension prestige, SVG de liaison, migration d'une sauvegarde ancienne
-incohérente, application de ses effets, achat sans écriture, annulation,
-validation, rechargement et sortie Arena. Le rendu a été inspecté dans un onglet
-Chrome visible à 1280 px puis 375 px ; à 375 px, largeur exacte 375/375 et
-cibles de nœuds d'au moins 76 px.
+SVG de liaison, migration d'une sauvegarde ancienne incohérente, application de
+ses effets, achat sans écriture, annulation, validation, rechargement et sortie
+Arena. Le rendu a été inspecté dans un onglet Chrome visible à 1280 px puis
+375 px ; à 375 px, largeur exacte 375/375 et cibles de nœuds d'au moins 76 px.
+
+Pour le prestige de l'issue #6, dans un onglet Chrome réellement visible :
+
+- migration d'une sauvegarde sans les nouveaux champs, avec `bestRound: 8` :
+  `bestManche: 2`, loadout vide, crédit et compteurs à zéro ;
+- une manche record ajoute exactement un jeton, la répétition ne l'ajoute pas,
+  et une propriété historique `unlock.prestige` injectée ne bloque aucun nœud ;
+- affectation, désaffectation complète sans confirmation et réaffectation d'un
+  autre loadout, avec coût et solde dérivés puis sauvegardés ;
+- application effective des six constantes et des six buffs : banque et combo
+  de départ, boucliers, trois traversées de parade, chaîne, absence de
+  sentinelles, densité, TTL, scores et paliers ;
+- achat d'un nœud payé d'abord au crédit, puis annulation restaurant exactement
+  `{ tree, bank, credit }`, sans écriture intermédiaire dans `localStorage` ;
+- reset d'un arbre ayant 1 320 investis avec `RÉCUPÉRATION` niveau 1 : 858 de
+  crédit (65 %), arbre vide, loadout et records conservés ;
+- écran prestige contrôlé à 1000 px et à 375 px : aucune largeur excédentaire
+  (375/375), contrôles de point à 44 px, cartes de buffs sur une colonne en
+  mobile, avantage et contrepartie tous deux visibles ; écran de reset inspecté
+  à 1000 px.
 
 ### Pas vérifié
 
-- **Le jeu n'a jamais été joué à la manette.** Les contrôles de l'arbre ont été
-  pilotés dans un onglet visible, mais pas au fil de trois rounds réellement
-  joués. Les particules, les secousses et le ronflement n'ont pas été rejugés
-  pendant cette reprise.
+- **Le jeu n'a jamais été joué à la manette.** Les contrôles de l'arbre et du
+  prestige ont été pilotés dans un onglet visible, mais pas au fil de trois
+  rounds réellement joués. Les particules, les secousses, le ronflement et le
+  son des nouveaux contrôles n'ont pas été rejugés pendant cette reprise.
 - **L'équilibrage est modélisé, pas éprouvé.** Le tableau du §5 sort d'un
   modèle de budget de frappes, pas de parties réelles.
 - La lisibilité du duel en conditions réelles (est-ce qu'on comprend ce qui se
@@ -373,6 +434,12 @@ cibles de nœuds d'au moins 76 px.
 - Les coûts n'ont pas été rééquilibrés après la nouvelle cadence de révélation.
   La structure et les transactions sont déterministes ; le rythme d'achat doit
   encore être éprouvé dans de vraies runs.
+- Les caps et coûts initiaux du prestige sont cohérents et bornés, mais restent
+  des valeurs de départ : `AVANCE` (+300), le prix des buffs (1 ou 2 jetons) et
+  la combinaison `PREMIÈRE HEURE` + `PROTOCOLE CALME` demandent des runs réelles.
+- `RÉCUPÉRATION` rend 60, 65 ou 70 % du coût historique des nœuds. La poche
+  séparée protège le dilemme banque/palier, mais la vitesse de reconstruction
+  après plusieurs resets n'a pas encore été éprouvée en partie longue.
 
 ---
 
@@ -421,18 +488,19 @@ plutôt qu'ils ne frustrent, et si l'annulation est assez visible. Ensuite
 seulement : chaîne plus longue, parade à plusieurs passes, blindés qui laissent
 tomber un bonus en se brisant, tourelles qui participent aux chaînes.
 
-### Priorité 5 — jetons de prestige
+### Priorité 5 — éprouver le prestige, sans l'élargir
 
-**Issue <https://github.com/Sterenna-studio/skill-arena/issues/6>.**
+**Issue <https://github.com/Sterenna-studio/skill-arena/issues/6> implémentée.**
 
-Seconde monnaie gagnée en franchissant des paliers, et seul moyen de récupérer
-un arbre déjà figé. Sorti de l'issue #5 pour ne pas la bloquer : l'arbre sait
-seulement évaluer `unlock.prestige`, sans créer ni stocker de jetons.
+Les jetons sont dérivés de `bestManche`, réaffectables depuis un écran dédié et
+réservés aux points de structure et aux buffs avec contrepartie. Ils n'ouvrent
+aucun nœud de l'arbre. Le reset rend un crédit séparé qui n'achète que des
+nœuds ; annuler l'atelier restaure aussi cette poche.
 
-Le risque principal est identifié dans l'issue : les jetons rendent plus fort,
-donc on va plus loin, donc on gagne plus de jetons. Quelque chose doit casser
-cette boucle. Et le reset prestige ne doit surtout pas ressembler au bouton
-« Réinitialiser la progression » existant, qui efface tout.
+La prochaine étape est de mesurer en vraies runs si les caps, coûts et
+contreparties créent des loadouts réellement concurrents. Ne pas ajouter de
+tables ou de cosmétiques ici : les jalons de tables sont l'issue #7 et les
+cosmétiques restent rattachés à l'issue #4.
 
 ---
 

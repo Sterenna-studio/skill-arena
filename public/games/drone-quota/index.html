@@ -29,6 +29,7 @@
       <div class="stat"><span>MEILLEUR SCORE</span><strong id="menu-best-score">—</strong></div>
       <div class="stat"><span>RUNS</span><strong id="menu-runs">0</strong></div>
       <div class="stat"><span>NŒUDS ACQUIS</span><strong id="menu-nodes">0</strong></div>
+      <div class="stat"><span>CRÉDIT ARBRE</span><strong id="menu-credit">0</strong></div>
     </div>
 
     <div class="rules">
@@ -43,6 +44,7 @@
     <div class="actions">
       <button class="btn primary" id="btn-play">▶ LANCER UNE RUN</button>
       <button class="btn" id="btn-view-tree">ARBRE DE COMPÉTENCES</button>
+      <button class="btn" id="btn-prestige">PRESTIGE · <span id="menu-tokens">0 / 0</span></button>
     </div>
 
     <button class="btn danger tiny" id="btn-wipe">Réinitialiser la progression</button>
@@ -56,6 +58,43 @@
       <span class="bar-note">Progression permanente</span>
     </header>
     <div class="tree" id="tree-view"></div>
+    <section class="tree-reset">
+      <div>
+        <p class="kicker">RECONSTRUCTION DE L’ARBRE</p>
+        <h3><span id="tree-invested">0</span> INVESTIS · <span id="tree-refund">0</span> RENDUS</h3>
+        <p>Le reset convertit <strong id="tree-refund-rate">60 %</strong> du score investi en crédit réservé aux nœuds. Crédit actuel : <strong id="tree-credit">0</strong>.</p>
+      </div>
+      <button class="btn reset-tree" id="btn-reset-tree" type="button">RÉINITIALISER L’ARBRE</button>
+    </section>
+  </section>
+
+  <!-- ══ PRESTIGE (configuration entre deux runs) ══ -->
+  <section class="screen" id="scr-prestige">
+    <header class="bar">
+      <button class="btn tiny" id="btn-prestige-back">← RETOUR</button>
+      <h2>PRESTIGE</h2>
+      <span class="token-chip">JETONS <strong id="prestige-available">0</strong> / <span id="prestige-total">0</span></span>
+    </header>
+
+    <p class="prestige-guide" id="prestige-guide"></p>
+    <div class="prestige-summary">
+      <span>CRÉDIT ARBRE<strong id="prestige-credit">0</strong></span>
+      <span>RECONSTRUCTIONS<strong id="prestige-count">0</strong></span>
+    </div>
+
+    <section class="prestige-group">
+      <header><h3>POINTS PERMANENTS</h3><p>Des constantes de structure, jamais les taux de l’arbre.</p></header>
+      <div class="prestige-list" id="prestige-stats"></div>
+    </section>
+
+    <section class="prestige-group">
+      <header><h3>BUFFS DE DÉPART</h3><p>Chaque avantage conserve une contrepartie visible.</p></header>
+      <div class="prestige-buff-list" id="prestige-buffs"></div>
+    </section>
+
+    <div class="actions">
+      <button class="btn" id="btn-clear-loadout" type="button">TOUT DÉSAFFECTER</button>
+    </div>
   </section>
 
   <!-- ══ BRIEFING DE ROUND ══ -->
@@ -170,6 +209,7 @@
       <h2>ATELIER</h2>
       <span class="bar-note">Manche <span id="shop-next-manche">2</span> · round <span id="shop-next-round">4</span> · palier <strong id="shop-next-quota">1755</strong></span>
       <span class="bank-chip">BANQUE <strong id="shop-bank">0</strong></span>
+      <span class="credit-chip">CRÉDIT NŒUDS <strong id="shop-credit">0</strong></span>
     </header>
     <p class="shop-warning" id="shop-warning"></p>
     <div class="tree" id="shop-tree"></div>

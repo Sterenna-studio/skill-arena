@@ -78,6 +78,11 @@
 
     turretIntervalMs: [0, 2600, 1800, 1200],
     turretPointShare: 0.6,
+
+    // Progression prestige : constantes de structure, distinctes des taux
+    // améliorés par l'arbre de score.
+    startingBankPerPoint: 300,
+    reconstructionRate: 0.6,
   };
 
   /**
@@ -263,10 +268,124 @@
     for (const node of allBranchNodes(branch)) NODES.set(node.id, { ...node, branch });
   }
 
+  // Les jetons équipent une forme de boucle, jamais un taux déjà amélioré par
+  // l'arbre. Toutes les affectations sont librement réversibles depuis le menu.
+  const PRESTIGE_STATS = [
+    {
+      id: 'chaineProfonde', name: 'CHAÎNE PROFONDE', max: 3, cost: 1,
+      desc: '+1 coup de chaîne par point (5 → 8).',
+      apply: (s, lvl) => { s.chainMax += lvl; },
+    },
+    {
+      id: 'blindageLeger', name: 'BLINDAGE LÉGER', max: 2, cost: 1,
+      desc: '-1 bouclier sur les blindés par point.',
+      apply: (s, lvl) => { s.armoredShields -= lvl; },
+    },
+    {
+      id: 'gardeLue', name: 'GARDE LUE', max: 2, cost: 1,
+      desc: '+1 traversée du curseur de parade par point.',
+      apply: (s, lvl) => { s.qteSweepLegs += lvl; },
+    },
+    {
+      id: 'avance', name: 'AVANCE', max: 3, cost: 1,
+      desc: `+${BALANCE.startingBankPerPoint} de banque au départ de la run par point.`,
+      apply: (s, lvl) => { s.startingBank += BALANCE.startingBankPerPoint * lvl; },
+    },
+    {
+      id: 'elan', name: 'ÉLAN', max: 1, cost: 1,
+      desc: 'Chaque round démarre au combo ×2.',
+      apply: (s, lvl) => { if (lvl) s.startingCombo = 2; },
+    },
+    {
+      id: 'recuperation', name: 'RÉCUPÉRATION', max: 2, cost: 1,
+      desc: '+5 % de crédit rendu par point (60 → 70 %).',
+      apply: (s, lvl) => { s.reconstructionRate += 0.05 * lvl; },
+    },
+  ];
+
+  const PRESTIGE_BUFFS = [
+    {
+      id: 'breche', name: 'BRÈCHE', cost: 1,
+      advantage: 'Les blindés démarrent avec un bouclier en moins.',
+      counterpart: 'Les CORE apparaissent deux fois moins souvent.',
+      apply: s => { s.armoredShields -= 1; s.coreWeightMult *= 0.5; },
+    },
+    {
+      id: 'surtension', name: 'SURTENSION', cost: 2,
+      advantage: 'La chaîne monte au moins jusqu’à 7 coups.',
+      counterpart: 'Chaque étourdissement dure 30 % moins longtemps.',
+      apply: s => { s.chainMax = Math.max(s.chainMax, 7); s.stunMult *= 0.7; },
+    },
+    {
+      id: 'respiration', name: 'RESPIRATION', cost: 2,
+      advantage: '+4 secondes à chaque round.',
+      counterpart: 'Le combo plafonne deux crans plus bas.',
+      apply: s => { s.roundBonusSeconds += 4; s.comboCap = Math.max(2, s.comboCap - 2); },
+    },
+    {
+      id: 'protocoleCalme', name: 'PROTOCOLE CALME', cost: 1,
+      advantage: 'Les sentinelles n’apparaissent plus.',
+      counterpart: 'Tous les paliers augmentent de 15 %.',
+      apply: s => { s.noSentinelles = true; s.quotaMult *= 1.15; },
+    },
+    {
+      id: 'premiereHeure', name: 'PREMIÈRE HEURE', cost: 2,
+      advantage: 'Tous les points sont doublés pendant la manche 1.',
+      counterpart: 'Les paliers augmentent de 10 % dès la manche 2.',
+      apply: s => { s.firstMancheScoreMult = 2; s.lateQuotaMult *= 1.1; },
+    },
+    {
+      id: 'surcharge', name: 'SURCHARGE', cost: 2,
+      advantage: 'Deux cibles simultanées supplémentaires.',
+      counterpart: 'La fenêtre de toutes les cibles diminue de 20 %.',
+      apply: s => { s.maxActive += 2; s.ttlMult *= 0.8; },
+    },
+  ];
+
+  const PRESTIGE_STAT_MAP = new Map(PRESTIGE_STATS.map(item => [item.id, item]));
+  const PRESTIGE_BUFF_MAP = new Map(PRESTIGE_BUFFS.map(item => [item.id, item]));
+
   // ── sauvegarde ──────────────────────────────────────────────────────────
 
+  function emptyLoadout() {
+    return { stats: {}, buffs: [] };
+  }
+
   function emptySave() {
-    return { tree: {}, bestRound: 0, bestScore: 0, runs: 0 };
+    return {
+      tree: {}, bestRound: 0, bestManche: 0, bestScore: 0, runs: 0,
+      loadout: emptyLoadout(), credit: 0, prestiges: 0,
+    };
+  }
+
+  function loadoutCost(loadout) {
+    let total = 0;
+    for (const [id, rawLevel] of Object.entries(loadout?.stats ?? {})) {
+      const item = PRESTIGE_STAT_MAP.get(id);
+      if (!item) continue;
+      total += Math.min(item.max, Math.max(0, Math.floor(Number(rawLevel) || 0))) * item.cost;
+    }
+    const buffs = Array.isArray(loadout?.buffs) ? loadout.buffs : [];
+    for (const id of new Set(buffs)) total += PRESTIGE_BUFF_MAP.get(id)?.cost ?? 0;
+    return total;
+  }
+
+  function normalizeLoadout(rawLoadout, tokenBudget) {
+    const normalized = emptyLoadout();
+    let available = Math.max(0, Math.floor(tokenBudget));
+    for (const item of PRESTIGE_STATS) {
+      const wanted = Math.min(item.max, Math.max(0, Math.floor(Number(rawLoadout?.stats?.[item.id]) || 0)));
+      const level = Math.min(wanted, Math.floor(available / item.cost));
+      if (level > 0) normalized.stats[item.id] = level;
+      available -= level * item.cost;
+    }
+    const wantedBuffs = new Set(Array.isArray(rawLoadout?.buffs) ? rawLoadout.buffs : []);
+    for (const item of PRESTIGE_BUFFS) {
+      if (!wantedBuffs.has(item.id) || available < item.cost) continue;
+      normalized.buffs.push(item.id);
+      available -= item.cost;
+    }
+    return normalized;
   }
 
   function loadSave() {
@@ -286,6 +405,15 @@
         if (Number.isFinite(level) && level > 0) tree[id] = Math.min(level, node.max);
       }
       save.tree = normalizeTree(tree);
+      const bestRound = Math.max(0, Math.floor(Number(save.bestRound) || 0));
+      const inheritedManche = Math.floor(bestRound / BALANCE.roundsPerManche);
+      save.bestRound = bestRound;
+      save.bestManche = Math.max(inheritedManche, Math.floor(Number(save.bestManche) || 0));
+      save.bestScore = Math.max(0, Math.floor(Number(save.bestScore) || 0));
+      save.runs = Math.max(0, Math.floor(Number(save.runs) || 0));
+      save.credit = Math.max(0, Math.floor(Number(save.credit) || 0));
+      save.prestiges = Math.max(0, Math.floor(Number(save.prestiges) || 0));
+      save.loadout = normalizeLoadout(save.loadout, save.bestManche);
       return save;
     } catch (error) {
       console.warn('[Drone Quota] sauvegarde illisible, on repart de zéro :', error?.message ?? error);
@@ -328,7 +456,7 @@
 
   // ── stats dérivées ──────────────────────────────────────────────────────
 
-  function deriveStats(tree) {
+  function deriveStats(tree, loadout = emptyLoadout()) {
     const stats = {
       pointMult: 1,
       critChance: 0,
@@ -348,6 +476,16 @@
       qteZoneMult: 1,
       playerStunMult: 1,
       quotaDiscount: 0,
+      chainMax: BALANCE.chainMax,
+      armoredShields: TARGETS.find(target => target.id === 'blinde').shield,
+      qteSweepLegs: BALANCE.qteSweepLegs,
+      startingBank: 0,
+      startingCombo: 1,
+      reconstructionRate: BALANCE.reconstructionRate,
+      noSentinelles: false,
+      quotaMult: 1,
+      lateQuotaMult: 1,
+      firstMancheScoreMult: 1,
     };
     for (const branch of TREE) {
       for (const node of allBranchNodes(branch)) {
@@ -355,13 +493,25 @@
         if (lvl > 0) node.apply(stats, lvl);
       }
     }
+    for (const item of PRESTIGE_STATS) {
+      const level = Math.min(item.max, Math.max(0, Math.floor(Number(loadout?.stats?.[item.id]) || 0)));
+      if (level > 0) item.apply(stats, level);
+    }
+    const buffs = Array.isArray(loadout?.buffs) ? loadout.buffs : [];
+    for (const id of new Set(buffs)) PRESTIGE_BUFF_MAP.get(id)?.apply(stats);
+    // BLINDAGE LÉGER et BRÈCHE se cumulent : à investissement maximal, le
+    // blindé peut réellement démarrer ouvert plutôt que neutraliser le buff.
+    stats.armoredShields = Math.max(0, Math.round(stats.armoredShields));
+    stats.qteSweepLegs = Math.max(2, Math.round(stats.qteSweepLegs));
     return stats;
   }
 
   function quotaFor(round, stats) {
     const raw = BALANCE.quotaBase * Math.pow(BALANCE.quotaGrowth, round - 1);
     const discount = stats ? stats.quotaDiscount : 0;
-    return Math.max(1, Math.round(raw * (1 - Math.min(0.6, discount))));
+    const baseMultiplier = stats?.quotaMult ?? 1;
+    const lateMultiplier = mancheOf(round) >= 2 ? (stats?.lateQuotaMult ?? 1) : 1;
+    return Math.max(1, Math.round(raw * (1 - Math.min(0.6, discount)) * baseMultiplier * lateMultiplier));
   }
 
   function roundSecondsFor(stats) {
@@ -371,6 +521,22 @@
   const mancheOf = r => Math.floor((r - 1) / BALANCE.roundsPerManche) + 1;
   const stepInManche = r => ((r - 1) % BALANCE.roundsPerManche) + 1;
   const isMancheEnd = r => stepInManche(r) === BALANCE.roundsPerManche;
+
+  function recordClearedRound(roundNumber) {
+    let changed = false;
+    if (roundNumber > save.bestRound) {
+      save.bestRound = roundNumber;
+      changed = true;
+    }
+    if (isMancheEnd(roundNumber)) {
+      const completedManche = mancheOf(roundNumber);
+      if (completedManche > save.bestManche) {
+        save.bestManche = completedManche;
+        changed = true;
+      }
+    }
+    return changed;
+  }
 
   function branchInvestment(branch, tree) {
     return allBranchNodes(branch).reduce((sum, node) => sum + (tree[node.id] ?? 0), 0);
@@ -382,7 +548,7 @@
     ), 0);
   }
 
-  function unlockCheck(node, tree, progression = {}) {
+  function unlockCheck(node, tree) {
     const level = tree[node.id] ?? 0;
     if (level > 0) return { open: true };
 
@@ -403,32 +569,41 @@
     if (branch && branchInvestment(branch, tree) < (unlock.invested ?? 0)) {
       return { open: false, reason: 'invested', required: unlock.invested };
     }
-    // Point d'extension pour l'issue #6 : une branche entière ou un nœud peut
-    // poser la condition, mais aucun jeton n'est créé ni stocké ici.
-    const requiredPrestige = Math.max(branch?.unlock?.prestige ?? 0, unlock.prestige ?? 0);
-    if ((progression.prestigeTokens ?? 0) < requiredPrestige) {
-      return { open: false, reason: 'prestige', required: requiredPrestige };
-    }
     return { open: true };
   }
 
-  function nodeState(node, tree, bank, progression) {
+  function nodeState(node, tree, bank, credit = 0) {
     const level = tree[node.id] ?? 0;
     if (level >= node.max) return { level, status: 'maxed', cost: null };
-    const gate = unlockCheck(node, tree, progression);
+    const gate = unlockCheck(node, tree);
     if (!gate.open) return { level, status: 'hidden', cost: node.costs[level], gate };
     const cost = node.costs[level];
-    return { level, status: bank >= cost ? 'buyable' : 'poor', cost };
+    return { level, status: bank + credit >= cost ? 'buyable' : 'poor', cost };
   }
 
   function ownedNodeCount(tree) {
     return Object.values(tree).reduce((sum, lvl) => sum + lvl, 0);
   }
 
+  function treeInvestedScore(tree) {
+    let total = 0;
+    for (const node of NODES.values()) {
+      const level = Math.min(node.max, Math.max(0, Math.floor(Number(tree[node.id]) || 0)));
+      total += node.costs.slice(0, level).reduce((sum, cost) => sum + cost, 0);
+    }
+    return total;
+  }
+
+  function tokenSummary(source = save) {
+    const total = Math.max(0, Math.floor(Number(source.bestManche) || 0));
+    const spent = loadoutCost(source.loadout);
+    return { total, spent, available: Math.max(0, total - spent) };
+  }
+
   // ── état ────────────────────────────────────────────────────────────────
 
   let save = loadSave();
-  let stats = deriveStats(save.tree);
+  let stats = deriveStats(save.tree, save.loadout);
   let interludeTimer = null;
   let shopSnapshot = null;
   let shopDirty = false;
@@ -484,10 +659,153 @@
   // ── accueil ─────────────────────────────────────────────────────────────
 
   function renderMenu() {
+    const tokens = tokenSummary();
     $('menu-best-round').textContent = save.bestRound ? `#${save.bestRound}` : '—';
     $('menu-best-score').textContent = save.bestScore ? fmt(save.bestScore) : '—';
     $('menu-runs').textContent = fmt(save.runs);
     $('menu-nodes').textContent = fmt(ownedNodeCount(save.tree));
+    $('menu-credit').textContent = fmt(save.credit);
+    $('menu-tokens').textContent = `${tokens.available} / ${tokens.total}`;
+  }
+
+  // ── prestige : affectation libre entre deux runs ───────────────────────
+
+  function setStatPoint(id, delta) {
+    const item = PRESTIGE_STAT_MAP.get(id);
+    if (!item || !Number.isInteger(delta) || Math.abs(delta) !== 1) return false;
+    const current = save.loadout.stats[id] ?? 0;
+    const next = Math.max(0, Math.min(item.max, current + delta));
+    if (next === current) return false;
+    if (delta > 0 && tokenSummary().available < item.cost) return false;
+    if (next > 0) save.loadout.stats[id] = next;
+    else delete save.loadout.stats[id];
+    stats = deriveStats(save.tree, save.loadout);
+    persist();
+    FX.sfx.tick();
+    renderMenu();
+    renderPrestige();
+    return true;
+  }
+
+  function togglePrestigeBuff(id) {
+    const item = PRESTIGE_BUFF_MAP.get(id);
+    if (!item) return false;
+    const equipped = save.loadout.buffs.includes(id);
+    if (!equipped && tokenSummary().available < item.cost) return false;
+    save.loadout.buffs = equipped
+      ? save.loadout.buffs.filter(buffId => buffId !== id)
+      : [...save.loadout.buffs, id];
+    stats = deriveStats(save.tree, save.loadout);
+    persist();
+    FX.sfx.tick();
+    renderMenu();
+    renderPrestige();
+    return true;
+  }
+
+  function clearLoadout() {
+    if (loadoutCost(save.loadout) === 0) return false;
+    save.loadout = emptyLoadout();
+    stats = deriveStats(save.tree, save.loadout);
+    persist();
+    FX.sfx.tick();
+    renderMenu();
+    renderPrestige();
+    return true;
+  }
+
+  function renderPrestige() {
+    const tokens = tokenSummary();
+    $('prestige-available').textContent = tokens.available;
+    $('prestige-total').textContent = tokens.total;
+    $('prestige-credit').textContent = fmt(save.credit);
+    $('prestige-count').textContent = fmt(save.prestiges);
+    $('prestige-guide').textContent = tokens.total < 2
+      ? 'Chaque nouvelle manche record accorde un jeton. Atteins la fin d’une manche pour étoffer ce panneau.'
+      : 'Chaque nouvelle manche record accorde un jeton supplémentaire. Réaffecte librement ta configuration avant une run.';
+
+    const statList = $('prestige-stats');
+    statList.innerHTML = '';
+    for (const item of PRESTIGE_STATS) {
+      const level = save.loadout.stats[item.id] ?? 0;
+      const row = document.createElement('article');
+      row.className = 'prestige-stat';
+      row.dataset.stat = item.id;
+      row.innerHTML = `
+        <div class="prestige-copy">
+          <strong>${item.name}</strong>
+          <span>${item.desc}</span>
+        </div>
+        <span class="prestige-dots" aria-label="${level} point${level > 1 ? 's' : ''} sur ${item.max}">${'●'.repeat(level)}${'○'.repeat(item.max - level)}</span>
+        <span class="prestige-cost">${item.cost} JETON</span>`;
+
+      const controls = document.createElement('span');
+      controls.className = 'prestige-stepper';
+      const minus = document.createElement('button');
+      minus.type = 'button';
+      minus.textContent = '−';
+      minus.setAttribute('aria-label', `Retirer un point de ${item.name}`);
+      minus.disabled = level === 0;
+      minus.addEventListener('click', () => setStatPoint(item.id, -1));
+      const plus = document.createElement('button');
+      plus.type = 'button';
+      plus.textContent = '+';
+      plus.setAttribute('aria-label', `Ajouter un point à ${item.name}`);
+      plus.disabled = level >= item.max || tokens.available < item.cost;
+      plus.addEventListener('click', () => setStatPoint(item.id, 1));
+      controls.append(minus, plus);
+      row.appendChild(controls);
+      statList.appendChild(row);
+    }
+
+    const buffList = $('prestige-buffs');
+    buffList.innerHTML = '';
+    for (const item of PRESTIGE_BUFFS) {
+      const equipped = save.loadout.buffs.includes(item.id);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `prestige-buff${equipped ? ' equipped' : ''}`;
+      button.dataset.buff = item.id;
+      button.setAttribute('aria-pressed', String(equipped));
+      button.disabled = !equipped && tokens.available < item.cost;
+      button.innerHTML = `
+        <span class="prestige-buff-head"><strong>${item.name}</strong><b>${equipped ? '✓ ÉQUIPÉ' : `${item.cost} JETON${item.cost > 1 ? 'S' : ''}`}</b></span>
+        <span class="buff-effect advantage"><i>AVANTAGE</i>${item.advantage}</span>
+        <span class="buff-effect counterpart"><i>CONTREPARTIE</i>${item.counterpart}</span>`;
+      button.addEventListener('click', () => togglePrestigeBuff(item.id));
+      buffList.appendChild(button);
+    }
+    $('btn-clear-loadout').disabled = tokens.spent === 0;
+  }
+
+  function renderTreeReset() {
+    const invested = treeInvestedScore(save.tree);
+    const returned = Math.floor(invested * stats.reconstructionRate);
+    const percent = Math.round(stats.reconstructionRate * 100);
+    $('tree-invested').textContent = fmt(invested);
+    $('tree-refund').textContent = fmt(returned);
+    $('tree-refund-rate').textContent = `${percent} %`;
+    $('tree-credit').textContent = fmt(save.credit);
+    $('btn-reset-tree').disabled = invested === 0;
+  }
+
+  function resetTree() {
+    const invested = treeInvestedScore(save.tree);
+    if (invested <= 0) return false;
+    const returned = Math.floor(invested * stats.reconstructionRate);
+    const lost = invested - returned;
+    const message = `Réinitialiser tout l’arbre ?\n\n${fmt(returned)} seront versés au crédit de reconstruction et ${fmt(lost)} seront perdus. Les jetons, records et buffs équipés restent intacts.`;
+    if (!window.confirm(message)) return false;
+    save.tree = {};
+    save.credit += returned;
+    save.prestiges += 1;
+    stats = deriveStats(save.tree, save.loadout);
+    persist();
+    FX.sfx.buy();
+    renderMenu();
+    renderTree($('tree-view'), 'readonly');
+    renderTreeReset();
+    return true;
   }
 
   // ── rendu de l'arbre ────────────────────────────────────────────────────
@@ -546,11 +864,8 @@
 
   function specialtyCondition(node) {
     const parts = [];
-    const branch = NODES.get(node.id)?.branch;
     if (node.unlock?.depth) parts.push(`profondeur ${node.unlock.depth}`);
     if (node.unlock?.invested) parts.push(`${node.unlock.invested} niveaux investis`);
-    const prestige = Math.max(branch?.unlock?.prestige ?? 0, node.unlock?.prestige ?? 0);
-    if (prestige) parts.push(`${prestige} jeton${prestige > 1 ? 's' : ''} de prestige`);
     return `CONDITION : ${parts.join(' · ')}`;
   }
 
@@ -582,6 +897,7 @@
   /** @param mode 'shop' = achetable, 'readonly' = consultation depuis l'accueil. */
   function renderTree(container, mode) {
     const bank = mode === 'shop' ? run.bank : Infinity;
+    const credit = mode === 'shop' ? save.credit : 0;
     container.innerHTML = '';
 
     for (const branch of TREE) {
@@ -599,7 +915,7 @@
       graph.innerHTML = '<svg class="tree-links" aria-hidden="true"></svg>';
       let mobileRow = 1;
       for (const node of branch.nodes) {
-        const state = nodeState(node, save.tree, bank);
+        const state = nodeState(node, save.tree, bank, credit);
         if (state.status === 'hidden') continue;
         const button = nodeButton(node, state, mode);
         button.style.setProperty('--tree-column', node.lane ?? '1 / -1');
@@ -616,7 +932,7 @@
         specialties.className = 'specialties';
         specialties.innerHTML = '<h4>MODULES FLOTTANTS</h4>';
         for (const node of branch.specialties) {
-          specialties.appendChild(nodeButton(node, nodeState(node, save.tree, bank), mode, true));
+          specialties.appendChild(nodeButton(node, nodeState(node, save.tree, bank, credit), mode, true));
         }
         box.appendChild(specialties);
       }
@@ -629,12 +945,14 @@
 
   function buy(node) {
     if (!shopSnapshot) return;
-    const state = nodeState(node, save.tree, run.bank);
+    const state = nodeState(node, save.tree, run.bank, save.credit);
     if (state.status !== 'buyable') return;
-    run.bank -= state.cost;
+    const creditSpent = Math.min(save.credit, state.cost);
+    save.credit -= creditSpent;
+    run.bank -= state.cost - creditSpent;
     save.tree[node.id] = state.level + 1;
     shopDirty = true;
-    stats = deriveStats(save.tree);
+    stats = deriveStats(save.tree, save.loadout);
     FX.sfx.buy();
     renderShop();
     // L'atelier est re-rendu : on retrouve le nœud pour lui donner son accusé
@@ -649,7 +967,7 @@
   // ── atelier (fin de manche) ─────────────────────────────────────────────
 
   function enterShop() {
-    shopSnapshot = { tree: { ...save.tree }, bank: run.bank };
+    shopSnapshot = { tree: { ...save.tree }, bank: run.bank, credit: save.credit };
     shopDirty = false;
     renderShop();
     show('scr-shop');
@@ -659,7 +977,8 @@
     if (!shopSnapshot) return false;
     save.tree = { ...shopSnapshot.tree };
     run.bank = shopSnapshot.bank;
-    stats = deriveStats(save.tree);
+    save.credit = shopSnapshot.credit;
+    stats = deriveStats(save.tree, save.loadout);
     shopDirty = false;
     renderShop();
     return true;
@@ -669,7 +988,8 @@
     if (!shopSnapshot) return;
     save.tree = { ...shopSnapshot.tree };
     run.bank = shopSnapshot.bank;
-    stats = deriveStats(save.tree);
+    save.credit = shopSnapshot.credit;
+    stats = deriveStats(save.tree, save.loadout);
     shopSnapshot = null;
     shopDirty = false;
   }
@@ -688,6 +1008,7 @@
     $('shop-next-manche').textContent = mancheOf(run.round);
     $('shop-next-quota').textContent = fmt(next);
     $('shop-bank').textContent = fmt(run.bank);
+    $('shop-credit').textContent = fmt(save.credit);
 
     const warning = $('shop-warning');
     const short = next - run.bank;
@@ -702,6 +1023,9 @@
       warning.innerHTML = `Ta banque couvre le palier du round ${run.round} `
         + `(<strong>${fmt(next)}</strong>), avec ${fmt(-short)} d'avance. `
         + 'Investir maintenant, c\'est repasser sous la barre.';
+    }
+    if (save.credit > 0) {
+      warning.innerHTML += ` <strong>${fmt(save.credit)}</strong> de crédit seront consommés avant la banque et ne peuvent jamais payer ce palier.`;
     }
 
     renderTree($('shop-tree'), 'shop');
@@ -748,7 +1072,7 @@
       const port = {
         index: i, el: button, target: null,
         ttlTimer: null, ttlLeft: 0, ttlArmedAt: 0,
-        stunTimer: null, chain: 0, shieldLeft: 0,
+        stunTimer: null, chain: 0, shieldLeft: 0, shieldMax: 0,
       };
       button.addEventListener('click', () => onPortClick(port));
       grid.appendChild(button);
@@ -774,6 +1098,7 @@
     port.target = null;
     port.chain = 0;
     port.shieldLeft = 0;
+    port.shieldMax = 0;
     port.el.className = 'port';
     port.el.querySelector('.icon').textContent = '';
     port.el.querySelector('.name').textContent = 'IDLE';
@@ -826,8 +1151,8 @@
   function startRound() {
     round.quota = quotaFor(run.round, stats);
     round.seconds = roundSecondsFor(stats);
-    round.combo = 1;
-    round.maxCombo = 1;
+    round.combo = stats.startingCombo;
+    round.maxCombo = stats.startingCombo;
     round.gain = 0;
     round.hits = 0;
     round.misses = 0;
@@ -905,7 +1230,8 @@
   function dressPort(port, type) {
     port.target = type;
     port.chain = 0;
-    port.shieldLeft = type.shield ?? 0;
+    port.shieldMax = type.id === 'blinde' ? stats.armoredShields : (type.shield ?? 0);
+    port.shieldLeft = port.shieldMax;
     port.el.className = `port up ${type.id}`;
     port.el.querySelector('.icon').textContent = type.icon;
     port.el.querySelector('.name').textContent = type.name;
@@ -913,13 +1239,14 @@
   }
 
   function spawn(port) {
-    const type = weightedPick(TARGETS, t => t.id === 'core' ? t.weight * stats.coreWeightMult : t.weight);
+    const targets = stats.noSentinelles ? TARGETS.filter(target => target.id !== 'sentinelle') : TARGETS;
+    const type = weightedPick(targets, t => t.id === 'core' ? t.weight * stats.coreWeightMult : t.weight);
     dressPort(port, type);
     armTtl(port, type.ttl * stats.ttlMult);
   }
 
   function paintShield(port) {
-    const total = port.target?.shield ?? 0;
+    const total = port.shieldMax;
     port.el.style.setProperty('--shield', total ? port.shieldLeft / total : 0);
     port.el.classList.toggle('shielded', port.shieldLeft > 0);
   }
@@ -989,7 +1316,7 @@
       port.shieldLeft -= 1;
       paintShield(port);
       const broken = port.shieldLeft === 0;
-      popText(port, broken ? 'BRISÉ' : `${port.shieldLeft}/${type.shield}`, broken ? 'crit' : 'turret');
+      popText(port, broken ? 'BRISÉ' : `${port.shieldLeft}/${port.shieldMax}`, broken ? 'crit' : 'turret');
       FX.burst(port.el, broken ? 'crit' : 'turret', broken ? 1.3 : 0.7);
       broken ? FX.sfx.crit(panOf(port)) : FX.sfx.shield(panOf(port));
       FX.shake(cabinet(), broken ? 6 : 3);
@@ -1024,7 +1351,7 @@
     round.chainBest = Math.max(round.chainBest, port.chain);
     bumpCombo();
 
-    if (port.chain >= BALANCE.chainMax) {
+    if (port.chain >= stats.chainMax) {
       popText(port, 'HORS SERVICE', 'crit');
       flashPort(port, 'hit');
       updateHud();
@@ -1090,6 +1417,7 @@
     const crit = !viaTurret && Math.random() < stats.critChance;
 
     let points = type.pts * comboFactor * stats.pointMult * share;
+    if (mancheOf(run.round) === 1) points *= stats.firstMancheScoreMult;
     if (overclock) points *= 2;
     if (crit) points *= stats.critMult;
     if (viaTurret) points *= stats.turretCombo >= 2 ? 1 : BALANCE.turretPointShare;
@@ -1150,7 +1478,7 @@
     // Deux traversées au minimum garantissent un aller-retour lisible. Chaque
     // jambe dure qteSweepMs et accepte la frappe : le joueur peut agir tout de
     // suite ou attendre d'avoir observé la trajectoire complète.
-    const legs = Math.max(2, Math.round(BALANCE.qteSweepLegs));
+    const legs = stats.qteSweepLegs;
     const duration = BALANCE.qteSweepMs * legs;
     round.qte = {
       port, startedAt: performance.now(), zoneStart: start, zoneWidth: zone,
@@ -1323,7 +1651,7 @@
     if (target.shieldLeft > 0) {
       target.shieldLeft -= 1;
       paintShield(target);
-      popText(target, target.shieldLeft === 0 ? 'BRISÉ' : `${target.shieldLeft}/${target.target.shield}`, 'turret');
+      popText(target, target.shieldLeft === 0 ? 'BRISÉ' : `${target.shieldLeft}/${target.shieldMax}`, 'turret');
       FX.burst(target.el, 'turret', 0.7);
       stunTarget(target, BALANCE.shieldStunMs);
       return;
@@ -1425,12 +1753,8 @@
     run.bank -= round.quota;
     setMsg(`Palier réglé — ${fmt(round.quota)} prélevés, il reste ${fmt(run.bank)} en banque.`, 'good');
     FX.sfx.paid();
-    if (run.round > save.bestRound) {
-      save.bestRound = run.round;
-      persist();
-    }
-
     const finishedManche = isMancheEnd(run.round);
+    if (recordClearedRound(run.round)) persist();
     run.round += 1;
 
     if (finishedManche) setTimeout(enterShop, 1500);
@@ -1507,10 +1831,10 @@
 
   function newRun() {
     discardShopChanges();
-    stats = deriveStats(save.tree);
+    stats = deriveStats(save.tree, save.loadout);
     run.active = true;
     run.round = 1;
-    run.bank = 0;
+    run.bank = stats.startingBank;
     run.totalScore = 0;
     renderBrief();
     show('scr-brief');
@@ -1528,15 +1852,23 @@
 
   $('btn-view-tree').addEventListener('click', () => {
     renderTree($('tree-view'), 'readonly');
+    renderTreeReset();
     show('scr-tree');
   });
   $('btn-tree-back').addEventListener('click', () => show('scr-menu'));
+  $('btn-reset-tree').addEventListener('click', resetTree);
+  $('btn-prestige').addEventListener('click', () => {
+    renderPrestige();
+    show('scr-prestige');
+  });
+  $('btn-prestige-back').addEventListener('click', () => show('scr-menu'));
+  $('btn-clear-loadout').addEventListener('click', clearLoadout);
   $('btn-home').addEventListener('click', () => { renderMenu(); show('scr-menu'); });
 
   $('btn-wipe').addEventListener('click', () => {
-    if (!window.confirm('Effacer tout l’arbre, le meilleur score et le compteur de runs ?')) return;
+    if (!window.confirm('Effacer toute la progression : arbre, jetons, loadout, crédit, records et compteur de runs ?')) return;
     save = emptySave();
-    stats = deriveStats(save.tree);
+    stats = deriveStats(save.tree, save.loadout);
     persist();
     renderMenu();
   });
@@ -1599,10 +1931,13 @@
   // à jouer vingt rounds à la main. Ces crochets court-circuitent uniquement
   // l'attente, jamais les règles.
   window.__droneQuota = {
-    BALANCE, TARGETS, TREE, NODES, ports,
+    BALANCE, TARGETS, TREE, NODES, PRESTIGE_STATS, PRESTIGE_BUFFS, ports,
     quotaFor, deriveStats, roundSecondsFor, mancheOf, stepInManche, isMancheEnd,
     normalizeTree, branchInvestment, branchDepth, unlockCheck, nodeState,
     renderTree, enterShop, cancelShopPurchases, validateShop, discardShopChanges,
+    emptyLoadout, normalizeLoadout, loadoutCost, tokenSummary, treeInvestedScore,
+    recordClearedRound, setStatPoint, togglePrestigeBuff, clearLoadout,
+    renderPrestige, renderTreeReset, resetTree,
     run, round,
     get save() { return save; },
     get stats() { return stats; },
