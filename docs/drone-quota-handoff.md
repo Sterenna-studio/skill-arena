@@ -380,9 +380,34 @@ prérequis par nœud ou seuil de branche, arbre strict ou graphe, réversibilit�
 second axe de déverrouillage), le piège de sauvegarde à traiter et la question
 du rendu mobile.
 
+Les cinq questions sont tranchées, elles sont consignées dans le fil de
+l'issue : nœuds **cachés** tant que leur parent n'a pas un niveau, ouverture
+par **prérequis de nœud *et* seuils d'investissement de branche**, arbre
+**strict** plus des mini-branches flottantes conditionnées à la profondeur dont
+le contenu reste voilé jusqu'à l'achat, et un **bouton d'annulation valable
+tant qu'on est dans l'atelier** (les achats se figent à la sortie).
+
+Deux conséquences techniques à ne pas manquer : `buy()` écrit dans
+`localStorage` immédiatement alors que l'annulation exige un instantané validé
+en fin de phase ; et avec des nœuds cachés, un nœud possédé dont le parent est
+retombé à zéro serait invisible tout en appliquant son effet.
+
 Une fois la structure en place, les pistes de nœuds qui collent aux mécaniques
 actuelles : chaîne plus longue, parade à plusieurs passes, blindés qui laissent
 tomber un bonus en se brisant, tourelles qui participent aux chaînes.
+
+### Priorité 5 — jetons de prestige
+
+**Issue <https://github.com/Sterenna-studio/skill-arena/issues/6>.**
+
+Seconde monnaie gagnée en franchissant des paliers, et seul moyen de récupérer
+un arbre déjà figé. Sorti de l'issue #5 pour ne pas la bloquer : l'arbre a
+seulement besoin de prévoir des nœuds conditionnés à des jetons.
+
+Le risque principal est identifié dans l'issue : les jetons rendent plus fort,
+donc on va plus loin, donc on gagne plus de jetons. Quelque chose doit casser
+cette boucle. Et le reset prestige ne doit surtout pas ressembler au bouton
+« Réinitialiser la progression » existant, qui efface tout.
 
 ### Priorité 4 — retour au joueur
 
