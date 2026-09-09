@@ -10,6 +10,7 @@
 
 <div class="corner-tools">
   <button class="tool" id="btn-mute" type="button" aria-pressed="false" title="Couper le son">🔊</button>
+  <button class="tool" id="btn-settings" type="button" title="Ouvrir les réglages">⚙ RÉGLAGES</button>
   <a class="tool" href="/arena/">← Arena</a>
 </div>
 
@@ -21,7 +22,7 @@
       <div class="plate" aria-hidden="true"></div>
       <h1>DRONE<span>QUOTA</span></h1>
       <p class="serial">TERMINAL DE MAINTENANCE · MOD. DQ-12</p>
-      <p class="tagline">Le terminal réclame son palier. Chaque round, la facture monte.</p>
+      <p class="tagline">Trois rounds pour remplir l’objectif. La facture tombe seulement en fin de manche.</p>
     </header>
 
     <div class="menu-stats">
@@ -33,21 +34,65 @@
     </div>
 
     <div class="rules">
-      <div class="rule"><b>1</b><span>Frappe ce qui sort des 12 ports. Le combo monte à chaque touche, et tombe si tu frappes dans le vide.</span></div>
-      <div class="rule"><b>2</b><span>Une cible frappée reste <em>sonnée</em> sur son port. Enchaîne-la : chaque coup de la chaîne vaut plus cher que le précédent.</span></div>
-      <div class="rule"><b>3</b><span>Les <em>blindés</em> 🛡️ encaissent trois coups avant de payer — mais chaque coup les sonne plus longtemps.</span></div>
-      <div class="rule"><b>4</b><span>Frapper une <em>sentinelle</em> ⚔️ déclenche une parade. Place ton coup dans la fenêtre, ou tu restes étourdi une seconde. Le chrono, lui, ne s'arrête pas.</span></div>
-      <div class="rule"><b>5</b><span>En fin de round, le palier est prélevé sur ta banque. S'il manque un point, la run s'arrête. <em>Trois rounds font une manche</em>, et l'atelier n'ouvre qu'entre deux manches.</span></div>
-      <div class="rule"><b>6</b><span>Les achats restent <em>annulables dans l'atelier</em>. Ils deviennent définitifs quand tu lances la manche suivante.</span></div>
+      <div class="rule"><b>1</b><span><em>Tu ne peux pas perdre avant la fin des trois rounds.</em> La banque s’accumule jusqu’à la facture de manche.</span></div>
+      <div class="rule"><b>2</b><span>Une cible touchée reste <em>sonnée</em>. Refrappe-la avant la fin de sa jauge pour augmenter sa valeur.</span></div>
+      <div class="rule"><b>3</b><span>Les touches chargent le <em>BOOST</em>. Un clic vide affiche un raté, mais il en faut cinq de suite pour perdre l’élan.</span></div>
     </div>
 
     <div class="actions">
       <button class="btn primary" id="btn-play">▶ LANCER UNE RUN</button>
+      <button class="btn" id="btn-help">COMMENT JOUER · 3 PANNEAUX</button>
       <button class="btn" id="btn-view-tree">ARBRE DE COMPÉTENCES</button>
       <button class="btn" id="btn-prestige">PRESTIGE · <span id="menu-tokens">0 / 0</span></button>
     </div>
 
     <button class="btn danger tiny" id="btn-wipe">Réinitialiser la progression</button>
+  </section>
+
+  <!-- ══ RÉGLAGES ══ -->
+  <section class="screen" id="scr-settings">
+    <header class="bar">
+      <button class="btn tiny" id="btn-settings-back">← RETOUR</button>
+      <h2>RÉGLAGES</h2>
+      <span class="bar-note">Conservés sur cet appareil</span>
+    </header>
+
+    <div class="settings-grid">
+      <section class="settings-card">
+        <h3>POINTEUR</h3>
+        <p>Le viseur arme est synthétisé en CSS. Le mode normal conserve le curseur du navigateur.</p>
+        <div class="segmented" role="group" aria-label="Mode du pointeur">
+          <button type="button" data-cursor-mode="weapon">ARME</button>
+          <button type="button" data-cursor-mode="normal">NORMAL</button>
+        </div>
+        <label class="range-setting" for="cfg-aim">
+          <span>RÉACTIVITÉ DU VISEUR <b id="cfg-aim-value">7 / 10</b></span>
+          <input id="cfg-aim" type="range" min="1" max="10" step="1" value="7">
+        </label>
+        <small>Le navigateur ne permet pas de changer la sensibilité du curseur système ; ce réglage agit sur le suivi du viseur arme.</small>
+      </section>
+
+      <section class="settings-card">
+        <h3>AUDIO</h3>
+        <label class="toggle-setting"><span>SON GLOBAL<small>Coupe toute la sortie audio.</small></span><input id="cfg-audio" type="checkbox" checked></label>
+        <label class="toggle-setting"><span>EFFETS<small>Impacts, interface et alertes.</small></span><input id="cfg-effects" type="checkbox" checked></label>
+        <label class="toggle-setting"><span>AMBIANCE<small>Ronflement continu de la machine.</small></span><input id="cfg-ambience" type="checkbox" checked></label>
+        <label class="range-setting" for="cfg-volume">
+          <span>VOLUME GÉNÉRAL <b id="cfg-volume-value">80 %</b></span>
+          <input id="cfg-volume" type="range" min="0" max="100" step="5" value="80">
+        </label>
+      </section>
+
+      <section class="settings-card">
+        <h3>CONFORT VISUEL</h3>
+        <label class="toggle-setting"><span>EFFETS RÉDUITS<small>Diminue particules, lumières, flashes et secousses.</small></span><input id="cfg-reduced" type="checkbox"></label>
+        <button class="btn" id="btn-replay-help" type="button">REVOIR LES 3 PANNEAUX</button>
+      </section>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="btn-reset-settings" type="button">RÉGLAGES PAR DÉFAUT</button>
+    </div>
   </section>
 
   <!-- ══ ARBRE (consultation depuis l'accueil) ══ -->
@@ -102,12 +147,12 @@
     <header class="title-block small">
       <p class="kicker" id="brief-manche">MANCHE 1 · ROUND 1/3</p>
       <h2 class="quota-figure" id="brief-quota">1500</h2>
-      <p class="tagline">palier à régler en fin de round · round <span id="brief-round">1</span></p>
+      <p class="tagline">objectif cumulé à régler après le round 3 · round <span id="brief-round">1</span></p>
     </header>
 
     <div class="menu-stats">
       <div class="stat"><span>BANQUE</span><strong id="brief-bank">0</strong></div>
-      <div class="stat"><span>À TROUVER</span><strong id="brief-missing">1500</strong></div>
+      <div class="stat"><span>RESTE À PRODUIRE</span><strong id="brief-missing">1500</strong></div>
       <div class="stat"><span>DURÉE</span><strong id="brief-duration">26s</strong></div>
     </div>
 
@@ -139,13 +184,19 @@
           <div class="glass-inner" id="glass-inner">
             <div class="hud">
               <div class="hud-cell"><span>ROUND</span><strong id="hud-round">1</strong></div>
-              <div class="hud-cell wide"><span>BANQUE / PALIER</span><strong id="hud-bank">0 / 1 500</strong></div>
-              <div class="hud-cell"><span>COMBO</span><strong id="hud-combo">×1</strong></div>
+              <div class="hud-cell wide"><span>BANQUE / OBJECTIF MANCHE</span><strong id="hud-bank">0 / 7 125</strong></div>
+              <div class="hud-cell"><span>BOOST</span><strong id="hud-combo">×1</strong></div>
               <div class="hud-cell"><span>MANCHE</span><strong id="hud-manche">M1 · 1/3</strong></div>
               <div class="hud-cell"><span>TEMPS</span><strong id="hud-time">26</strong></div>
             </div>
 
-            <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">0 %</em></div>
+            <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">OBJECTIF · 0 %</em></div>
+
+            <div class="boost-meter" id="boost-meter">
+              <span>BOOST <strong id="boost-mult">×1</strong></span>
+              <div><i id="boost-fill"></i><em id="boost-label">PROCHAINE PUISSANCE · 0 %</em></div>
+              <b id="miss-label">5 RATÉS TOLÉRÉS</b>
+            </div>
 
             <div class="effects">
               <span class="pill" id="pill-coolant">COOLANT</span>
@@ -184,9 +235,9 @@
             <span class="inter-manche" id="inter-manche">MANCHE 1</span>
             <strong class="inter-title" id="inter-title">ROUND 2 / 3</strong>
             <div class="inter-grid">
-              <span>PALIER<b id="inter-quota">780</b></span>
+              <span>OBJECTIF MANCHE<b id="inter-quota">7 125</b></span>
               <span>BANQUE<b id="inter-bank">0</b></span>
-              <span>À TROUVER<b id="inter-missing">0</b></span>
+              <span>RESTE À PRODUIRE<b id="inter-missing">0</b></span>
             </div>
             <p class="inter-note" id="inter-note"></p>
             <button class="btn primary" id="btn-inter-go">CONTINUER · <span id="inter-count">4</span></button>
@@ -207,7 +258,7 @@
   <section class="screen" id="scr-shop">
     <header class="bar">
       <h2>ATELIER</h2>
-      <span class="bar-note">Manche <span id="shop-next-manche">2</span> · round <span id="shop-next-round">4</span> · palier <strong id="shop-next-quota">1755</strong></span>
+      <span class="bar-note">Manche <span id="shop-next-manche">2</span> · round <span id="shop-next-round">4</span> · objectif <strong id="shop-next-quota">24 047</strong></span>
       <span class="bank-chip">BANQUE <strong id="shop-bank">0</strong></span>
       <span class="credit-chip">CRÉDIT NŒUDS <strong id="shop-credit">0</strong></span>
     </header>
@@ -223,7 +274,7 @@
   <!-- ══ FIN DE RUN ══ -->
   <section class="screen" id="scr-over">
     <header class="title-block small">
-      <p class="kicker" id="over-kicker">PALIER NON RÉGLÉ</p>
+      <p class="kicker" id="over-kicker">OBJECTIF DE MANCHE NON ATTEINT</p>
       <h2 id="over-round">MANCHE 2 · ROUND 4</h2>
     </header>
 
@@ -244,7 +295,25 @@
 
 </div>
 
+<!-- Trois panneaux maximum : premier lancement et rappel depuis les réglages. -->
+<div class="tutorial" id="tutorial" role="dialog" aria-modal="true" aria-labelledby="tutorial-title" hidden>
+  <section class="tutorial-card">
+    <span class="tutorial-step" id="tutorial-step">1 / 3</span>
+    <div class="tutorial-symbol" id="tutorial-symbol" aria-hidden="true">③</div>
+    <h2 id="tutorial-title">UNE MANCHE, TROIS ROUNDS</h2>
+    <p id="tutorial-copy"></p>
+    <div class="tutorial-actions">
+      <button class="btn" id="btn-tutorial-skip" type="button">PASSER</button>
+      <button class="btn primary" id="btn-tutorial-next" type="button">SUIVANT →</button>
+    </div>
+  </section>
+</div>
+
+<!-- Futur point de remplacement par un sprite fourni ; aucun asset aujourd'hui. -->
+<span class="weapon-cursor" id="weapon-cursor" aria-hidden="true" hidden><i></i><b></b></span>
+
 <script src="fx.js"></script>
+<script src="prefs.js"></script>
 <script src="game.js"></script>
 </body>
 </html>

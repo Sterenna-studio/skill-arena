@@ -1,15 +1,14 @@
 /**
  * Drone Quota — whack-a-mole roguelite à quotas.
  *
- * Structure : un round dure quelques dizaines de secondes et se termine sur un
- * palier à régler. Trois rounds forment une manche ; entre deux rounds d'une
- * même manche il n'y a qu'un souffle, et l'atelier n'ouvre qu'en fin de manche.
+ * Structure : trois rounds cumulent une banque vers un objectif de manche,
+ * réglé seulement après le troisième. Entre deux rounds il n'y a qu'un souffle,
+ * et l'atelier n'ouvre qu'après une manche validée.
  * Pas de vies : la pression, c'est le temps et le quota. Se tromper coûte des
  * secondes, jamais un compteur de cœurs.
  *
- * La banque paie le palier *et* achète les nœuds de l'arbre, qui sont
- * définitifs. Tout le dilemme est là — investir, c'est reculer sur la facture
- * suivante.
+ * La banque paie l'objectif *et* achète les nœuds persistants de l'arbre. Tout
+ * le dilemme est là — investir, c'est reculer sur la facture suivante.
  *
  * Autonome : aucune dépendance, aucun appel réseau, progression en
  * localStorage. Rien à voir avec le wallet Star Tokens de l'arcade.
@@ -23,9 +22,14 @@
   // doit rester jouable en silence plutôt que planter au premier clic.
   const FX = window.DQFX ?? {
     sfx: new Proxy({}, { get: () => () => {} }),
-    hum() {}, setMuted() { return true; }, isMuted: () => true, unlock() {},
+    hum() {}, setMuted() { return true; }, isMuted: () => true, unlock() {}, configureAudio() {},
     attach() {}, resize() {}, burst() {}, tracer() {}, shake() {}, clear() {},
-    scar() {}, clearScars() {}, centerOf: () => ({ x: 0, y: 0 }),
+    scar() {}, clearScars() {}, centerOf: () => ({ x: 0, y: 0 }), setReducedEffects() {},
+  };
+  const PREFS = window.DQPrefs ?? {
+    get: () => ({ cursorMode: 'normal', aimResponsiveness: 7, audioEnabled: true, effectsEnabled: true, ambienceEnabled: true, masterVolume: 80, reducedEffects: false, tutorialSeen: false }),
+    set(patch) { return { ...this.get(), ...patch }; },
+    reset() { return this.get(); }, subscribe() {}, initCursor() {}, hideCursor() {},
   };
 
   const BALANCE = {
@@ -33,12 +37,9 @@
     roundsPerManche: 3,
     interludeMs: 4000,
 
-    // Calé sur un modèle de budget de frappes : le facteur limitant est la
-    // main du joueur, pas le débit des ports. Un débutant sans arbre qui tape
-    // une fois par cible fait ~3 900 par round, un bon joueur qui mène ses
-    // chaînes jusqu'au bout ~16 000. À 1 500, l'arbre vide mure au round 5
-    // pour le premier, au 10 pour le second, et l'arbre plein tient jusqu'au
-    // 14-17. C'est la croissance géométrique qui fait le tri, pas la base.
+    // Base issue du modèle historique de budget de frappes. Les trois paliers
+    // sont maintenant regroupés sans changer leur somme, mais la nouvelle
+    // charge progressive du BOOST impose de remesurer le rendement en partie.
     quotaBase: 1500,
     // Croissance géométrique, pas polynomiale : le revenu d'un round est à peu
     // près constant, donc un palier quasi linéaire finit toujours par être
@@ -53,6 +54,10 @@
     overclockMs: 4200,
     baseComboCap: 6,
     baseMaxActive: 2,
+    missTolerance: 5,
+    boostHitBase: 20,
+    boostScoreScale: 4,
+    boostScoreCap: 34,
 
     // Chaîne d'étourdissement : une cible frappée reste sonnée sur le port et
     // rapporte de plus en plus tant qu'on l'enchaîne. Chaque coup l'étourdit
@@ -125,9 +130,9 @@
           apply: (s, lvl) => { s.pointMult += 0.25 * lvl; },
         },
         {
-          id: 'combo', name: 'COMBO ÉTENDU', max: 3, costs: [440, 1100, 2400],
+          id: 'combo', name: 'BOOST ÉTENDU', max: 3, costs: [440, 1100, 2400],
           tier: 2, lane: '1', requires: { frappe: 1 },
-          desc: lvl => `Combo plafonné à ×${BALANCE.baseComboCap + lvl * 2} au lieu de ×${BALANCE.baseComboCap}.`,
+          desc: lvl => `BOOST plafonné à ×${BALANCE.baseComboCap + lvl * 2} au lieu de ×${BALANCE.baseComboCap}.`,
           apply: (s, lvl) => { s.comboCap += 2 * lvl; },
         },
         {
@@ -208,8 +213,8 @@
           id: 'surchauffe', name: 'SURCHAUFFE', max: 2, costs: [2800, 6000],
           tier: 3, lane: '1 / -1', requires: { tourelleD: 1 },
           desc: lvl => lvl === 1
-            ? 'Les tirs de tourelle alimentent ton combo.'
-            : 'Les tirs de tourelle alimentent le combo et marquent à plein tarif.',
+            ? 'Les tirs de tourelle alimentent ton BOOST.'
+            : 'Les tirs de tourelle alimentent le BOOST et marquent à plein tarif.',
           apply: (s, lvl) => { s.turretCombo = lvl; },
         },
       ],
@@ -293,7 +298,7 @@
     },
     {
       id: 'elan', name: 'ÉLAN', max: 1, cost: 1,
-      desc: 'Chaque round démarre au combo ×2.',
+      desc: 'Chaque round démarre avec un BOOST ×2.',
       apply: (s, lvl) => { if (lvl) s.startingCombo = 2; },
     },
     {
@@ -319,7 +324,7 @@
     {
       id: 'respiration', name: 'RESPIRATION', cost: 2,
       advantage: '+4 secondes à chaque round.',
-      counterpart: 'Le combo plafonne deux crans plus bas.',
+      counterpart: 'Le BOOST plafonne deux crans plus bas.',
       apply: s => { s.roundBonusSeconds += 4; s.comboCap = Math.max(2, s.comboCap - 2); },
     },
     {
@@ -521,6 +526,14 @@
   const mancheOf = r => Math.floor((r - 1) / BALANCE.roundsPerManche) + 1;
   const stepInManche = r => ((r - 1) % BALANCE.roundsPerManche) + 1;
   const isMancheEnd = r => stepInManche(r) === BALANCE.roundsPerManche;
+  function mancheQuotaFor(roundNumber, currentStats) {
+    const firstRound = roundNumber - stepInManche(roundNumber) + 1;
+    let total = 0;
+    for (let offset = 0; offset < BALANCE.roundsPerManche; offset++) {
+      total += quotaFor(firstRound + offset, currentStats);
+    }
+    return total;
+  }
 
   function recordClearedRound(roundNumber) {
     let changed = false;
@@ -604,6 +617,7 @@
 
   let save = loadSave();
   let stats = deriveStats(save.tree, save.loadout);
+  let preferences = PREFS.get();
   let interludeTimer = null;
   let shopSnapshot = null;
   let shopDirty = false;
@@ -618,6 +632,8 @@
     quota: 0,
     combo: 1,
     maxCombo: 1,
+    boostCharge: 0,
+    missStreak: 0,
     gain: 0,
     hits: 0,
     misses: 0,
@@ -643,6 +659,7 @@
 
   function show(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === screenId));
+    PREFS.hideCursor();
     window.scrollTo({ top: 0 });
   }
 
@@ -666,6 +683,131 @@
     $('menu-nodes').textContent = fmt(ownedNodeCount(save.tree));
     $('menu-credit').textContent = fmt(save.credit);
     $('menu-tokens').textContent = `${tokens.available} / ${tokens.total}`;
+  }
+
+  // ── aide et préférences ────────────────────────────────────────────────
+
+  const TUTORIAL_PANELS = [
+    {
+      symbol: '③',
+      title: 'UNE MANCHE, TROIS ROUNDS',
+      copy: 'Ta banque s’accumule pendant <strong>trois rounds complets</strong>. Tu ne peux pas perdre avant la facture de fin de manche : regarde l’objectif global et rattrape ton retard au round suivant.',
+    },
+    {
+      symbol: '⚡',
+      title: 'REFRAPPE LES CIBLES SONNÉES',
+      copy: 'Une touche laisse la cible dans son puits. Son cadre jaune et sa jauge indiquent exactement le temps restant : <strong>refrappe avant qu’elle ne reparte</strong> pour augmenter sa valeur.',
+    },
+    {
+      symbol: '×5',
+      title: 'FAIS MONTER LE BOOST',
+      copy: 'Les touches et leur score remplissent le BOOST. Un clic vide affiche un raté mais ne casse rien tout seul : il faut <strong>cinq ratés consécutifs</strong> pour dissiper la jauge et le multiplicateur.',
+    },
+  ];
+
+  let tutorialIndex = 0;
+  let tutorialStartsRun = false;
+  let settingsReturnScreen = 'scr-menu';
+
+  function activeScreenId() {
+    return document.querySelector('.screen.active')?.id ?? 'scr-menu';
+  }
+
+  function renderTutorial() {
+    const panel = TUTORIAL_PANELS[tutorialIndex];
+    $('tutorial-step').textContent = `${tutorialIndex + 1} / ${TUTORIAL_PANELS.length}`;
+    $('tutorial-symbol').textContent = panel.symbol;
+    $('tutorial-title').textContent = panel.title;
+    $('tutorial-copy').innerHTML = panel.copy;
+    $('btn-tutorial-next').textContent = tutorialIndex === TUTORIAL_PANELS.length - 1
+      ? (tutorialStartsRun ? 'LANCER LA RUN →' : 'FERMER')
+      : 'SUIVANT →';
+  }
+
+  function openTutorial(startsRun = false) {
+    tutorialIndex = 0;
+    tutorialStartsRun = startsRun;
+    renderTutorial();
+    $('tutorial').hidden = false;
+    $('btn-tutorial-next').focus();
+  }
+
+  function closeTutorial(startRunAfter = false) {
+    $('tutorial').hidden = true;
+    preferences = PREFS.set({ tutorialSeen: true });
+    const shouldStart = startRunAfter && tutorialStartsRun;
+    tutorialStartsRun = false;
+    if (shouldStart) newRun();
+  }
+
+  function nextTutorialPanel() {
+    if (tutorialIndex < TUTORIAL_PANELS.length - 1) {
+      tutorialIndex += 1;
+      renderTutorial();
+      return;
+    }
+    closeTutorial(true);
+  }
+
+  function requestRun() {
+    if (!preferences.tutorialSeen) openTutorial(true);
+    else newRun();
+  }
+
+  function paintMute() {
+    const muted = !preferences.audioEnabled;
+    const button = $('btn-mute');
+    button.textContent = muted ? '🔇' : '🔊';
+    button.setAttribute('aria-pressed', String(muted));
+    button.title = muted ? 'Rétablir le son' : 'Couper le son';
+  }
+
+  function renderSettings() {
+    document.querySelectorAll('[data-cursor-mode]').forEach(button => {
+      const active = button.dataset.cursorMode === preferences.cursorMode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    $('cfg-aim').value = preferences.aimResponsiveness;
+    $('cfg-aim').disabled = preferences.cursorMode !== 'weapon';
+    $('cfg-aim').closest('.range-setting').classList.toggle('disabled', preferences.cursorMode !== 'weapon');
+    $('cfg-aim-value').textContent = `${preferences.aimResponsiveness} / 10`;
+    $('cfg-audio').checked = preferences.audioEnabled;
+    $('cfg-effects').checked = preferences.effectsEnabled;
+    $('cfg-ambience').checked = preferences.ambienceEnabled;
+    $('cfg-volume').value = preferences.masterVolume;
+    $('cfg-volume-value').textContent = `${preferences.masterVolume} %`;
+    $('cfg-reduced').checked = preferences.reducedEffects;
+  }
+
+  function applyPreferences(nextPreferences) {
+    preferences = nextPreferences;
+    document.body.classList.toggle('reduce-effects', preferences.reducedEffects);
+    FX.configureAudio({
+      effectsEnabled: preferences.effectsEnabled,
+      ambienceEnabled: preferences.ambienceEnabled,
+      masterVolume: preferences.masterVolume / 100,
+    });
+    FX.setMuted(!preferences.audioEnabled);
+    FX.setReducedEffects(preferences.reducedEffects);
+    if (round.running) FX.hum(preferences.audioEnabled && preferences.ambienceEnabled);
+    renderSettings();
+    paintMute();
+  }
+
+  function openSettings() {
+    const current = activeScreenId();
+    if (current === 'scr-round') {
+      setMsg('Les réglages complets sont disponibles entre deux rounds. Le bouton son reste actif.', '');
+      return;
+    }
+    settingsReturnScreen = current === 'scr-settings' ? 'scr-menu' : current;
+    renderSettings();
+    show('scr-settings');
+  }
+
+  function closeSettings() {
+    show(settingsReturnScreen);
   }
 
   // ── prestige : affectation libre entre deux runs ───────────────────────
@@ -1003,7 +1145,7 @@
   }
 
   function renderShop() {
-    const next = quotaFor(run.round, stats);
+    const next = mancheQuotaFor(run.round, stats);
     $('shop-next-round').textContent = run.round;
     $('shop-next-manche').textContent = mancheOf(run.round);
     $('shop-next-quota').textContent = fmt(next);
@@ -1016,16 +1158,16 @@
     // mais chaque achat t'en rapproche.
     if (short > 0) {
       warning.className = 'shop-warning danger';
-      warning.innerHTML = `Il te manque <strong>${fmt(short)}</strong> pour le palier du round ${run.round}. `
-        + 'Tout ce que tu dépenses ici, il faudra le regagner sur les ports.';
+      warning.innerHTML = `Il te manque <strong>${fmt(short)}</strong> pour l’objectif cumulé de la manche ${mancheOf(run.round)}. `
+        + 'Tu disposeras de trois rounds pour le regagner sur les ports.';
     } else {
       warning.className = 'shop-warning';
-      warning.innerHTML = `Ta banque couvre le palier du round ${run.round} `
+      warning.innerHTML = `Ta banque couvre l’objectif de la manche ${mancheOf(run.round)} `
         + `(<strong>${fmt(next)}</strong>), avec ${fmt(-short)} d'avance. `
         + 'Investir maintenant, c\'est repasser sous la barre.';
     }
     if (save.credit > 0) {
-      warning.innerHTML += ` <strong>${fmt(save.credit)}</strong> de crédit seront consommés avant la banque et ne peuvent jamais payer ce palier.`;
+      warning.innerHTML += ` <strong>${fmt(save.credit)}</strong> de crédit seront consommés avant la banque et ne peuvent jamais payer cet objectif.`;
     }
 
     renderTree($('shop-tree'), 'shop');
@@ -1038,7 +1180,7 @@
   // ── briefing ────────────────────────────────────────────────────────────
 
   function renderBrief() {
-    const quota = quotaFor(run.round, stats);
+    const quota = mancheQuotaFor(run.round, stats);
     $('brief-round').textContent = run.round;
     $('brief-manche').textContent = `MANCHE ${mancheOf(run.round)} · ROUND ${stepInManche(run.round)}/${BALANCE.roundsPerManche}`;
     $('brief-quota').textContent = fmt(quota);
@@ -1047,10 +1189,10 @@
     $('brief-duration').textContent = `${roundSecondsFor(stats)}s`;
 
     const owned = ownedNodeCount(save.tree);
+    const safety = '<strong>Aucune défaite avant le round 3/3.</strong> La banque et le retard sont conservés entre les rounds de cette manche. ';
     $('brief-hint').innerHTML = owned
-      ? `Tu démarres avec <strong>${owned}</strong> niveau${owned > 1 ? 'x' : ''} d'arbre déjà acquis. `
-        + 'Le palier, lui, ne se souvient de rien.'
-      : 'Aucun nœud pour l\'instant : encaisse la première manche, puis va dépenser à l\'atelier.';
+      ? safety + `Tu démarres aussi avec ${owned} niveau${owned > 1 ? 'x' : ''} d'arbre acquis.`
+      : safety + 'Remplis l’objectif cumulé pour ouvrir ton premier atelier.';
   }
 
   // ── grille ──────────────────────────────────────────────────────────────
@@ -1064,10 +1206,12 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'port';
+      button.setAttribute('aria-label', `Port ${i + 1}, vide`);
       button.innerHTML = `<span class="id">P${String(i + 1).padStart(2, '0')}</span>`
         + '<span class="socket"><span class="shaft"></span>'
         + '<span class="riser"><span class="icon"></span></span></span>'
         + '<span class="shieldbar" aria-hidden="true"></span>'
+        + '<span class="stun-state" aria-hidden="true"><b>SONNÉ</b><i></i></span>'
         + '<span class="scars"></span><span class="name">IDLE</span>';
       const port = {
         index: i, el: button, target: null,
@@ -1102,6 +1246,7 @@
     port.el.className = 'port';
     port.el.querySelector('.icon').textContent = '';
     port.el.querySelector('.name').textContent = 'IDLE';
+    port.el.setAttribute('aria-label', `Port ${port.index + 1}, vide`);
     port.el.style.removeProperty('--shield');
   }
 
@@ -1149,10 +1294,12 @@
   // ── round ───────────────────────────────────────────────────────────────
 
   function startRound() {
-    round.quota = quotaFor(run.round, stats);
+    round.quota = mancheQuotaFor(run.round, stats);
     round.seconds = roundSecondsFor(stats);
     round.combo = stats.startingCombo;
     round.maxCombo = stats.startingCombo;
+    round.boostCharge = 0;
+    round.missStreak = 0;
     round.gain = 0;
     round.hits = 0;
     round.misses = 0;
@@ -1171,7 +1318,7 @@
     closeQte();
     $('interlude').hidden = true;
     updateHud();
-    setMsg('Frappe tout ce qui bouge.', '');
+    setMsg(`Round ${stepInManche(run.round)}/3 — construis la banque, aucun échec avant la fin de manche.`, '');
     show('scr-round');
     FX.clear();
     FX.clearScars();
@@ -1235,6 +1382,7 @@
     port.el.className = `port up ${type.id}`;
     port.el.querySelector('.icon').textContent = type.icon;
     port.el.querySelector('.name').textContent = type.name;
+    port.el.setAttribute('aria-label', `Port ${port.index + 1}, ${type.name}`);
     if (port.shieldLeft) paintShield(port);
   }
 
@@ -1256,14 +1404,62 @@
     const scoring = port.target.pts > 0 && !port.target.effect;
     clearPort(port);
     if (!scoring) return;
-    round.combo = 1;
     port.el.classList.add('gone');
     setTimeout(() => port.el.classList.remove('gone'), 240);
     FX.sfx.escape();
-    updateHud();
+    setMsg('Cible échappée — ton BOOST reste intact.', '');
   }
 
   // ── frappe ──────────────────────────────────────────────────────────────
+
+  function chargeBoost(points, port, fixedGain = null) {
+    round.missStreak = 0;
+    if (round.combo >= stats.comboCap) {
+      round.boostCharge = 100;
+      return;
+    }
+
+    const scoreGain = Math.min(BALANCE.boostScoreCap, Math.sqrt(Math.max(0, points)) * BALANCE.boostScoreScale);
+    round.boostCharge += fixedGain ?? (BALANCE.boostHitBase + scoreGain);
+    let surged = false;
+    while (round.boostCharge >= 100 && round.combo < stats.comboCap) {
+      round.boostCharge -= 100;
+      round.combo += 1;
+      round.maxCombo = Math.max(round.maxCombo, round.combo);
+      surged = true;
+    }
+    if (round.combo >= stats.comboCap) round.boostCharge = 100;
+    if (surged) {
+      popText(port, `BOOST ×${round.combo}`, 'crit');
+      const meter = $('boost-meter');
+      meter.classList.remove('surge');
+      void meter.offsetWidth;
+      meter.classList.add('surge');
+      setTimeout(() => meter.classList.remove('surge'), 320);
+    }
+  }
+
+  function registerMiss(port) {
+    round.misses += 1;
+    round.missStreak += 1;
+    const remaining = BALANCE.missTolerance - round.missStreak;
+    popText(port, `RATÉ ${round.missStreak}/${BALANCE.missTolerance}`, 'neg');
+    FX.sfx.miss(panOf(port));
+
+    if (remaining > 0) {
+      setMsg(`Coup vide sans pénalité — encore ${remaining} avant de perdre le BOOST.`, '');
+      updateHud();
+      return;
+    }
+
+    round.combo = 1;
+    round.boostCharge = 0;
+    round.missStreak = 0;
+    setMsg(`${BALANCE.missTolerance} ratés de suite — BOOST dissipé.`, 'bad');
+    FX.scar(port.el, 'miss');
+    FX.shake(cabinet(), 4);
+    updateHud();
+  }
 
   function onPortClick(port) {
     if (!round.running) return;
@@ -1278,16 +1474,9 @@
     }
 
     if (!port.target) {
-      // Frapper dans le vide casse le combo : sans ça, le spam de clics est
-      // toujours la stratégie optimale.
-      round.misses += 1;
-      round.combo = 1;
-      popText(port, 'RATÉ', 'neg');
-      setMsg('Coup dans le vide — combo perdu.', 'bad');
-      FX.sfx.miss(panOf(port));
-      FX.scar(port.el, 'miss');
-      FX.shake(cabinet(), 2);
-      updateHud();
+      // Un clic imprécis informe sans punir. Seule une série de ratés dissipe
+      // le boost, ce qui laisse de la marge au tactile sans rendre le spam roi.
+      registerMiss(port);
       return;
     }
 
@@ -1295,7 +1484,8 @@
 
     if (type.effect) {
       applyEffect(type.effect);
-      bumpCombo();
+      round.hits += 1;
+      chargeBoost(0, port, 24);
       popText(port, type.effect === 'coolant' ? 'FLUX -' : 'POINTS ×2', 'turret');
       FX.burst(port.el, 'bonus', 1.1);
       FX.sfx.bonus(type.effect);
@@ -1322,9 +1512,8 @@
       FX.shake(cabinet(), broken ? 6 : 3);
       FX.scar(port.el, 'hit');
       stunTarget(port, BALANCE.shieldStunMs);
-      // Pas de combo sur un coup absorbé : rien n'a touché. Engager un blindé
-      // coûte donc de l'élan, sinon les trois coups de bouclier montaient le
-      // combo gratuitement et la cible payait presque un palier à elle seule.
+      round.hits += 1;
+      chargeBoost(0, port, 12);
       updateHud();
       return;
     }
@@ -1338,7 +1527,7 @@
     const chainMult = 1 + chainIndex * BALANCE.chainStep;
     const kindMult = type.parry ? BALANCE.parryBonus : type.shield ? BALANCE.shieldBonus : 1;
 
-    scoreHit(port, type, chainMult * kindMult, false, { keep: true, chainIndex });
+    const points = scoreHit(port, type, chainMult * kindMult, false, { keep: true, chainIndex });
 
     // L'onde part avant l'incrément de combo : les éclats appartiennent à la
     // frappe qui les a produits, ils ne doivent pas encaisser le combo qu'elle
@@ -1349,7 +1538,7 @@
     round.hits += 1;
     port.chain += 1;
     round.chainBest = Math.max(round.chainBest, port.chain);
-    bumpCombo();
+    chargeBoost(points, port);
 
     if (port.chain >= stats.chainMax) {
       popText(port, 'HORS SERVICE', 'crit');
@@ -1369,8 +1558,13 @@
   function stunTarget(port, ms) {
     if (!port.target) return;
     const duration = Math.max(120, ms * stats.stunMult);
-    port.el.classList.add('stunned');
     port.el.style.setProperty('--stun-ms', `${Math.round(duration)}ms`);
+    port.el.classList.remove('stunned');
+    void port.el.offsetWidth;
+    port.el.classList.add('stunned');
+    port.el.setAttribute('aria-label', `Port ${port.index + 1}, ${port.target.name} sonné, refrappe maintenant`);
+    const stunLabel = port.el.querySelector('.stun-state b');
+    if (stunLabel) stunLabel.textContent = `SONNÉ ${(duration / 1000).toFixed(1)}s`;
     if (port.stunTimer) clearTimeout(port.stunTimer);
     port.stunTimer = setTimeout(() => {
       if (!port.target) return;
@@ -1384,11 +1578,6 @@
       port.ttlTimer = null;
       port.ttlLeft = 0;
     }
-  }
-
-  function bumpCombo() {
-    round.combo = Math.min(stats.comboCap, round.combo + 1);
-    round.maxCombo = Math.max(round.maxCombo, round.combo);
   }
 
   function splash(origin) {
@@ -1428,7 +1617,7 @@
     round.gain += points;
 
     const suffix = chainIndex > 0 ? ` ×${(1 + chainIndex * BALANCE.chainStep).toFixed(1)}` : '';
-    popText(port, `+${fmt(points)}${suffix}`, crit ? 'crit' : viaTurret ? 'turret' : '');
+    popText(port, `${viaTurret ? '' : 'TOUCHÉ · '}+${fmt(points)}${suffix}`, crit ? 'crit' : viaTurret ? 'turret' : '');
 
     const pan = panOf(port);
     if (viaTurret) {
@@ -1448,6 +1637,7 @@
     FX.scar(port.el, crit ? 'crit' : 'hit');
 
     if (!keep) flashPort(port, viaTurret ? 'turret-hit' : 'hit');
+    return points;
   }
 
   function applyEffect(effect) {
@@ -1657,8 +1847,12 @@
       return;
     }
 
-    scoreHit(target, target.target, 1, true, { keep: false });
-    if (stats.turretCombo) bumpCombo();
+    const points = scoreHit(target, target.target, 1, true, { keep: false });
+    if (stats.turretCombo) {
+      const playerMisses = round.missStreak;
+      chargeBoost(points, target, stats.turretCombo >= 2 ? 45 : 28);
+      round.missStreak = playerMisses;
+    }
     updateHud();
   }
 
@@ -1690,13 +1884,27 @@
     const combo = $('hud-combo');
     combo.textContent = `×${round.combo}`;
     combo.classList.toggle('combo-hot', round.combo >= stats.comboCap);
+    $('boost-mult').textContent = `×${round.combo}`;
 
     const heat = Math.max(0, Math.min(1, (round.combo - 1) / Math.max(1, stats.comboCap - 1)));
     cabinet()?.style.setProperty('--combo-heat', heat.toFixed(3));
+    cabinet()?.setAttribute('data-boost-tier', String(round.combo));
+
+    const boostRatio = round.combo >= stats.comboCap ? 1 : Math.max(0, Math.min(1, round.boostCharge / 100));
+    $('boost-fill').style.width = `${boostRatio * 100}%`;
+    $('boost-label').textContent = round.combo >= stats.comboCap
+      ? 'PUISSANCE MAXIMALE'
+      : `PROCHAINE PUISSANCE · ${Math.floor(boostRatio * 100)} %`;
+    const misses = round.missStreak;
+    const remaining = BALANCE.missTolerance - misses;
+    $('miss-label').textContent = misses
+      ? `${misses}/${BALANCE.missTolerance} RATÉS · ENCORE ${remaining}`
+      : `${BALANCE.missTolerance} RATÉS TOLÉRÉS`;
+    $('boost-meter').classList.toggle('warning', misses >= Math.ceil(BALANCE.missTolerance / 2));
 
     const ratio = Math.min(1, run.bank / round.quota);
     $('quota-fill').style.width = `${ratio * 100}%`;
-    $('quota-label').textContent = `${Math.floor(ratio * 100)} %`;
+    $('quota-label').textContent = `OBJECTIF MANCHE · ${Math.floor(ratio * 100)} %`;
     document.querySelector('.quota-bar').classList.toggle('done', ratio >= 1);
   }
 
@@ -1742,8 +1950,18 @@
     if (!round.running) return;
     stopRound();
 
+    const finishedManche = isMancheEnd(run.round);
+    if (!finishedManche) {
+      const completedStep = stepInManche(run.round);
+      if (recordClearedRound(run.round)) persist();
+      setMsg(`Round ${completedStep}/3 terminé — ${fmt(run.bank)} en banque, aucune défaite possible ici.`, 'good');
+      run.round += 1;
+      setTimeout(showInterlude, 1100);
+      return;
+    }
+
     if (run.bank < round.quota) {
-      setMsg(`Palier manqué — il manquait ${fmt(round.quota - run.bank)}.`, 'bad');
+      setMsg(`Objectif de manche manqué — il manquait ${fmt(round.quota - run.bank)}.`, 'bad');
       FX.sfx.failed();
       FX.shake(cabinet(), 13);
       setTimeout(gameOver, 1500);
@@ -1751,14 +1969,12 @@
     }
 
     run.bank -= round.quota;
-    setMsg(`Palier réglé — ${fmt(round.quota)} prélevés, il reste ${fmt(run.bank)} en banque.`, 'good');
+    setMsg(`Manche validée — ${fmt(round.quota)} prélevés, il reste ${fmt(run.bank)} en banque.`, 'good');
     FX.sfx.paid();
-    const finishedManche = isMancheEnd(run.round);
     if (recordClearedRound(run.round)) persist();
     run.round += 1;
 
-    if (finishedManche) setTimeout(enterShop, 1500);
-    else setTimeout(showInterlude, 1100);
+    setTimeout(enterShop, 1500);
   }
 
   /**
@@ -1766,7 +1982,7 @@
    * d'atelier. Ça enchaîne tout seul, ou tout de suite si le joueur clique.
    */
   function showInterlude() {
-    const quota = quotaFor(run.round, stats);
+    const quota = mancheQuotaFor(run.round, stats);
     const short = Math.max(0, quota - run.bank);
 
     $('inter-title').textContent = `ROUND ${stepInManche(run.round)} / ${BALANCE.roundsPerManche}`;
@@ -1775,8 +1991,8 @@
     $('inter-bank').textContent = fmt(run.bank);
     $('inter-missing').textContent = fmt(short);
     $('inter-note').textContent = short > 0
-      ? `Il te manque ${fmt(short)} — l'atelier n'ouvre qu'en fin de manche.`
-      : 'Le palier est déjà couvert : ce round est du rab pour l\'atelier.';
+      ? `Il te manque ${fmt(short)}, mais la run continue : verdict seulement après le round 3.`
+      : 'Objectif déjà couvert : tout ce que tu produis maintenant restera pour l\'atelier.';
 
     $('interlude').hidden = false;
     show('scr-round');
@@ -1811,7 +2027,7 @@
     if (run.totalScore > save.bestScore) save.bestScore = run.totalScore;
     persist();
 
-    $('over-kicker').textContent = 'PALIER NON RÉGLÉ';
+    $('over-kicker').textContent = 'OBJECTIF DE MANCHE NON ATTEINT';
     $('over-round').textContent = `MANCHE ${mancheOf(run.round)} · ROUND ${run.round}`;
     $('over-missing').textContent = fmt(missing);
     $('over-score').textContent = fmt(run.totalScore);
@@ -1842,8 +2058,9 @@
 
   // ── câblage ─────────────────────────────────────────────────────────────
 
-  $('btn-play').addEventListener('click', newRun);
-  $('btn-retry').addEventListener('click', newRun);
+  $('btn-play').addEventListener('click', requestRun);
+  $('btn-retry').addEventListener('click', requestRun);
+  $('btn-help').addEventListener('click', () => openTutorial(false));
   $('btn-start-round').addEventListener('click', startRound);
   $('btn-next-round').addEventListener('click', validateShop);
   $('btn-cancel-shop').addEventListener('click', cancelShopPurchases);
@@ -1864,6 +2081,21 @@
   $('btn-prestige-back').addEventListener('click', () => show('scr-menu'));
   $('btn-clear-loadout').addEventListener('click', clearLoadout);
   $('btn-home').addEventListener('click', () => { renderMenu(); show('scr-menu'); });
+  $('btn-settings').addEventListener('click', openSettings);
+  $('btn-settings-back').addEventListener('click', closeSettings);
+  $('btn-replay-help').addEventListener('click', () => openTutorial(false));
+  $('btn-tutorial-next').addEventListener('click', nextTutorialPanel);
+  $('btn-tutorial-skip').addEventListener('click', () => closeTutorial(true));
+  document.querySelectorAll('[data-cursor-mode]').forEach(button => {
+    button.addEventListener('click', () => PREFS.set({ cursorMode: button.dataset.cursorMode }));
+  });
+  $('cfg-aim').addEventListener('input', event => PREFS.set({ aimResponsiveness: event.target.value }));
+  $('cfg-audio').addEventListener('change', event => PREFS.set({ audioEnabled: event.target.checked }));
+  $('cfg-effects').addEventListener('change', event => PREFS.set({ effectsEnabled: event.target.checked }));
+  $('cfg-ambience').addEventListener('change', event => PREFS.set({ ambienceEnabled: event.target.checked }));
+  $('cfg-volume').addEventListener('input', event => PREFS.set({ masterVolume: event.target.value }));
+  $('cfg-reduced').addEventListener('change', event => PREFS.set({ reducedEffects: event.target.checked }));
+  $('btn-reset-settings').addEventListener('click', () => PREFS.reset());
 
   $('btn-wipe').addEventListener('click', () => {
     if (!window.confirm('Effacer toute la progression : arbre, jetons, loadout, crédit, records et compteur de runs ?')) return;
@@ -1875,6 +2107,10 @@
 
   // Barre d'espace pendant un duel : le clavier doit pouvoir parer aussi.
   window.addEventListener('keydown', event => {
+    if (event.code === 'Escape' && !$('tutorial').hidden) {
+      closeTutorial(false);
+      return;
+    }
     if (event.code !== 'Space' || !round.qte || round.qte.done) return;
     event.preventDefault();
     attemptQte();
@@ -1892,23 +2128,18 @@
 
   FX.attach($('fx-layer'), $('arena'));
 
-  const muteBtn = $('btn-mute');
-  const paintMute = () => {
-    const muted = FX.isMuted();
-    muteBtn.textContent = muted ? '🔇' : '🔊';
-    muteBtn.setAttribute('aria-pressed', String(muted));
-    muteBtn.title = muted ? 'Rétablir le son' : 'Couper le son';
-  };
-  muteBtn.addEventListener('click', () => {
-    FX.setMuted(!FX.isMuted());
-    paintMute();
-    if (!FX.isMuted()) {
+  PREFS.initCursor($('weapon-cursor'));
+  PREFS.subscribe(applyPreferences);
+  applyPreferences(preferences);
+
+  $('btn-mute').addEventListener('click', () => {
+    const next = PREFS.set({ audioEnabled: !preferences.audioEnabled });
+    if (next.audioEnabled) {
       FX.unlock();
       FX.sfx.tick();
-      if (round.running) FX.hum(true);
+      if (round.running && next.ambienceEnabled) FX.hum(true);
     }
   });
-  paintMute();
 
   // Les navigateurs n'autorisent l'audio qu'après un geste : on ouvre le
   // contexte au premier contact, quel qu'il soit.
@@ -1932,15 +2163,17 @@
   // l'attente, jamais les règles.
   window.__droneQuota = {
     BALANCE, TARGETS, TREE, NODES, PRESTIGE_STATS, PRESTIGE_BUFFS, ports,
-    quotaFor, deriveStats, roundSecondsFor, mancheOf, stepInManche, isMancheEnd,
+    quotaFor, mancheQuotaFor, deriveStats, roundSecondsFor, mancheOf, stepInManche, isMancheEnd,
     normalizeTree, branchInvestment, branchDepth, unlockCheck, nodeState,
     renderTree, enterShop, cancelShopPurchases, validateShop, discardShopChanges,
     emptyLoadout, normalizeLoadout, loadoutCost, tokenSummary, treeInvestedScore,
     recordClearedRound, setStatPoint, togglePrestigeBuff, clearLoadout,
-    renderPrestige, renderTreeReset, resetTree,
+    renderPrestige, renderTreeReset, resetTree, chargeBoost, registerMiss,
+    openTutorial, openSettings, updateHud, endRound, startRound, newRun,
     run, round,
     get save() { return save; },
     get stats() { return stats; },
+    get preferences() { return preferences; },
     get shopSnapshot() { return shopSnapshot; },
 
     forceSpawn(index, typeId) {

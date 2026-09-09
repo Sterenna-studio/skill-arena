@@ -4,16 +4,17 @@ Tout ce qu'il faut pour reprendre le jeu sans contexte préalable : ce qu'il
 est, comment le lancer, ce sur quoi il repose, ce qui est vérifié, ce qui ne
 l'est pas, et par où continuer.
 
-Écrit le 2026-09-09, à jour de l'issue #6.
+Écrit le 2026-09-09, mis à jour le 2026-09-10 après la passe UX/boost.
 
 ---
 
 ## 1. Ce que c'est
 
 Un whack-a-mole roguelite autonome, servi en statique dans le catalogue Skill
-Arena. Le joueur frappe ce qui sort de douze ports pendant un round chronométré
-et doit avoir assez en banque à la fin pour régler un **palier**. Le palier
-monte géométriquement. Entre deux manches, la banque achète des nœuds d'un
+Arena. Le joueur frappe ce qui sort de douze ports pendant trois rounds
+chronométrés et doit avoir assez en banque à la fin pour régler l'**objectif de
+manche**. Cette facture est la somme des trois anciens paliers et monte
+géométriquement. Entre deux manches, la banque achète des nœuds d'un
 arbre de compétences **persistant** — et c'est le dilemme central : la banque
 paie la facture *et* achète les nœuds, donc investir, c'est reculer sur le
 palier suivant.
@@ -59,10 +60,11 @@ qu'on le demande.
 
 ```txt
 public/games/drone-quota/
-├── index.html   250 l.  structure : écrans, meuble, HUD, parade, prestige
-├── style.css   1221 l.  meuble, ports, duel, arbre, prestige, responsive
-├── game.js     1970 l.  règles, économie, arbre, prestige, machine à états
-└── fx.js        633 l.  son, particules, secousses, traces d'usure
+├── index.html   319 l.  écrans, meuble, HUD, tutoriel, réglages, prestige
+├── style.css   1416 l.  meuble, ports, états, écrans et responsive
+├── game.js     2203 l.  règles, économie, boost, arbre, machine à états
+├── fx.js        648 l.  son, particules, secousses, traces d'usure
+└── prefs.js     167 l.  préférences locales et viseur DOM optionnel
 ```
 
 Le jeu est aussi déclaré à deux endroits côté hub Next.js :
@@ -88,9 +90,15 @@ API publique, exposée en `window.DQFX` :
 | `scar(el, kind)` / `clearScars()` | traces d'impact persistantes sur la tôle |
 | `attach(canvas, host)` / `resize()` / `clear()` | cycle de vie du canvas |
 | `setMuted / isMuted / unlock` | sourdine persistante, ouverture du contexte audio |
+| `configureAudio(options)` | volume, effets ponctuels et ambiance séparés |
+| `setReducedEffects(bool)` | force ou libère le mode sensoriel dégradé |
 
 `game.js` porte un objet de repli si `fx.js` n'a pas chargé : le jeu doit
 rester jouable en silence plutôt que planter au premier clic.
+
+`prefs.js` est une troisième frontière, sans règle de score : il normalise les
+préférences et anime le viseur DOM. Le viseur CSS est un point de remplacement
+prévu pour un futur sprite, sans imposer d'asset aujourd'hui.
 
 **Cette frontière est délibérée** : le rendu de la machine est un chantier à
 part (issue #4) et doit pouvoir être remplacé sans rouvrir les règles. Ne pas
@@ -104,19 +112,24 @@ dans `game.js`.
 ### Structure
 
 - Un **round** dure `roundSeconds` (26 s de base, + `RALLONGE`).
-- En fin de round, le **palier** est prélevé sur la banque. S'il manque un
-  point, la run s'arrête. Il n'y a **pas de vies** : la pression, c'est le
-  temps et le palier.
+- La banque s'accumule pendant les trois rounds. **Le joueur ne peut pas perdre
+  pendant une manche** : le verdict et le prélèvement arrivent seulement après
+  le round 3/3. Un retard aux rounds 1 ou 2 peut donc être rattrapé.
 - **Trois rounds font une manche.** Entre deux rounds d'une même manche : un
   souffle de quelques secondes (écran `#interlude`, auto-avance, bouton pour
   passer). En fin de manche : l'**atelier**, qui ouvre l'arbre.
-- Palier : `1500 × 1.5^(round−1)`, réduit par `NÉGOCIATION`.
+- Objectif de manche : somme des trois valeurs
+  `1500 × 1.5^(round−1)`, réduites par `NÉGOCIATION`. La première demande
+  7 125 ; ce regroupement conserve le coût cumulé historique tout en retirant
+  les défaites intermédiaires.
 
 ### Écrans
 
 `#scr-menu` → `#scr-brief` → `#scr-round` → (`#interlude` | `#scr-shop`) →
-`#scr-round` … → `#scr-over`. Plus `#scr-tree` et `#scr-prestige` en
-consultation depuis l'accueil. Un seul porte `.active` à la fois (`show(id)`).
+`#scr-round` … → `#scr-over`. Plus `#scr-tree`, `#scr-prestige` et
+`#scr-settings` en consultation. `#tutorial` est une modale de trois panneaux,
+ouverte au premier lancement et rejouable depuis les réglages. Un seul écran
+porte `.active` à la fois (`show(id)`).
 
 ### Cibles
 
@@ -137,17 +150,32 @@ Chaque coup suivant vaut `1 + 0.45 × index` de plus, jusqu'à `chainMax` = 5,
 après quoi elle est mise hors service. La fenêtre d'étourdissement rétrécit à
 chaque coup (`560 ms × 0.74^n`), donc la chaîne se referme d'elle-même.
 
-Un drone mené au bout : 9 → 26 → 51 → 85 → 126 (arbre `frappe:2`).
+Avec `frappe:2`, un drone mené au bout donne désormais environ
+9 → 13 → 17 → 42 → 50 : la jauge franchit ×2 après le troisième coup, et ce
+nouveau multiplicateur s'applique à partir du coup suivant.
 
-**Conséquence à connaître** : si la fenêtre expire en cours de chaîne, la cible
-s'échappe et **casse le combo**. Abandonner une chaîne coûte donc cher — c'est
-volontaire, mais voir §9, ce n'est peut-être pas assez lisible pour le joueur.
+Si la fenêtre expire, la cible s'échappe mais le BOOST reste intact. Une fuite
+n'est plus une sanction cachée : seuls cinq clics vides consécutifs dissipent
+la jauge et ramènent son multiplicateur à ×1.
+
+### BOOST et tolérance des ratés
+
+Chaque touche manuelle remplit une jauge selon une base fixe et la racine du
+score marqué ; les coups de bouclier et bonus apportent une charge plus petite.
+À 100 %, le multiplicateur monte d'un cran jusqu'à `comboCap`, la jauge repart
+et les impacts deviennent visuellement et auditivement plus forts. Les
+tourelles ne participent que si leur nœud d'arbre le permet.
+
+Un clic dans un port vide affiche `RATÉ n/5` mais ne retire ni score, ni BOOST,
+ni multiplicateur. Une touche remet cette série à zéro. Au cinquième raté
+consécutif seulement, le BOOST retombe à zéro et le multiplicateur à ×1. Une
+cible ignorée ou une parade perdue ne compte pas comme clic vide.
 
 ### Blindés
 
 Trois coups absorbés (aucun point, aucun combo — rien n'a touché), chacun
-prolongeant l'étourdissement pour garder la fenêtre ouverte. Une fois brisé, il
-paie à ×2.2 et se chaîne normalement.
+prolongeant l'étourdissement pour garder la fenêtre ouverte et apportant une
+petite charge de BOOST. Une fois brisé, il paie à ×2.2 et se chaîne normalement.
 
 ### Parade
 
@@ -223,6 +251,11 @@ Sourdine : `drone-quota:mute:v1`. La clé n'a pas changé ; une sauvegarde sans
 les nouveaux champs reçoit leurs valeurs par défaut. Pour une sauvegarde
 ancienne, `bestManche` est amorcé à `floor(bestRound / 3)`.
 
+Préférences d'appareil : `localStorage['drone-quota:prefs:v1']` contient le
+mode de pointeur, la réactivité du viseur, son global, effets, ambiance, volume,
+effets visuels réduits et passage du tutoriel. Le premier chargement respecte
+l'ancienne clé de sourdine avant de créer ces préférences.
+
 ### Prestige — jetons dérivés et loadout réversible
 
 Une **manche record terminée** accorde implicitement un jeton. Aucun solde
@@ -238,12 +271,12 @@ Les six points permanents changent des constantes que l'arbre ne modifie pas :
 - `BLINDAGE LÉGER` : un bouclier de blindé en moins par point ;
 - `GARDE LUE` : une traversée de parade en plus par point ;
 - `AVANCE` : +300 de banque de départ par point ;
-- `ÉLAN` : combo ×2 au début de chaque round ;
+- `ÉLAN` : BOOST ×2 au début de chaque round ;
 - `RÉCUPÉRATION` : crédit de reconstruction 60 → 70 %, +5 % par point.
 
 Les six buffs de départ présentent toujours l'avantage et sa contrepartie avec
 le même poids visuel : `BRÈCHE` (blindage −1 / CORE ×0,5), `SURTENSION`
-(chaîne ≥7 / étourdissement −30 %), `RESPIRATION` (+4 s / plafond de combo −2),
+(chaîne ≥7 / étourdissement −30 %), `RESPIRATION` (+4 s / plafond de BOOST −2),
 `PROTOCOLE CALME` (aucune sentinelle / paliers +15 %), `PREMIÈRE HEURE`
 (points ×2 en manche 1 / paliers +10 % dès la manche 2) et `SURCHARGE`
 (deux cibles de plus / TTL −20 %).
@@ -253,6 +286,29 @@ uniquement l'arbre, incrémente `prestiges`, puis rend 60 % du score investi
 (jusqu'à 70 % avec `RÉCUPÉRATION`) dans une poche `credit` séparée. Ce crédit
 ne règle jamais un palier et ne finance rien d'autre qu'un nœud. Le reset
 global du pied de menu reste la seule action qui efface toute la progression.
+
+### Lisibilité et réglages
+
+L'accueil résume maintenant les règles en trois blocs et le premier lancement
+ouvre trois panneaux maximum : survie jusqu'au round 3, cible sonnée, puis
+BOOST et cinq ratés. Le panneau reste accessible depuis « COMMENT JOUER » et
+les réglages.
+
+Une cible sonnée porte un cadre ambre, une pose inclinée, le texte `SONNÉ 0,6s`
+et une barre qui se vide sur la durée réelle de `stunTarget()`. Le HUD sépare
+nettement l'objectif cumulé et le BOOST ; chaque touche affiche `TOUCHÉ`, chaque
+clic vide affiche son rang dans la tolérance.
+
+`#scr-settings` configure : pointeur normal ou viseur arme, réactivité du viseur
+1–10, son global, effets, ambiance, volume 0–100 et effets visuels réduits. Une
+page web ne peut pas modifier la sensibilité du curseur système : le curseur
+normal reste natif et la réactivité ne s'applique qu'au viseur DOM. Les
+réglages complets ne s'ouvrent pas pendant un round chronométré ; le bouton de
+sourdine immédiate reste disponible.
+
+Le jeu applique `user-select: none` et retire le halo tactile sans masquer le
+focus clavier. Sous 620 px, les outils flottants et tous les contrôles du
+panneau de réglages offrent au moins 44 px.
 
 ---
 
@@ -264,7 +320,7 @@ plancher. Le modèle raisonne donc en **budget de frappes** : `secondes × taps
 par seconde`, réparti sur les cibles selon leur poids, chaque cible coûtant
 `(coups de bouclier) + (parade) + (longueur de chaîne)` frappes.
 
-Résultat visé, avec `quotaBase = 1500` et `quotaGrowth = 1.5` :
+Résultat historique visé, avec `quotaBase = 1500` et `quotaGrowth = 1.5` :
 
 | arbre | débutant (1 coup/cible, 2,5 f/s) | bon joueur (chaînes complètes, 4 f/s) |
 |---|---|---|
@@ -272,7 +328,14 @@ Résultat visé, avec `quotaBase = 1500` et `quotaGrowth = 1.5` :
 | milieu | 10 | 14 |
 | plein | 14 | 17 |
 
-Valeur par frappe, arbre vide : drone 39, scout 79, blindé 127, core 198.
+Ancien repère avant la jauge progressive, valeur par frappe arbre vide :
+drone 39, scout 79, blindé 127, core 198. Ne pas l'utiliser comme mesure du
+build actuel sans recalcul.
+
+Le prélèvement par manche conserve exactement la somme de ces paliers, mais la
+possibilité de rattraper un mauvais round change la variance et le ressenti. Le
+nouveau BOOST change aussi la vitesse d'accès aux multiplicateurs : les bornes
+du tableau ne doivent plus être traitées comme validées sans nouvelles runs.
 
 **La croissance doit rester géométrique.** Une courbe polynomiale a déjà été
 essayée (`round^1.12`) : le revenu d'un round étant à peu près constant, une
@@ -319,6 +382,7 @@ dq.PRESTIGE_STATS, dq.PRESTIGE_BUFFS
 dq.ports                      // les 12 objets de port
 dq.run, dq.round, dq.save, dq.stats
 dq.quotaFor(r, stats)
+dq.mancheQuotaFor(r, stats)
 dq.deriveStats(tree, loadout)
 dq.normalizeTree(tree)
 dq.branchInvestment(branch, tree), dq.branchDepth(branch, tree)
@@ -330,6 +394,9 @@ dq.treeInvestedScore(tree), dq.resetTree()
 dq.setStatPoint(id, -1|1), dq.togglePrestigeBuff(id), dq.clearLoadout()
 dq.recordClearedRound(round)
 dq.mancheOf(r), dq.stepInManche(r), dq.isMancheEnd(r)
+dq.chargeBoost(points, port, fixedGain), dq.registerMiss(port)
+dq.updateHud(), dq.endRound(), dq.startRound(), dq.newRun()
+dq.preferences, dq.openTutorial(), dq.openSettings()
 
 dq.forceSpawn(index, typeId)  // place une cible précise sur un port
 dq.fireTurretNow(0 | 1)       // déclenche un tir de flanc
@@ -397,12 +464,32 @@ Pour le prestige de l'issue #6, dans un onglet Chrome réellement visible :
   mobile, avantage et contrepartie tous deux visibles ; écran de reset inspecté
   à 1000 px.
 
+Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
+
+- objectif de manche 1 égal à 7 125, exactement `1500 + 2250 + 3375` ; banque
+  insuffisante aux rounds 1 et 2 sans défaite, puis verdict au round 3 ; avec
+  7 225 en banque, le paiement laisse 100, passe au round 4 et ouvre l'atelier ;
+- les trois panneaux du tutoriel, leur sortie vers le briefing et la mémorisation
+  locale ; rendu inspecté à 1000 px et 375 px ;
+- quatre clics vides conservant un BOOST ×3 chargé à 55 %, cinquième clic
+  ramenant multiplicateur et jauge à zéro ;
+- cible sonnée avec classe, libellé `SONNÉ 0.6s`, barre animée sur 0,56 s et
+  retour `TOUCHÉ` ; HUD boost inspecté à 1000 px ;
+- réglages persistants : bascule arme/normal, réactivité 4/10, effets sonores,
+  mode visuel réduit et qualité `dégradé` ; tous les boutons de l'écran font au
+  moins 44 px ; la sourdine historique migre vers `audioEnabled: false` ;
+- viseur arme DOM observé au point de tir, puis disparition immédiate en mode
+  normal ; `user-select: none` effectif ;
+- à 375 px : largeur exacte 375/375, ports à 63 px, jauge boost à 311 px,
+  réglages en une colonne de 359 px.
+
 ### Pas vérifié
 
 - **Le jeu n'a jamais été joué à la manette.** Les contrôles de l'arbre et du
   prestige ont été pilotés dans un onglet visible, mais pas au fil de trois
-  rounds réellement joués. Les particules, les secousses, le ronflement et le
-  son des nouveaux contrôles n'ont pas été rejugés pendant cette reprise.
+  rounds réellement joués. Les réglages audio ont été contrôlés par leur état
+  et l'API, mais leur volume perçu, les particules et les secousses n'ont pas
+  été jugés à l'oreille ou sur une partie complète pendant cette reprise.
 - **L'équilibrage est modélisé, pas éprouvé.** Le tableau du §5 sort d'un
   modèle de budget de frappes, pas de parties réelles.
 - La lisibilité du duel en conditions réelles (est-ce qu'on comprend ce qui se
@@ -412,12 +499,17 @@ Pour le prestige de l'issue #6, dans un onglet Chrome réellement visible :
 
 ## 9. Aspérités connues et questions ouvertes
 
-- **Abandonner une chaîne casse le combo.** Quand la fenêtre expire, la cible
-  « s'échappe » et le combo retombe à 1. C'est une vraie tension, mais rien ne
-  le dit au joueur : il verra son combo tomber sans comprendre pourquoi.
-- **Une sentinelle qu'on ignore casse aussi le combo** en partant, comme
-  n'importe quelle cible à points positifs. Est-ce qu'éviter une sentinelle
-  doit être puni ? À trancher.
+- Le seuil de **cinq ratés consécutifs** est une valeur de départ demandée pour
+  essai. Il faut observer s'il pardonne l'imprécision sans rendre le balayage de
+  tous les ports optimal.
+- La charge actuelle (`20 + min(34, sqrt(points) × 4)`) fait monter le BOOST en
+  quelques touches et crée volontairement un emballement. Sa vitesse, surtout
+  avec les chaînes et `PREMIÈRE HEURE`, n'est pas encore équilibrée en jeu réel.
+- Le regroupement des paliers en facture de manche conserve le coût total mais
+  autorise le rattrapage. Il faut vérifier si cette sécurité améliore la lecture
+  sans rendre les deux premiers rounds trop peu tendus.
+- Le viseur arme est un dessin CSS provisoire. L'issue #8 précise les formats,
+  états et arbitrages nécessaires avant un éventuel remplacement par sprite.
 - Le blindé immobilise huit frappes. C'est le pari le plus engageant du jeu,
   mais rien ne prévient le joueur de ce qu'il s'apprête à investir.
 - `run.active` est écrit mais jamais lu.
@@ -450,8 +542,9 @@ Pour le prestige de l'issue #6, dans un onglet Chrome réellement visible :
 C'est le seul point qui ne peut pas être fait en script. Trois ou quatre runs
 suffisent à répondre à :
 
-- Le round 1 est-il franchissable sans rien connaître ?
-- La chaîne écrase-t-elle le reste, ou reste-t-elle un choix ?
+- La facture au seul round 3 garde-t-elle de la tension pendant toute la manche ?
+- Le BOOST monte-t-il trop vite avec une chaîne rentable ?
+- Cinq ratés pardonnent-ils sans encourager le spam ?
 - La parade est-elle lisible, ou juste une interruption pénible ?
 - Le souffle entre rounds fait-il respirer, ou casse-t-il le rythme ?
 
@@ -468,8 +561,9 @@ et un mode dégradé si le coût devient sensible sur mobile.
 
 ### Priorité 3 — retour au joueur
 
-Les aspérités du §9, en particulier dire au joueur *pourquoi* son combo tombe,
-et un écran de fin de run qui exploite les compteurs déjà collectés.
+La passe UX apporte tutoriel, objectif cumulé, cible sonnée, BOOST et réglages.
+Il reste surtout un écran de fin de run qui exploite les compteurs déjà
+collectés et les essais réels listés au §9.
 
 ### Priorité 4 — éprouver l'arbre restructuré, puis l'élargir
 
@@ -501,6 +595,15 @@ La prochaine étape est de mesurer en vraies runs si les caps, coûts et
 contreparties créent des loadouts réellement concurrents. Ne pas ajouter de
 tables ou de cosmétiques ici : les jalons de tables sont l'issue #7 et les
 cosmétiques restent rattachés à l'issue #4.
+
+### Travail parallèle — apports graphiques
+
+**Issue <https://github.com/Sterenna-studio/skill-arena/issues/8> ouverte.**
+
+Elle centralise les sprites éventuels, leurs états, références de direction
+artistique, droits et arbitrages de priorité que Pierre peut fournir en
+parallèle. Aucun asset ne doit être intégré avant confirmation explicite de
+l'exception à la contrainte actuelle « aucun fichier d'asset ».
 
 ---
 

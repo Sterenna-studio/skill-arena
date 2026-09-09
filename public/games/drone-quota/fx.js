@@ -20,6 +20,9 @@ window.DQFX = (() => {
   let master = null;
   let humNodes = null;
   let muted = false;
+  let effectsEnabled = true;
+  let ambienceEnabled = true;
+  let masterVolume = 0.8;
 
   try {
     muted = window.localStorage.getItem(MUTE_KEY) === '1';
@@ -36,7 +39,7 @@ window.DQFX = (() => {
         return null;
       }
       master = ctx.createGain();
-      master.gain.value = 0.9;
+      master.gain.value = masterVolume;
 
       // Un léger compresseur colle les impacts entre eux : sans lui, un combo
       // rapide donne une bouillie de clics qui sature.
@@ -56,6 +59,7 @@ window.DQFX = (() => {
 
   /** Chaîne osc → gain → (pan) → master, avec enveloppe percussive. */
   function blip({ freq = 440, type = 'square', gain = 0.16, attack = 0.004, decay = 0.11, pan = 0, sweep = null, delay = 0 }) {
+    if (!effectsEnabled) return;
     const c = audio();
     if (!c) return;
     const t0 = c.currentTime + delay;
@@ -86,6 +90,7 @@ window.DQFX = (() => {
 
   /** Souffle filtré : sert pour la tôle, la fumée et les tirs. */
   function noise({ gain = 0.12, decay = 0.12, freq = 1400, q = 1, kind = 'bandpass', pan = 0, delay = 0 }) {
+    if (!effectsEnabled) return;
     const c = audio();
     if (!c) return;
     const t0 = c.currentTime + delay;
@@ -179,23 +184,20 @@ window.DQFX = (() => {
 
   /** Ronflement du meuble : la machine est allumée, on l'entend. */
   function hum(on) {
-    const c = audio();
-    if (!c) {
-      humNodes = null;
-      return;
-    }
-    if (on && humNodes) return;
-
-    if (!on) {
-      if (!humNodes) return;
+    if (!on || !ambienceEnabled || muted) {
+      if (!humNodes || !ctx) return;
       const { gain, oscs } = humNodes;
-      gain.gain.cancelScheduledValues(c.currentTime);
-      gain.gain.setValueAtTime(gain.gain.value, c.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.35);
-      oscs.forEach(osc => osc.stop(c.currentTime + 0.4));
+      gain.gain.cancelScheduledValues(ctx.currentTime);
+      gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+      oscs.forEach(osc => osc.stop(ctx.currentTime + 0.4));
       humNodes = null;
       return;
     }
+
+    const c = audio();
+    if (!c) return;
+    if (humNodes) return;
 
     const gain = c.createGain();
     gain.gain.setValueAtTime(0.0001, c.currentTime);
@@ -232,10 +234,16 @@ window.DQFX = (() => {
         humNodes = null;
       }
       if (master) master.gain.value = 0;
-    } else if (master) {
-      master.gain.value = 0.9;
-    }
+    } else if (master) master.gain.value = masterVolume;
     return muted;
+  }
+
+  function configureAudio(options = {}) {
+    effectsEnabled = options.effectsEnabled !== false;
+    ambienceEnabled = options.ambienceEnabled !== false;
+    masterVolume = Math.max(0, Math.min(1, Number(options.masterVolume) || 0));
+    if (master) master.gain.value = muted ? 0 : masterVolume;
+    if (!ambienceEnabled) hum(false);
   }
 
   // ── particules ──────────────────────────────────────────────────────────
@@ -257,6 +265,7 @@ window.DQFX = (() => {
   let frameCount = 0;
   let slowWindows = 0;
   let fastWindows = 0;
+  let manuallyReduced = false;
 
   function setQuality(reduced) {
     degraded = Boolean(reduced);
@@ -277,7 +286,12 @@ window.DQFX = (() => {
     const littleMemory = Number(navigator.deviceMemory || 8) <= 4;
     const fewCores = Number(navigator.hardwareConcurrency || 8) <= 4;
     constrainedAtStart = Boolean(reducedMotion || (mobile && (littleMemory || fewCores)));
-    setQuality(constrainedAtStart);
+    setQuality(constrainedAtStart || manuallyReduced);
+  }
+
+  function setReducedEffects(value) {
+    manuallyReduced = Boolean(value);
+    setQuality(constrainedAtStart || manuallyReduced);
   }
 
   function attach(canvasEl, hostEl) {
@@ -489,7 +503,7 @@ window.DQFX = (() => {
       if (slowWindows >= 2) setQuality(true);
       return;
     }
-    if (constrainedAtStart) return;
+    if (constrainedAtStart || manuallyReduced) return;
     fastWindows = average < 18 ? fastWindows + 1 : 0;
     if (fastWindows >= 4) setQuality(false);
   }
@@ -624,10 +638,11 @@ window.DQFX = (() => {
 
   return {
     attach, resize,
-    sfx, hum, setMuted, isMuted: () => muted, unlock: () => audio(),
+    sfx, hum, setMuted, isMuted: () => muted, unlock: () => audio(), configureAudio,
     burst, tracer, shake, clear,
     scar, clearScars,
     centerOf,
+    setReducedEffects,
     quality: () => degraded ? 'dégradé' : 'complet',
   };
 })();
