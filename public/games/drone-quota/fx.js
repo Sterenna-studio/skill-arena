@@ -39,7 +39,7 @@ window.DQFX = (() => {
       master.gain.value = 0.9;
 
       // Un léger compresseur colle les impacts entre eux : sans lui, un combo
-      // rapide donne une bouillie de clics qui satur.
+      // rapide donne une bouillie de clics qui sature.
       const glue = ctx.createDynamicsCompressor();
       glue.threshold.value = -18;
       glue.knee.value = 22;
@@ -244,14 +244,48 @@ window.DQFX = (() => {
   let c2d = null;
   let host = null;
   let dpr = 1;
+  let lightsLayer = null;
+  let wellLightsLayer = null;
+  let gridObserver = null;
   const particles = [];
   const shakes = new Map();
   let raf = null;
+  let degraded = false;
+  let constrainedAtStart = false;
+  let previousFrameAt = 0;
+  let frameTotal = 0;
+  let frameCount = 0;
+  let slowWindows = 0;
+  let fastWindows = 0;
+
+  function setQuality(reduced) {
+    degraded = Boolean(reduced);
+    slowWindows = 0;
+    fastWindows = 0;
+    frameTotal = 0;
+    frameCount = 0;
+    document.documentElement.classList.toggle('fx-degrade', degraded);
+    resize();
+  }
+
+  /** Le petit mobile peu doté démarre prudemment ; les autres appareils sont
+   * mesurés pendant les effets et ne baissent de qualité qu'en cas de coût
+   * répété. Un onglet masqué ne compte jamais dans la mesure. */
+  function configureQuality() {
+    const mobile = window.matchMedia?.('(max-width: 620px), (pointer: coarse)').matches;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const littleMemory = Number(navigator.deviceMemory || 8) <= 4;
+    const fewCores = Number(navigator.hardwareConcurrency || 8) <= 4;
+    constrainedAtStart = Boolean(reducedMotion || (mobile && (littleMemory || fewCores)));
+    setQuality(constrainedAtStart);
+  }
 
   function attach(canvasEl, hostEl) {
     canvas = canvasEl;
     host = hostEl;
-    c2d = canvas.getContext('2d');
+    c2d = canvas.getContext('2d', { alpha: true, desynchronized: true });
+    configureQuality();
+    attachLocalLights();
     resize();
     if (window.ResizeObserver) new ResizeObserver(resize).observe(host);
     else window.addEventListener('resize', resize);
@@ -264,11 +298,12 @@ window.DQFX = (() => {
     // le canvas à 1 px, sinon les premières particules du round dessinent dans
     // le vide en attendant que le ResizeObserver rattrape.
     if (rect.width < 2 || rect.height < 2) return;
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = degraded ? 1 : Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.max(1, Math.round(rect.width * dpr));
     canvas.height = Math.max(1, Math.round(rect.height * dpr));
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
+    syncLocalLights();
   }
 
   /** Centre d'un élément dans le repère du canvas. */
@@ -287,10 +322,83 @@ window.DQFX = (() => {
     bonus: ['#9dffd8', '#3cf0a0', '#e0fff2'],
   };
 
+  function attachLocalLights() {
+    if (!host || lightsLayer) return;
+    lightsLayer = document.createElement('span');
+    lightsLayer.className = 'local-lights';
+    lightsLayer.setAttribute('aria-hidden', 'true');
+    wellLightsLayer = document.createElement('span');
+    wellLightsLayer.className = 'well-lights';
+    lightsLayer.appendChild(wellLightsLayer);
+    host.insertBefore(lightsLayer, canvas);
+
+    const grid = host.querySelector('.grid');
+    if (!grid || !window.MutationObserver) return;
+    gridObserver = new MutationObserver(syncLocalLights);
+    gridObserver.observe(grid, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+  }
+
+  /** Recompose les nappes des seules sources visibles. La couleur vient du
+   * CSS du port : cette couche ne connaît donc aucun type de cible. */
+  function syncLocalLights() {
+    if (!wellLightsLayer || !host) return;
+    const sources = [...host.querySelectorAll('.port.up')].slice(0, degraded ? 4 : 8);
+    const fragment = document.createDocumentFragment();
+    for (const source of sources) {
+      const { x, y, w } = centerOf(source);
+      const light = document.createElement('i');
+      light.className = 'local-light';
+      light.style.left = `${x}px`;
+      light.style.top = `${y}px`;
+      light.style.setProperty('--light-size', `${Math.max(90, w * 2.7)}px`);
+      light.style.setProperty('--light-color', getComputedStyle(source).getPropertyValue('--well-light').trim());
+      fragment.appendChild(light);
+    }
+    wellLightsLayer.replaceChildren(fragment);
+  }
+
+  /** Éclair bref qui se répand au-delà de la case frappée. */
+  function flashLight(el, kind, power) {
+    if (!lightsLayer) return;
+    const { x, y, w } = centerOf(el);
+    const colors = PALETTE[kind] ?? PALETTE.hit;
+    const light = document.createElement('i');
+    light.className = 'local-light impact';
+    light.style.left = `${x}px`;
+    light.style.top = `${y}px`;
+    light.style.setProperty('--light-size', `${Math.max(110, w * 3.5 * Math.min(1.5, power))}px`);
+    light.style.setProperty('--light-color', colors[1]);
+    lightsLayer.appendChild(light);
+    setTimeout(() => light.remove(), degraded ? 190 : 280);
+  }
+
+  /** Une partie des impacts finit physiquement au fond du puits. */
+  function settleDebris(el, kind, power) {
+    const socket = el?.querySelector('.socket');
+    if (!socket) return;
+    const colors = PALETTE[kind] ?? PALETTE.hit;
+    const amount = degraded ? 1 : Math.max(1, Math.round(1 + power));
+    for (let i = 0; i < amount; i++) {
+      const old = socket.querySelectorAll('.well-debris');
+      if (old.length >= (degraded ? 5 : 10)) old[0].remove();
+      const bit = document.createElement('i');
+      const dust = Math.random() < 0.42;
+      bit.className = `well-debris${dust ? ' dust' : ''}`;
+      bit.style.setProperty('--debris-x', `${16 + Math.random() * 68}%`);
+      bit.style.setProperty('--debris-y', `${6 + Math.random() * 15}%`);
+      bit.style.setProperty('--debris-w', `${dust ? 1.5 + Math.random() * 2.4 : 3 + Math.random() * 5}px`);
+      bit.style.setProperty('--debris-h', `${dust ? 1.5 + Math.random() * 2.2 : 1 + Math.random() * 1.8}px`);
+      bit.style.setProperty('--debris-rot', `${Math.round(Math.random() * 180)}deg`);
+      bit.style.setProperty('--debris-color', dust ? '#4b5060' : colors[Math.floor(Math.random() * colors.length)]);
+      socket.appendChild(bit);
+    }
+  }
+
   function push(p) {
     // Plafond dur : sur un combo long, mieux vaut perdre les plus vieilles
     // étincelles que faire tomber la fréquence d'images.
-    if (particles.length > 320) particles.splice(0, particles.length - 320);
+    const ceiling = degraded ? 120 : 320;
+    if (particles.length > ceiling) particles.splice(0, particles.length - ceiling);
     particles.push(p);
     start();
   }
@@ -299,7 +407,11 @@ window.DQFX = (() => {
     if (!c2d) return;
     const { x, y, w } = centerOf(el);
     const colors = PALETTE[kind] ?? PALETTE.hit;
-    const count = Math.round((kind === 'crit' ? 22 : kind === 'bad' ? 18 : 12) * power);
+    const density = degraded ? 0.52 : 1;
+    const count = Math.round((kind === 'crit' ? 22 : kind === 'bad' ? 18 : 12) * power * density);
+
+    flashLight(el, kind, power);
+    settleDebris(el, kind, power);
 
     for (let i = 0; i < count; i++) {
       const angle = -Math.PI / 2 + (Math.random() - 0.5) * (kind === 'bad' ? 3.4 : 2.2);
@@ -319,7 +431,7 @@ window.DQFX = (() => {
 
     // Poussière : lente, opaque, elle donne le poids que les étincelles seules
     // ne donnent pas.
-    for (let i = 0; i < Math.round(5 * power); i++) {
+    for (let i = 0; i < Math.round(5 * power * density); i++) {
       push({
         kind: 'dust',
         x: x + (Math.random() - 0.5) * w * 0.7,
@@ -343,12 +455,13 @@ window.DQFX = (() => {
     const b = centerOf(toEl);
     push({ kind: 'tracer', x: a.x, y: b.y, x2: b.x, y2: b.y, life: 1, decay: 0.12, size: 2.2, color });
     push({ kind: 'ring', x: a.x, y: b.y, life: 1, decay: 0.1, size: 9, color });
+    flashLight(toEl, 'turret', 0.8);
   }
 
   function shake(el, amount = 4) {
     if (!el) return;
     const current = shakes.get(el) ?? 0;
-    shakes.set(el, Math.min(14, Math.max(current, amount)));
+    shakes.set(el, Math.min(14, Math.max(current, amount * (degraded ? 0.72 : 1))));
     start();
   }
 
@@ -356,8 +469,34 @@ window.DQFX = (() => {
     if (raf === null) raf = requestAnimationFrame(frame);
   }
 
-  function frame() {
+  function measureFrame(now) {
+    if (document.hidden || !previousFrameAt) {
+      previousFrameAt = now;
+      return;
+    }
+    const elapsed = now - previousFrameAt;
+    previousFrameAt = now;
+    if (elapsed <= 0 || elapsed > 80) return;
+    frameTotal += elapsed;
+    frameCount++;
+    if (frameCount < 24) return;
+
+    const average = frameTotal / frameCount;
+    frameTotal = 0;
+    frameCount = 0;
+    if (!degraded) {
+      slowWindows = average > 22 ? slowWindows + 1 : 0;
+      if (slowWindows >= 2) setQuality(true);
+      return;
+    }
+    if (constrainedAtStart) return;
+    fastWindows = average < 18 ? fastWindows + 1 : 0;
+    if (fastWindows >= 4) setQuality(false);
+  }
+
+  function frame(now) {
     raf = null;
+    measureFrame(now);
 
     if (c2d) {
       c2d.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -409,8 +548,10 @@ window.DQFX = (() => {
       c2d.strokeStyle = p.color;
       c2d.lineWidth = p.size;
       c2d.lineCap = 'round';
-      c2d.shadowColor = p.color;
-      c2d.shadowBlur = 8;
+      if (!degraded) {
+        c2d.shadowColor = p.color;
+        c2d.shadowBlur = 8;
+      }
       c2d.beginPath();
       c2d.moveTo(p.x, p.y);
       c2d.lineTo(p.x - p.vx * 2.2, p.y - p.vy * 2.2);
@@ -423,8 +564,10 @@ window.DQFX = (() => {
     } else if (p.kind === 'ring') {
       c2d.strokeStyle = p.color;
       c2d.lineWidth = 2 * p.life;
-      c2d.shadowColor = p.color;
-      c2d.shadowBlur = 12;
+      if (!degraded) {
+        c2d.shadowColor = p.color;
+        c2d.shadowBlur = 12;
+      }
       c2d.beginPath();
       c2d.arc(p.x, p.y, p.size * (1.6 - p.life), 0, Math.PI * 2);
       c2d.stroke();
@@ -434,8 +577,10 @@ window.DQFX = (() => {
       c2d.strokeStyle = p.color;
       c2d.lineWidth = p.size;
       c2d.lineCap = 'round';
-      c2d.shadowColor = p.color;
-      c2d.shadowBlur = 14;
+      if (!degraded) {
+        c2d.shadowColor = p.color;
+        c2d.shadowBlur = 14;
+      }
       c2d.beginPath();
       c2d.moveTo(p.x, p.y);
       c2d.lineTo(hx, p.y2);
@@ -447,6 +592,7 @@ window.DQFX = (() => {
 
   function clear() {
     particles.length = 0;
+    lightsLayer?.querySelectorAll('.local-light.impact').forEach(light => light.remove());
     for (const el of shakes.keys()) el.style.removeProperty('transform');
     shakes.clear();
     if (c2d) {
@@ -473,6 +619,7 @@ window.DQFX = (() => {
 
   function clearScars() {
     document.querySelectorAll('.scars').forEach(layer => { layer.innerHTML = ''; });
+    document.querySelectorAll('.well-debris').forEach(bit => bit.remove());
   }
 
   return {
@@ -481,5 +628,6 @@ window.DQFX = (() => {
     burst, tracer, shake, clear,
     scar, clearScars,
     centerOf,
+    quality: () => degraded ? 'dégradé' : 'complet',
   };
 })();
