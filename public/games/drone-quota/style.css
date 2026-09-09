@@ -931,8 +931,6 @@ body {
 
 .pop {
   position: absolute;
-  top: 44%;
-  left: 50%;
   z-index: 6;
   transform: translate(-50%, -50%);
   font-size: 13px;
@@ -946,6 +944,91 @@ body {
 .pop.crit { color: var(--amber); font-size: 17px; text-shadow: 0 0 18px rgba(255, 190, 60, 0.9), 0 2px 3px #000; }
 .pop.turret { color: var(--violet); font-size: 11px; }
 @keyframes pop { to { transform: translate(-50%, -190%); opacity: 0; } }
+
+/* Les quatre voix alternent à chaque retour : affiche pop massive, disco
+   chromée, cartouche cyber et bulle arcade. Les fontes sont uniquement des
+   piles système afin de conserver le dossier autonome. */
+.pop.voiced {
+  width: min(128px, 34vw);
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  color: var(--green);
+  line-height: 0.9;
+  text-align: center;
+  animation: pop-voiced 0.68s cubic-bezier(0.1, 0.75, 0.25, 1) both;
+}
+.pop.voiced b {
+  display: block;
+  white-space: nowrap;
+  font-size: clamp(20px, 4.4vw, 32px);
+  letter-spacing: 0.02em;
+}
+.pop.voiced small {
+  display: block;
+  padding: 3px 6px 2px;
+  border: 1px solid currentColor;
+  background: rgba(3, 5, 12, 0.88);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.72);
+  color: inherit;
+  font: 800 8px/1.1 "Courier New", monospace;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+.pop.voiced.neg { color: var(--red); }
+.pop.voiced.crit { color: var(--amber); }
+
+.pop.voice-0 b {
+  color: #f8ff45;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-style: italic;
+  -webkit-text-stroke: 1px #080914;
+  text-shadow: 3px 3px 0 #ff3d96, -2px -2px 0 #35e6ff, 0 0 14px currentColor;
+  transform: rotate(-7deg) skewX(-9deg);
+  animation: voice-slam 0.34s cubic-bezier(0.12, 0.84, 0.24, 1.28) both;
+}
+.pop.voice-1 b {
+  color: #fff;
+  font-family: "Arial Black", "Trebuchet MS", sans-serif;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-shadow: 2px 0 #ff3d96, 4px 0 #a274ff, 6px 0 #35e6ff, 0 0 18px currentColor;
+  transform: rotate(4deg);
+  animation: voice-disco 0.42s steps(4, end) both;
+}
+.pop.voice-2 b {
+  padding: 5px 9px 4px;
+  color: currentColor;
+  border: 2px solid currentColor;
+  background: #070914;
+  box-shadow: 4px 4px 0 #ff3d96, -3px -3px 0 rgba(53, 230, 255, 0.75);
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+  font-family: "Courier New", Consolas, monospace;
+  font-size: clamp(16px, 3.7vw, 26px);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-shadow: 2px 0 rgba(255, 61, 150, 0.85), -2px 0 rgba(53, 230, 255, 0.85);
+  animation: voice-glitch 0.42s steps(2, end) both;
+}
+.pop.voice-3 b {
+  color: #ff64be;
+  font-family: "Segoe UI Black", "Arial Black", sans-serif;
+  -webkit-text-stroke: 1px #fff76b;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 0 #733dff, 3px 6px 0 #35e6ff, 0 0 18px currentColor;
+  transform: rotate(-2deg);
+  animation: voice-bubble 0.4s cubic-bezier(0.2, 1.7, 0.35, 1) both;
+}
+@keyframes pop-voiced {
+  0% { transform: translate(-50%, -25%) scale(0.5); opacity: 0; }
+  18% { opacity: 1; }
+  70% { transform: translate(-50%, -120%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -185%) scale(0.9); opacity: 0; }
+}
+@keyframes voice-slam { from { transform: rotate(-15deg) skewX(-14deg) scale(2.2); filter: blur(2px); } }
+@keyframes voice-disco { 0% { transform: translateX(-8px) rotate(4deg); } 50% { transform: translateX(7px) rotate(-2deg); } }
+@keyframes voice-glitch { 0%, 42% { transform: translateX(-5px); } 45%, 70% { transform: translateX(5px); } }
+@keyframes voice-bubble { from { transform: rotate(8deg) scale(0.15); } 65% { transform: rotate(-5deg) scale(1.18); } }
 
 .timebar { height: 5px; margin: 10px 0; background: #06070e; border-radius: 999px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8); }
 .timebar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--cyan), var(--violet)); transform-origin: left; }
@@ -1178,7 +1261,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .riser, .flank b, .quota-bar i, .boost-meter > div i { transition-duration: 0.01ms; }
   .boot span, .quota-bar.done, .node.just-bought, .hud-cell strong.urgent, .boost-meter.surge, .weapon-cursor.firing i { animation: none; }
-  .pop { animation-duration: 0.01ms; }
+  .pop, .pop.voiced, .pop.voiced b { animation-duration: 0.01ms; }
 }
 
 /* ══ MÉCANIQUES DE FRAPPE ═══════════════════════════════════════════════ */
@@ -1190,7 +1273,19 @@ body {
   transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.25, 1.05);
   transform-origin: var(--zoom-x, 50%) var(--zoom-y, 50%);
 }
-.glass-inner.duel .grid { transform: scale(1.85); }
+.glass-inner.duel .grid {
+  --duel-scale-far: 1.68;
+  --duel-scale-mid: 1.82;
+  --duel-scale-near: 1.92;
+  animation: duel-camera 1.45s ease-in-out infinite alternate;
+}
+/* Une respiration avant/arrière maintient la pression pendant les deux
+   traversées du duel, comme si la caméra plongeait vers la case parée. */
+@keyframes duel-camera {
+  0% { transform: scale(var(--duel-scale-far)) translate3d(-0.35%, 0.5%, 0) rotate(-0.18deg); }
+  45% { transform: scale(var(--duel-scale-mid)) translate3d(0.28%, -0.35%, 0) rotate(0.14deg); }
+  100% { transform: scale(var(--duel-scale-near)) translate3d(-0.18%, -0.7%, 0) rotate(-0.08deg); }
+}
 .glass-inner.duel .hud,
 .glass-inner.duel .quota-bar,
 .glass-inner.duel .effects,
@@ -1380,7 +1475,11 @@ body {
 
 @media (max-width: 620px) {
   .qte { inset: auto 8px 8px; padding: 10px; }
-  .glass-inner.duel .grid { transform: scale(1.5); }
+  .glass-inner.duel .grid {
+    --duel-scale-far: 1.36;
+    --duel-scale-mid: 1.46;
+    --duel-scale-near: 1.54;
+  }
 }
 
 /* Mode dégradé activé par fx.js seulement sur appareil contraint ou après
@@ -1406,11 +1505,14 @@ html.fx-degrade .shaft::before { filter: none; }
 @media (prefers-reduced-motion: reduce) {
   .glass-inner.stunned, .port.stunned .riser .icon, .port.up.sentinelle .riser .icon { animation: none; }
   .glass-inner .grid { transition-duration: 0.01ms; }
+  .glass-inner.duel .grid { animation: none; transform: scale(var(--duel-scale-mid)); }
   .local-light { animation: none; }
 }
 
+body.reduce-effects .glass-inner.duel .grid,
 body.reduce-effects .glass-inner.stunned,
 body.reduce-effects .port.stunned .riser .icon,
 body.reduce-effects .port.up.sentinelle .riser .icon,
 body.reduce-effects .boost-meter.surge,
 body.reduce-effects .weapon-cursor.firing i { animation: none; }
+body.reduce-effects .glass-inner.duel .grid { transform: scale(var(--duel-scale-mid)); }

@@ -105,6 +105,13 @@
     { id: 'sentinelle', icon: '⚔️', name: 'SENTINELLE', pts: 18, weight: 14, ttl: 1300, parry: true },
   ];
 
+  // Vocabulaire court et cyclique : chaque frappe change de voix et de
+  // silhouette typographique, sans dépendre d'une police ou d'un asset.
+  const HIT_FEEDBACK = ['BIM !', 'TCHAK !', 'ZAP !', 'CLAC !', 'PAF !', 'PULSE !'];
+  const MISS_FEEDBACK = ['FIOU !', 'ZIP !', 'OUPS !', 'PLOP !', 'FLOP !', 'FZZT !'];
+  let feedbackWordIndex = 0;
+  let feedbackStyleIndex = 0;
+
   const ROWS = 3;
   const COLS = 4;
   const PORTS = ROWS * COLS;
@@ -1250,12 +1257,43 @@
     port.el.style.removeProperty('--shield');
   }
 
-  function popText(port, text, kind) {
+  function nextFeedback(words) {
+    const word = words[feedbackWordIndex % words.length];
+    feedbackWordIndex += 1;
+    return word;
+  }
+
+  /**
+   * Affiche un retour au-dessus de la grille, donc hors du puits qui masque
+   * volontairement ses débords. `voice` active la grande onomatopée ; `text`
+   * reste l'information utile (score, série de ratés, bonus).
+   */
+  function popText(port, text, kind = '', voice = '') {
     const pop = document.createElement('span');
-    pop.className = `pop ${kind}`;
-    pop.textContent = text;
-    port.el.appendChild(pop);
-    setTimeout(() => pop.remove(), 430);
+    pop.className = `pop ${kind}`.trim();
+
+    if (voice) {
+      pop.classList.add('voiced', `voice-${feedbackStyleIndex % 4}`);
+      feedbackStyleIndex += 1;
+
+      const shout = document.createElement('b');
+      const detail = document.createElement('small');
+      shout.textContent = voice;
+      detail.textContent = text;
+      pop.append(shout, detail);
+    } else {
+      pop.textContent = text;
+    }
+
+    const arena = $('arena');
+    const arenaRect = arena.getBoundingClientRect();
+    const portRect = port.el.getBoundingClientRect();
+    const halfWidth = voice ? Math.min(64, arenaRect.width / 3) : 36;
+    const centerX = portRect.left - arenaRect.left + portRect.width / 2;
+    pop.style.left = `${Math.max(halfWidth, Math.min(arenaRect.width - halfWidth, centerX))}px`;
+    pop.style.top = `${portRect.top - arenaRect.top + portRect.height * 0.48}px`;
+    arena.appendChild(pop);
+    setTimeout(() => pop.remove(), voice ? 680 : 430);
   }
 
   function flashPort(port, cls) {
@@ -1443,7 +1481,12 @@
     round.misses += 1;
     round.missStreak += 1;
     const remaining = BALANCE.missTolerance - round.missStreak;
-    popText(port, `RATÉ ${round.missStreak}/${BALANCE.missTolerance}`, 'neg');
+    popText(
+      port,
+      `RATÉ ${round.missStreak}/${BALANCE.missTolerance}`,
+      'neg',
+      nextFeedback(MISS_FEEDBACK),
+    );
     FX.sfx.miss(panOf(port));
 
     if (remaining > 0) {
@@ -1617,7 +1660,8 @@
     round.gain += points;
 
     const suffix = chainIndex > 0 ? ` ×${(1 + chainIndex * BALANCE.chainStep).toFixed(1)}` : '';
-    popText(port, `${viaTurret ? '' : 'TOUCHÉ · '}+${fmt(points)}${suffix}`, crit ? 'crit' : viaTurret ? 'turret' : '');
+    const voice = !viaTurret && keep ? nextFeedback(HIT_FEEDBACK) : '';
+    popText(port, `+${fmt(points)}${suffix}`, crit ? 'crit' : viaTurret ? 'turret' : '', voice);
 
     const pan = panOf(port);
     if (viaTurret) {
@@ -2169,6 +2213,8 @@
     emptyLoadout, normalizeLoadout, loadoutCost, tokenSummary, treeInvestedScore,
     recordClearedRound, setStatPoint, togglePrestigeBuff, clearLoadout,
     renderPrestige, renderTreeReset, resetTree, chargeBoost, registerMiss,
+    popText, nextHitFeedback: () => nextFeedback(HIT_FEEDBACK),
+    nextMissFeedback: () => nextFeedback(MISS_FEEDBACK),
     openTutorial, openSettings, updateHud, endRound, startRound, newRun,
     run, round,
     get save() { return save; },

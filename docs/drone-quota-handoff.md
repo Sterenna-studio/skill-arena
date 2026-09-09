@@ -4,7 +4,8 @@ Tout ce qu'il faut pour reprendre le jeu sans contexte préalable : ce qu'il
 est, comment le lancer, ce sur quoi il repose, ce qui est vérifié, ce qui ne
 l'est pas, et par où continuer.
 
-Écrit le 2026-09-09, mis à jour le 2026-09-10 après la passe UX/boost.
+Écrit le 2026-09-09, mis à jour le 2026-09-10 après la passe de retours
+pop/cyberpunk et de pression visuelle du duel.
 
 ---
 
@@ -61,8 +62,8 @@ qu'on le demande.
 ```txt
 public/games/drone-quota/
 ├── index.html   319 l.  écrans, meuble, HUD, tutoriel, réglages, prestige
-├── style.css   1416 l.  meuble, ports, états, écrans et responsive
-├── game.js     2203 l.  règles, économie, boost, arbre, machine à états
+├── style.css   1518 l.  meuble, ports, états, écrans et responsive
+├── game.js     2249 l.  règles, économie, boost, arbre, machine à états
 ├── fx.js        648 l.  son, particules, secousses, traces d'usure
 └── prefs.js     167 l.  préférences locales et viseur DOM optionnel
 ```
@@ -171,6 +172,14 @@ ni multiplicateur. Une touche remet cette série à zéro. Au cinquième raté
 consécutif seulement, le BOOST retombe à zéro et le multiplicateur à ×1. Une
 cible ignorée ou une parade perdue ne compte pas comme clic vide.
 
+Les touches manuelles et clics vides font alterner six onomatopées de chaque
+famille et quatre silhouettes typographiques : affiche pop, chromes disco,
+cartouche cyber et bulle arcade. La grande voix et le détail utile (points ou
+`RATÉ n/5`) sont deux lignes distinctes. Ces retours sont placés dans l'arène,
+pas dans le `<button>` dont le puits masque les débordements ; leur centre est
+borné sur les cases de bord. Les tourelles et dommages d'onde gardent le petit
+retour chiffré pour ne pas saturer la dalle d'onomatopées automatiques.
+
 ### Blindés
 
 Trois coups absorbés (aucun point, aucun combo — rien n'a touché), chacun
@@ -187,7 +196,9 @@ Frapper une sentinelle intacte ouvre un duel :
 3. **Le chrono du round continue de tourner.** Volontaire : sinon rater la
    parade deviendrait un abri où souffler quand le plateau déborde.
 4. La dalle zoome sur le port (`#glass-inner.duel`, origine du transform
-   calée sur le port).
+   calée sur le port). Pendant le balayage, la grille oscille et avance/recule
+   légèrement comme une caméra qui plonge dans le plateau. Le mode d'effets
+   réduits conserve un zoom fixe.
 5. Un curseur fait au minimum un aller-retour : chaque traversée dure
    `qteSweepMs` (1450 ms) et `qteSweepLegs` vaut 2. Une zone de `qteZone`
    (24 %, élargie par `RÉFLEXE`) est placée au hasard. Le clic ou la barre
@@ -395,6 +406,8 @@ dq.setStatPoint(id, -1|1), dq.togglePrestigeBuff(id), dq.clearLoadout()
 dq.recordClearedRound(round)
 dq.mancheOf(r), dq.stepInManche(r), dq.isMancheEnd(r)
 dq.chargeBoost(points, port, fixedGain), dq.registerMiss(port)
+dq.popText(port, detail, kind, voix)
+dq.nextHitFeedback(), dq.nextMissFeedback()
 dq.updateHud(), dq.endRound(), dq.startRound(), dq.newRun()
 dq.preferences, dq.openTutorial(), dq.openSettings()
 
@@ -494,6 +507,12 @@ Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
   modèle de budget de frappes, pas de parties réelles.
 - La lisibilité du duel en conditions réelles (est-ce qu'on comprend ce qui se
   passe quand ça zoome ?) n'a pas été évaluée.
+- Les quatre voix d'impact ont été inspectées dans un onglet visible, à
+  1100 px et 375 px, avec une largeur de document exacte (1100/1100 et
+  375/375). Une vraie touche et un vrai clic vide produisent respectivement
+  `ZAP ! +6` et `PLOP ! RATÉ 1/5`. Le duel affiche `duel-camera` et sa pose
+  médiane mesurée est bien un zoom ×1,82 avec léger décalage/roulis. Le rythme
+  sur les 2,9 s complets reste à apprécier en partie, pas sur une pose figée.
 
 ---
 
@@ -532,6 +551,13 @@ Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
 - `RÉCUPÉRATION` rend 60, 65 ou 70 % du coût historique des nœuds. La poche
   séparée protège le dilemme banque/palier, mais la vitesse de reconstruction
   après plusieurs resets n'a pas encore été éprouvée en partie longue.
+- L'issue #7 doit maintenant couvrir des **terrains modulaires** : nombres et
+  formes de cases variables, cases absentes ou désactivées, et cases bonus à
+  forte probabilité de parade. Les tourelles de flanc doivent devenir un
+  équipement placé avant la manche : slot latéral, case ciblée choisie, cadence
+  propre, puis frappes répétées tant qu'une cible est présente. Une variante de
+  contrôle ferait peu de points mais prolongerait prioritairement un
+  étourdissement amorcé par le joueur. Rien de ce modèle n'est encore codé.
 
 ---
 
@@ -565,7 +591,15 @@ La passe UX apporte tutoriel, objectif cumulé, cible sonnée, BOOST et réglage
 Il reste surtout un écran de fin de run qui exploite les compteurs déjà
 collectés et les essais réels listés au §9.
 
-### Priorité 4 — éprouver l'arbre restructuré, puis l'élargir
+### Priorité 4 — concevoir les terrains et l'équipement (issue #7)
+
+Les nouvelles orientations sont consignées au §9 et dans l'issue #7. Avant
+de coder, il reste à trancher si les terrains sont choisis avant la run ou
+traversés, comment leurs revenus restent comparables, et si les records restent
+globaux. Le premier incrément doit extraire une configuration de terrain sans
+changer le plateau 4 × 3 actuel, puis seulement ajouter des formes alternatives.
+
+### Priorité 5 — éprouver l'arbre restructuré, puis l'élargir
 
 **Issue <https://github.com/Sterenna-studio/skill-arena/issues/5> implémentée.**
 
@@ -582,7 +616,7 @@ plutôt qu'ils ne frustrent, et si l'annulation est assez visible. Ensuite
 seulement : chaîne plus longue, parade à plusieurs passes, blindés qui laissent
 tomber un bonus en se brisant, tourelles qui participent aux chaînes.
 
-### Priorité 5 — éprouver le prestige, sans l'élargir
+### Priorité 6 — éprouver le prestige, sans l'élargir
 
 **Issue <https://github.com/Sterenna-studio/skill-arena/issues/6> implémentée.**
 
