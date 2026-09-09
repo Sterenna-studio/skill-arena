@@ -186,6 +186,12 @@ Chaque nœud écrit dans l'objet de stats via `apply(stats, lvl)`, et
 `deriveStats(tree)` fait une passe unique. Ajouter un nœud = ajouter une entrée
 dans `TREE`, rien d'autre.
 
+Seuls cinq nœuds ont un prérequis (`critique` et `onde` derrière `frappe`,
+`tourelleD`, `ciblage` et `surchauffe` derrière `tourelleG`). Les douze autres
+sont accessibles dès la première visite à l'atelier, et les branches FLUX et
+VITAL n'ont aucun verrou. **Ce n'est donc pas un arbre mais quatre listes**, et
+c'est l'objet de l'issue #5 — voir la priorité 3 du §10.
+
 `loadSave()` filtre les identifiants inconnus et borne les niveaux au `max` :
 une sauvegarde d'une version antérieure dégrade proprement au lieu d'injecter
 un niveau fantôme. C'est ce qui a permis de supprimer `vie` et `bouclier` sans
@@ -356,14 +362,24 @@ courbure du verre), des lumières locales qui éclairent les surfaces voisines a
 lieu de `box-shadow` statiques, de la poussière et des éclats au fond du puits,
 et un mode dégradé si le coût devient sensible sur mobile.
 
-### Priorité 3 — élargir l'arbre
+### Priorité 3 — restructurer l'arbre, puis l'élargir
 
-Dix-sept nœuds, c'était le périmètre d'une tranche verticale. La demande
-initiale parlait d'un « grand arbre ». Les branches sont prêtes à recevoir des
-nœuds sans refonte : une entrée dans `TREE` suffit. Pistes qui collent aux
-mécaniques actuelles : chaîne plus longue, parade à plusieurs passes, blindés
-qui laissent tomber un bonus en se brisant, tourelles qui participent aux
-chaînes.
+**Issue <https://github.com/Sterenna-studio/skill-arena/issues/5>.**
+
+L'arbre actuel n'est pas un arbre : quatre listes plates, dont 12 nœuds sur 17
+sans aucun prérequis, et deux branches entières ouvertes dès la première
+visite. Rien ne s'ouvre à mesure qu'on investit.
+
+**Restructurer d'abord, élargir ensuite** : ajouter des nœuds à quatre listes
+plates ne ferait que rendre le problème plus visible. L'issue détaille les cinq
+questions à trancher avant de coder (nœuds verrouillés visibles ou cachés,
+prérequis par nœud ou seuil de branche, arbre strict ou graphe, réversibilité,
+second axe de déverrouillage), le piège de sauvegarde à traiter et la question
+du rendu mobile.
+
+Une fois la structure en place, les pistes de nœuds qui collent aux mécaniques
+actuelles : chaîne plus longue, parade à plusieurs passes, blindés qui laissent
+tomber un bonus en se brisant, tourelles qui participent aux chaînes.
 
 ### Priorité 4 — retour au joueur
 
