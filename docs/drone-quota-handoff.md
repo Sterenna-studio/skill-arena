@@ -59,10 +59,10 @@ qu'on le demande.
 
 ```txt
 public/games/drone-quota/
-├── index.html   208 l.  structure : écrans, meuble, HUD, panneau de parade
-├── style.css    853 l.  meuble, orifices, états de port, duel, interlude
-├── game.js     1401 l.  règles, économie, arbre, machine à états
-└── fx.js        485 l.  son, particules, secousses, traces d'usure
+├── index.html   210 l.  structure : écrans, meuble, HUD, panneau de parade
+├── style.css   1087 l.  meuble, orifices, états de port, duel, interlude
+├── game.js     1635 l.  règles, économie, arbre, machine à états
+└── fx.js        633 l.  son, particules, secousses, traces d'usure
 ```
 
 Le jeu est aussi déclaré à deux endroits côté hub Next.js :
@@ -175,29 +175,45 @@ déclencher de duel — le joueur n'a pas frappé, il n'a pas à être puni.
 
 ### Arbre — 17 nœuds, permanent
 
-Acheté avec la banque, conservé d'une run à l'autre. Quatre branches :
+Acheté avec la banque, conservé d'une run à l'autre. Les quatre branches sont
+maintenant de vrais arbres stricts : un nœud principal a zéro ou un parent,
+et reste **absent du DOM** jusqu'à ce que ce parent ait au moins un niveau.
+Les racines sont les quatre seuls nœuds principaux visibles sur un arbre vide.
 
-- **ARMEMENT** : `frappe` (4), `combo` (3), `etourdi` (3), `critique` (3),
-  `onde` (2)
-- **FLUX** : `cadence` (3), `densite` (3), `fenetre` (2), `rarete` (3)
-- **TOURELLES** : `tourelleG` (3), `tourelleD` (3), `ciblage` (2),
-  `surchauffe` (2)
-- **VITAL** : `rallonge` (3), `reflexe` (2), `amorti` (2), `negoce` (3)
+- **ARMEMENT** : `frappe` → (`combo`, `etourdi`) ; `combo` → `onde` ;
+  spécialisation flottante `critique`.
+- **FLUX** : `cadence` → (`densite`, `fenetre`) ; `densite` → `rarete`.
+- **TOURELLES** : `tourelleG` → `tourelleD` → `surchauffe` ; spécialisation
+  flottante `ciblage`.
+- **VITAL** : `rallonge` → `reflexe` → `negoce` ; spécialisation flottante
+  `amorti`.
+
+Le tier 3 exige aussi **trois niveaux investis dans sa branche**. Les trois
+spécialisations flottantes exigent une profondeur 2 et trois niveaux investis.
+Avant leur premier achat, leur emplacement et leur condition sont lisibles,
+mais leur icône et leurs statistiques restent opaques. `unlockCheck()` accepte
+déjà une exigence `unlock.prestige` sur un nœud ou sa branche, et un contexte
+`prestigeTokens` ; aucun jeton n'est créé, compté ou sauvegardé ici (issue #6).
+
+Le rendu est une grille CSS explicite par branche. Un SVG créé dans le DOM,
+en `pointer-events: none`, relie uniquement les nœuds principaux révélés. Sous
+620 px, la grille devient une colonne verticale et les liens sont recalculés.
+Les nœuds restent tous des `<button>`.
 
 Chaque nœud écrit dans l'objet de stats via `apply(stats, lvl)`, et
-`deriveStats(tree)` fait une passe unique. Ajouter un nœud = ajouter une entrée
-dans `TREE`, rien d'autre.
+`deriveStats(tree)` fait une passe unique sur nœuds principaux et flottants.
 
-Seuls cinq nœuds ont un prérequis (`critique` et `onde` derrière `frappe`,
-`tourelleD`, `ciblage` et `surchauffe` derrière `tourelleG`). Les douze autres
-sont accessibles dès la première visite à l'atelier, et les branches FLUX et
-VITAL n'ont aucun verrou. **Ce n'est donc pas un arbre mais quatre listes**, et
-c'est l'objet de l'issue #5 — voir la priorité 3 du §10.
+`loadSave()` filtre les identifiants inconnus, borne les niveaux au `max`, puis
+appelle `normalizeTree()`. Si une sauvegarde historique possède un descendant
+dont le nouveau parent manque, les ancêtres requis sont ajoutés gratuitement.
+C'est le choix de migration sans perte : un achat ancien ne devient ni
+invisible ni inactif, au prix d'un petit cadeau ponctuel de niveaux parents.
 
-`loadSave()` filtre les identifiants inconnus et borne les niveaux au `max` :
-une sauvegarde d'une version antérieure dégrade proprement au lieu d'injecter
-un niveau fantôme. C'est ce qui a permis de supprimer `vie` et `bouclier` sans
-migration.
+L'atelier est transactionnel. `enterShop()` prend un instantané `{ tree,
+bank }`; `buy()` ne persiste plus. « ANNULER LES ACHATS » restaure l'instantané,
+et « MANCHE SUIVANTE » appelle `validateShop()`, qui écrit avant de figer les
+achats. Un rechargement ou le lien Arena appelle `discardShopChanges()` : un
+état à moitié acheté ne rejoint jamais `localStorage`.
 
 Sauvegarde : `localStorage['drone-quota:v1']` =
 `{ tree, bestRound, bestScore, runs }`. Sourdine : `drone-quota:mute:v1`.
@@ -267,6 +283,10 @@ dq.ports                      // les 12 objets de port
 dq.run, dq.round, dq.save, dq.stats
 dq.quotaFor(r, stats)
 dq.deriveStats(tree)
+dq.normalizeTree(tree)
+dq.branchInvestment(branch, tree), dq.branchDepth(branch, tree)
+dq.unlockCheck(node, tree, progression), dq.nodeState(node, tree, bank)
+dq.enterShop(), dq.cancelShopPurchases(), dq.validateShop()
 dq.mancheOf(r), dq.stepInManche(r), dq.isMancheEnd(r)
 
 dq.forceSpawn(index, typeId)  // place une cible précise sur un port
@@ -306,15 +326,22 @@ Chaîne d'étourdissement (valeurs exactes à chaque cran, mise hors service au
 sonnée et enchaînable, duel perdu étourdissant le joueur 998 ms puis
 rétablissant ses clics, plateau figé et autres ports inertes pendant le duel,
 tourelles limitées à leur colonne, souffle entre rounds d'une manche, atelier
-en fin de manche, prérequis de nœuds, migration d'une sauvegarde d'avant la
-refonte, ports atteignables par le hit-testing réel du navigateur, mobile
-375 px sans débordement.
+en fin de manche, ports atteignables par le hit-testing réel du navigateur.
+
+Pour l'arbre de l'issue #5 : quatre racines seules sur une sauvegarde vide,
+révélation parentale, seuil de tier 3, condition combinée des spécialisations,
+point d'extension prestige, SVG de liaison, migration d'une sauvegarde ancienne
+incohérente, application de ses effets, achat sans écriture, annulation,
+validation, rechargement et sortie Arena. Le rendu a été inspecté dans un onglet
+Chrome visible à 1280 px puis 375 px ; à 375 px, largeur exacte 375/375 et
+cibles de nœuds d'au moins 76 px.
 
 ### Pas vérifié
 
-- **Le jeu n'a jamais été joué à la manette.** Tout a été piloté en script,
-  volet navigateur masqué. Les particules, les secousses et le ronflement
-  n'ont jamais été vus ni entendus en mouvement.
+- **Le jeu n'a jamais été joué à la manette.** Les contrôles de l'arbre ont été
+  pilotés dans un onglet visible, mais pas au fil de trois rounds réellement
+  joués. Les particules, les secousses et le ronflement n'ont pas été rejugés
+  pendant cette reprise.
 - **L'équilibrage est modélisé, pas éprouvé.** Le tableau du §5 sort d'un
   modèle de budget de frappes, pas de parties réelles.
 - La lisibilité du duel en conditions réelles (est-ce qu'on comprend ce qui se
@@ -339,6 +366,13 @@ refonte, ports atteignables par le hit-testing réel du navigateur, mobile
   sont déjà comptés.
 - Le zoom du duel déborde de la dalle sur les ports de bord (masqué par
   `overflow: hidden`). Ça passe, mais ce n'est pas cadré.
+- La migration de l'arbre privilégie la conservation : un descendant ancien
+  complète gratuitement ses nouveaux ancêtres. C'est volontaire et borné au
+  premier chargement logique, mais les joueurs concernés reçoivent donc
+  quelques niveaux qu'ils n'ont pas payés.
+- Les coûts n'ont pas été rééquilibrés après la nouvelle cadence de révélation.
+  La structure et les transactions sont déterministes ; le rythme d'achat doit
+  encore être éprouvé dans de vraies runs.
 
 ---
 
@@ -365,35 +399,26 @@ courbure du verre), des lumières locales qui éclairent les surfaces voisines a
 lieu de `box-shadow` statiques, de la poussière et des éclats au fond du puits,
 et un mode dégradé si le coût devient sensible sur mobile.
 
-### Priorité 3 — restructurer l'arbre, puis l'élargir
+### Priorité 3 — retour au joueur
 
-**Issue <https://github.com/Sterenna-studio/skill-arena/issues/5>.**
+Les aspérités du §9, en particulier dire au joueur *pourquoi* son combo tombe,
+et un écran de fin de run qui exploite les compteurs déjà collectés.
 
-L'arbre actuel n'est pas un arbre : quatre listes plates, dont 12 nœuds sur 17
-sans aucun prérequis, et deux branches entières ouvertes dès la première
-visite. Rien ne s'ouvre à mesure qu'on investit.
+### Priorité 4 — éprouver l'arbre restructuré, puis l'élargir
 
-**Restructurer d'abord, élargir ensuite** : ajouter des nœuds à quatre listes
-plates ne ferait que rendre le problème plus visible. L'issue détaille les cinq
-questions à trancher avant de coder (nœuds verrouillés visibles ou cachés,
-prérequis par nœud ou seuil de branche, arbre strict ou graphe, réversibilité,
-second axe de déverrouillage), le piège de sauvegarde à traiter et la question
-du rendu mobile.
+**Issue <https://github.com/Sterenna-studio/skill-arena/issues/5> implémentée.**
 
-Les cinq questions sont tranchées, elles sont consignées dans le fil de
-l'issue : nœuds **cachés** tant que leur parent n'a pas un niveau, ouverture
-par **prérequis de nœud *et* seuils d'investissement de branche**, arbre
-**strict** plus des mini-branches flottantes conditionnées à la profondeur dont
-le contenu reste voilé jusqu'à l'achat, et un **bouton d'annulation valable
-tant qu'on est dans l'atelier** (les achats se figent à la sortie).
+La restructuration est en place : nœuds cachés, double ouverture parent +
+investissement, arbre strict, trois spécialisations flottantes opaques et
+annulation transactionnelle. La migration sans perte complète les parents des
+anciens achats. Desktop et disposition verticale 375 px ont été contrôlés à
+l'écran ; voir §8 pour la limite entre vérification fonctionnelle et
+équilibrage réel.
 
-Deux conséquences techniques à ne pas manquer : `buy()` écrit dans
-`localStorage` immédiatement alors que l'annulation exige un instantané validé
-en fin de phase ; et avec des nœuds cachés, un nœud possédé dont le parent est
-retombé à zéro serait invisible tout en appliquant son effet.
-
-Une fois la structure en place, les pistes de nœuds qui collent aux mécaniques
-actuelles : chaîne plus longue, parade à plusieurs passes, blindés qui laissent
+**Éprouver d'abord, élargir ensuite** : les prochaines runs doivent dire si
+trois niveaux est le bon seuil de tier 3, si les modules opaques donnent envie
+plutôt qu'ils ne frustrent, et si l'annulation est assez visible. Ensuite
+seulement : chaîne plus longue, parade à plusieurs passes, blindés qui laissent
 tomber un bonus en se brisant, tourelles qui participent aux chaînes.
 
 ### Priorité 5 — jetons de prestige
@@ -401,18 +426,13 @@ tomber un bonus en se brisant, tourelles qui participent aux chaînes.
 **Issue <https://github.com/Sterenna-studio/skill-arena/issues/6>.**
 
 Seconde monnaie gagnée en franchissant des paliers, et seul moyen de récupérer
-un arbre déjà figé. Sorti de l'issue #5 pour ne pas la bloquer : l'arbre a
-seulement besoin de prévoir des nœuds conditionnés à des jetons.
+un arbre déjà figé. Sorti de l'issue #5 pour ne pas la bloquer : l'arbre sait
+seulement évaluer `unlock.prestige`, sans créer ni stocker de jetons.
 
 Le risque principal est identifié dans l'issue : les jetons rendent plus fort,
 donc on va plus loin, donc on gagne plus de jetons. Quelque chose doit casser
 cette boucle. Et le reset prestige ne doit surtout pas ressembler au bouton
 « Réinitialiser la progression » existant, qui efface tout.
-
-### Priorité 4 — retour au joueur
-
-Les aspérités du §9, en particulier dire au joueur *pourquoi* son combo tombe,
-et un écran de fin de run qui exploite les compteurs déjà collectés.
 
 ---
 

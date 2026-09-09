@@ -688,17 +688,70 @@ body {
 @keyframes boot { from { transform: scale(1.7); opacity: 0; } 55% { opacity: 1; } to { transform: scale(0.92); opacity: 0.9; } }
 
 /* ── arbre ──────────────────────────────────────────────── */
-.tree { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 10px; }
-.branch { padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); }
+.tree {
+  column-count: 2;
+  column-gap: 14px;
+  margin-bottom: 10px;
+}
+.branch {
+  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 14px;
+  padding: 14px;
+  break-inside: avoid;
+  vertical-align: top;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
 .branch > h3 { font-size: 11px; letter-spacing: 0.22em; margin-bottom: 4px; color: var(--branch, var(--cyan)); }
-.branch > p { font-size: 10px; color: var(--faint); line-height: 1.5; margin-bottom: 12px; }
+.branch > p { font-size: 10px; color: var(--faint); line-height: 1.5; margin-bottom: 8px; }
+.branch-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--faint);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+}
+.branch-graph {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 10px;
+  min-width: 0;
+}
+.tree-links {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.tree-links path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--branch, var(--cyan)) 52%, transparent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
 
 .node {
   display: block;
+  position: relative;
+  z-index: 1;
+  grid-column: var(--tree-column, 1 / -1);
+  grid-row: var(--tree-row, auto);
   width: 100%;
+  min-width: 0;
+  min-height: 88px;
   text-align: left;
   padding: 10px 12px;
-  margin-bottom: 8px;
+  margin: 0;
   background: linear-gradient(180deg, rgba(20, 24, 44, 0.85), var(--bg-2));
   border: 1px solid var(--border);
   border-left: 2px solid var(--branch, var(--cyan));
@@ -708,24 +761,42 @@ body {
   cursor: pointer;
   transition: border-color 0.12s, box-shadow 0.12s, opacity 0.12s, transform 0.08s;
 }
-.node:last-child { margin-bottom: 0; }
 .node-head { display: flex; align-items: baseline; gap: 8px; }
 .node-name { font-size: 11px; letter-spacing: 0.1em; flex: 1 1 auto; }
 .node-dots { font-size: 10px; color: var(--branch, var(--cyan)); letter-spacing: 0.1em; }
 .node-desc { display: block; margin-top: 5px; font-size: 10px; line-height: 1.55; color: var(--muted); }
-.node-foot { display: flex; align-items: baseline; gap: 8px; margin-top: 7px; }
+.node-foot { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-top: 7px; }
 .node-cost { font-size: 11px; color: var(--amber); font-variant-numeric: tabular-nums; }
-.node-state { font-size: 9px; letter-spacing: 0.14em; color: var(--faint); margin-left: auto; }
+.node-state { min-width: 0; font-size: 9px; line-height: 1.4; text-align: right; letter-spacing: 0.1em; color: var(--faint); margin-left: auto; }
 
 .node.buyable { border-color: var(--border-hot); }
 .node.buyable:hover { box-shadow: 0 0 20px rgba(255, 190, 60, 0.2); border-color: var(--amber); }
 .node.buyable:active { transform: translateY(1px); }
 .node.poor { opacity: 0.55; cursor: not-allowed; }
 .node.poor .node-cost { color: var(--red); }
-.node.locked { opacity: 0.4; cursor: not-allowed; }
 .node.maxed { opacity: 0.8; cursor: default; border-color: var(--green); }
 .node.maxed .node-state { color: var(--green); }
 .node.readonly { cursor: default; }
+.node.opaque {
+  min-height: 96px;
+  border-style: dashed;
+  border-left-style: solid;
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 7px, transparent 7px 14px),
+    linear-gradient(180deg, rgba(15, 18, 32, 0.9), rgba(6, 8, 15, 0.96));
+}
+.node.opaque .node-name { filter: blur(2px); opacity: 0.58; }
+.node.opaque .node-desc { color: var(--faint); }
+.specialty-condition {
+  display: block;
+  margin-top: 7px;
+  color: var(--branch, var(--cyan));
+  font-size: 8px;
+  line-height: 1.45;
+  letter-spacing: 0.08em;
+}
+.node.opaque-locked { opacity: 0.62; cursor: not-allowed; }
+.node:disabled { cursor: default; }
 .node.just-bought { animation: bought 0.45s ease-out; }
 @keyframes bought {
   0% { box-shadow: 0 0 0 rgba(60, 240, 160, 0); }
@@ -733,10 +804,32 @@ body {
   100% { box-shadow: 0 0 0 rgba(60, 240, 160, 0); }
 }
 
+.specialties {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed color-mix(in srgb, var(--branch, var(--cyan)) 42%, transparent);
+}
+.specialties > h4 {
+  color: var(--branch, var(--cyan));
+  font-size: 8px;
+  letter-spacing: 0.18em;
+}
+.specialties .node { grid-column: auto; grid-row: auto; }
+
 .shop-warning { margin-bottom: 14px; padding: 10px 14px; border: 1px solid var(--border-hot); border-radius: var(--r); background: rgba(255, 190, 60, 0.06); font-size: 11px; line-height: 1.6; color: var(--muted); }
 .shop-warning strong { color: var(--amber); }
 .shop-warning.danger { border-color: var(--red); background: rgba(255, 77, 99, 0.07); }
 .shop-warning.danger strong { color: var(--red); }
+.shop-transaction {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: center;
+  color: var(--faint);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
 
 .brief-hint { margin-bottom: 20px; text-align: center; font-size: 11px; line-height: 1.7; color: var(--muted); }
 .brief-hint strong { color: var(--amber); }
@@ -763,6 +856,20 @@ body {
   .port .name { display: none; }
   .rules { grid-template-columns: 1fr; }
   .deck { margin: 9px 6px 0; }
+  .tree { column-count: 1; }
+  .branch { padding: 12px 10px; }
+  .branch-graph {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    gap: 24px;
+  }
+  .branch-graph .node {
+    grid-column: 1 !important;
+    grid-row: var(--tree-mobile-row, auto);
+    min-height: 76px;
+  }
+  .node-state { max-width: 72%; }
+  .actions.sticky .btn { flex: 1 1 150px; min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

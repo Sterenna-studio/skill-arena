@@ -37,7 +37,7 @@
       <div class="rule"><b>3</b><span>Les <em>blindés</em> 🛡️ encaissent trois coups avant de payer — mais chaque coup les sonne plus longtemps.</span></div>
       <div class="rule"><b>4</b><span>Frapper une <em>sentinelle</em> ⚔️ déclenche une parade. Place ton coup dans la fenêtre, ou tu restes étourdi une seconde. Le chrono, lui, ne s'arrête pas.</span></div>
       <div class="rule"><b>5</b><span>En fin de round, le palier est prélevé sur ta banque. S'il manque un point, la run s'arrête. <em>Trois rounds font une manche</em>, et l'atelier n'ouvre qu'entre deux manches.</span></div>
-      <div class="rule"><b>6</b><span>Les nœuds achetés à l'atelier sont <em>définitifs</em> — mais ce que tu dépenses ne paiera pas la facture suivante.</span></div>
+      <div class="rule"><b>6</b><span>Les achats restent <em>annulables dans l'atelier</em>. Ils deviennent définitifs quand tu lances la manche suivante.</span></div>
     </div>
 
     <div class="actions">
@@ -174,6 +174,8 @@
     <p class="shop-warning" id="shop-warning"></p>
     <div class="tree" id="shop-tree"></div>
     <div class="actions sticky">
+      <p class="shop-transaction" id="shop-transaction">Aucun achat en attente.</p>
+      <button class="btn" id="btn-cancel-shop" type="button" disabled>ANNULER LES ACHATS</button>
       <button class="btn primary" id="btn-next-round">MANCHE SUIVANTE →</button>
     </div>
   </section>

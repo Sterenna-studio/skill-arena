@@ -102,7 +102,8 @@
   // ── arbre de compétences ────────────────────────────────────────────────
   //
   // Permanent : les niveaux achetés survivent à la mort. Le palier monte pour
-  // compenser. Chaque nœud écrit directement dans l'objet de stats dérivé.
+  // compenser. L'arbre principal est strict (un parent au plus par nœud) ; les
+  // spécialisations flottantes s'ouvrent à la profondeur de leur branche.
 
   const TREE = [
     {
@@ -110,33 +111,39 @@
       name: 'ARMEMENT',
       color: '#35e6ff',
       blurb: 'Ce que ton marteau fait au contact.',
+      tierThresholds: { 3: 3 },
       nodes: [
         {
           id: 'frappe', name: 'FRAPPE RENFORCÉE', max: 4, costs: [260, 620, 1400, 2900],
+          tier: 1, lane: '1 / -1',
           desc: lvl => `+${lvl * 25}% sur tous les points marqués.`,
           apply: (s, lvl) => { s.pointMult += 0.25 * lvl; },
         },
         {
           id: 'combo', name: 'COMBO ÉTENDU', max: 3, costs: [440, 1100, 2400],
+          tier: 2, lane: '1', requires: { frappe: 1 },
           desc: lvl => `Combo plafonné à ×${BALANCE.baseComboCap + lvl * 2} au lieu de ×${BALANCE.baseComboCap}.`,
           apply: (s, lvl) => { s.comboCap += 2 * lvl; },
         },
         {
           id: 'etourdi', name: 'MARTEAU LOURD', max: 3, costs: [700, 1750, 3600],
+          tier: 2, lane: '2', requires: { frappe: 1 },
           desc: lvl => `Les cibles restent sonnées ${lvl * 22}% plus longtemps : plus de coups dans la chaîne.`,
           apply: (s, lvl) => { s.stunMult += 0.22 * lvl; },
         },
         {
-          id: 'critique', name: 'FRAPPE CRITIQUE', max: 3, costs: [560, 1300, 2700],
-          requires: { frappe: 1 },
-          desc: lvl => `${lvl * 8}% de chance de tripler les points d'une touche.`,
-          apply: (s, lvl) => { s.critChance += 0.08 * lvl; },
-        },
-        {
           id: 'onde', name: 'ONDE DE CHOC', max: 2, costs: [1700, 3800],
-          requires: { frappe: 2 },
+          tier: 3, lane: '1 / -1', requires: { combo: 1 },
           desc: lvl => `L'impact touche aussi les ports voisins, à ${lvl === 1 ? '50' : '100'}% des points.`,
           apply: (s, lvl) => { s.splash = lvl === 1 ? 0.5 : 1; },
+        },
+      ],
+      specialties: [
+        {
+          id: 'critique', name: 'FRAPPE CRITIQUE', max: 3, costs: [560, 1300, 2700],
+          unlock: { depth: 2, invested: 3 },
+          desc: lvl => `${lvl * 8}% de chance de tripler les points d'une touche.`,
+          apply: (s, lvl) => { s.critChance += 0.08 * lvl; },
         },
       ],
     },
@@ -145,24 +152,29 @@
       name: 'FLUX',
       color: '#3cf0a0',
       blurb: 'Ce que les ports crachent, et à quelle vitesse.',
+      tierThresholds: { 3: 3 },
       nodes: [
         {
           id: 'cadence', name: 'CADENCE DE POP', max: 3, costs: [560, 1400, 3000],
+          tier: 1, lane: '1 / -1',
           desc: lvl => `Les cibles arrivent ${lvl * 12}% plus vite.`,
           apply: (s, lvl) => { s.spawnScale *= Math.pow(0.88, lvl); },
         },
         {
           id: 'densite', name: 'DENSITÉ DE FLUX', max: 3, costs: [750, 1900, 3900],
+          tier: 2, lane: '1', requires: { cadence: 1 },
           desc: lvl => `${BALANCE.baseMaxActive + lvl} cibles simultanées au lieu de ${BALANCE.baseMaxActive}.`,
           apply: (s, lvl) => { s.maxActive += lvl; },
         },
         {
           id: 'fenetre', name: 'FENÊTRE LONGUE', max: 2, costs: [640, 1650],
+          tier: 2, lane: '2', requires: { cadence: 1 },
           desc: lvl => `Les cibles restent ${lvl * 18}% plus longtemps.`,
           apply: (s, lvl) => { s.ttlMult += 0.18 * lvl; },
         },
         {
           id: 'rarete', name: 'SIGNAL RARE', max: 3, costs: [820, 2000, 4300],
+          tier: 3, lane: '1 / -1', requires: { densite: 1 },
           desc: lvl => `CORE ${(1 + 0.5 * lvl).toFixed(1)}× plus fréquent.`,
           apply: (s, lvl) => { s.coreWeightMult += 0.5 * lvl; },
         },
@@ -173,33 +185,37 @@
       name: 'TOURELLES',
       color: '#a274ff',
       blurb: 'Des canons sur les flancs qui frappent sans toi.',
+      tierThresholds: { 3: 3 },
       nodes: [
         {
           id: 'tourelleG', name: 'TOURELLE BÂBORD', max: 3, costs: [1100, 2600, 5200],
+          tier: 1, lane: '1 / -1',
           desc: lvl => `Tire sur la colonne de gauche toutes les ${(BALANCE.turretIntervalMs[lvl] / 1000).toFixed(1)} s.`,
           apply: (s, lvl) => { s.turretLeft = lvl; },
         },
         {
           id: 'tourelleD', name: 'TOURELLE TRIBORD', max: 3, costs: [1100, 2600, 5200],
-          requires: { tourelleG: 1 },
+          tier: 2, lane: '1 / -1', requires: { tourelleG: 1 },
           desc: lvl => `Tire sur la colonne de droite toutes les ${(BALANCE.turretIntervalMs[lvl] / 1000).toFixed(1)} s.`,
           apply: (s, lvl) => { s.turretRight = lvl; },
         },
         {
-          id: 'ciblage', name: 'CIBLAGE SMART', max: 2, costs: [2200, 4700],
-          requires: { tourelleG: 1 },
-          desc: lvl => lvl === 1
-            ? 'Les tourelles ne gaspillent plus leurs tirs sur les sentinelles.'
-            : 'Les tourelles évitent les sentinelles et visent la cible la plus chère.',
-          apply: (s, lvl) => { s.turretSmart = lvl; },
-        },
-        {
           id: 'surchauffe', name: 'SURCHAUFFE', max: 2, costs: [2800, 6000],
-          requires: { tourelleG: 2 },
+          tier: 3, lane: '1 / -1', requires: { tourelleD: 1 },
           desc: lvl => lvl === 1
             ? 'Les tirs de tourelle alimentent ton combo.'
             : 'Les tirs de tourelle alimentent le combo et marquent à plein tarif.',
           apply: (s, lvl) => { s.turretCombo = lvl; },
+        },
+      ],
+      specialties: [
+        {
+          id: 'ciblage', name: 'CIBLAGE SMART', max: 2, costs: [2200, 4700],
+          unlock: { depth: 2, invested: 3 },
+          desc: lvl => lvl === 1
+            ? 'Les tourelles ne gaspillent plus leurs tirs sur les sentinelles.'
+            : 'Les tourelles évitent les sentinelles et visent la cible la plus chère.',
+          apply: (s, lvl) => { s.turretSmart = lvl; },
         },
       ],
     },
@@ -208,34 +224,43 @@
       name: 'VITAL',
       color: '#ffbe3c',
       blurb: 'Gagner du temps, et payer moins cher.',
+      tierThresholds: { 3: 3 },
       nodes: [
         {
           id: 'rallonge', name: 'RALLONGE', max: 3, costs: [900, 2400, 5000],
+          tier: 1, lane: '1 / -1',
           desc: lvl => `+${lvl * 2} secondes par round.`,
           apply: (s, lvl) => { s.roundBonusSeconds += 2 * lvl; },
         },
         {
           id: 'reflexe', name: 'RÉFLEXE', max: 2, costs: [1300, 3200],
+          tier: 2, lane: '1 / -1', requires: { rallonge: 1 },
           desc: lvl => `Fenêtre de parade ${lvl * 22}% plus large.`,
           apply: (s, lvl) => { s.qteZoneMult += 0.22 * lvl; },
         },
         {
-          id: 'amorti', name: 'AMORTISSEUR', max: 2, costs: [1500, 3600],
-          desc: lvl => `Parade ratée : tu restes étourdi ${lvl * 25}% moins longtemps.`,
-          apply: (s, lvl) => { s.playerStunMult -= 0.25 * lvl; },
-        },
-        {
           id: 'negoce', name: 'NÉGOCIATION', max: 3, costs: [1900, 4500, 8500],
+          tier: 3, lane: '1 / -1', requires: { reflexe: 1 },
           desc: lvl => `Palier réduit de ${lvl * 6}%.`,
           apply: (s, lvl) => { s.quotaDiscount += 0.06 * lvl; },
+        },
+      ],
+      specialties: [
+        {
+          id: 'amorti', name: 'AMORTISSEUR', max: 2, costs: [1500, 3600],
+          unlock: { depth: 2, invested: 3 },
+          desc: lvl => `Parade ratée : tu restes étourdi ${lvl * 25}% moins longtemps.`,
+          apply: (s, lvl) => { s.playerStunMult -= 0.25 * lvl; },
         },
       ],
     },
   ];
 
+  const allBranchNodes = branch => [...branch.nodes, ...(branch.specialties ?? [])];
+
   const NODES = new Map();
   for (const branch of TREE) {
-    for (const node of branch.nodes) NODES.set(node.id, { ...node, branch });
+    for (const node of allBranchNodes(branch)) NODES.set(node.id, { ...node, branch });
   }
 
   // ── sauvegarde ──────────────────────────────────────────────────────────
@@ -260,12 +285,37 @@
         const level = Math.floor(Number(lvl));
         if (Number.isFinite(level) && level > 0) tree[id] = Math.min(level, node.max);
       }
-      save.tree = tree;
+      save.tree = normalizeTree(tree);
       return save;
     } catch (error) {
       console.warn('[Drone Quota] sauvegarde illisible, on repart de zéro :', error?.message ?? error);
       return emptySave();
     }
+  }
+
+  /**
+   * Une ancienne sauvegarde peut posséder un descendant dont le nouveau parent
+   * est à zéro. On conserve l'achat et on complète gratuitement ses ancêtres :
+   * aucun bonus payé ne devient invisible ou inactif après la refonte.
+   */
+  function normalizeTree(tree) {
+    const normalized = { ...tree };
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const node of NODES.values()) {
+        if ((normalized[node.id] ?? 0) <= 0) continue;
+        for (const [parentId, requiredLevel] of Object.entries(node.requires ?? {})) {
+          const parent = NODES.get(parentId);
+          if (!parent) continue;
+          const target = Math.min(parent.max, requiredLevel);
+          if ((normalized[parentId] ?? 0) >= target) continue;
+          normalized[parentId] = target;
+          changed = true;
+        }
+      }
+    }
+    return normalized;
   }
 
   function persist() {
@@ -300,7 +350,7 @@
       quotaDiscount: 0,
     };
     for (const branch of TREE) {
-      for (const node of branch.nodes) {
+      for (const node of allBranchNodes(branch)) {
         const lvl = tree[node.id] ?? 0;
         if (lvl > 0) node.apply(stats, lvl);
       }
@@ -322,14 +372,51 @@
   const stepInManche = r => ((r - 1) % BALANCE.roundsPerManche) + 1;
   const isMancheEnd = r => stepInManche(r) === BALANCE.roundsPerManche;
 
-  function nodeState(node, tree, bank) {
+  function branchInvestment(branch, tree) {
+    return allBranchNodes(branch).reduce((sum, node) => sum + (tree[node.id] ?? 0), 0);
+  }
+
+  function branchDepth(branch, tree) {
+    return branch.nodes.reduce((depth, node) => (
+      (tree[node.id] ?? 0) > 0 ? Math.max(depth, node.tier ?? 1) : depth
+    ), 0);
+  }
+
+  function unlockCheck(node, tree, progression = {}) {
+    const level = tree[node.id] ?? 0;
+    if (level > 0) return { open: true };
+
+    for (const [parentId, requiredLevel] of Object.entries(node.requires ?? {})) {
+      if ((tree[parentId] ?? 0) < requiredLevel) return { open: false, reason: 'parent' };
+    }
+
+    const branch = NODES.get(node.id)?.branch;
+    const tierThreshold = branch?.tierThresholds?.[node.tier] ?? 0;
+    if (branch && branchInvestment(branch, tree) < tierThreshold) {
+      return { open: false, reason: 'invested', required: tierThreshold };
+    }
+
+    const unlock = node.unlock ?? {};
+    if (branch && branchDepth(branch, tree) < (unlock.depth ?? 0)) {
+      return { open: false, reason: 'depth', required: unlock.depth };
+    }
+    if (branch && branchInvestment(branch, tree) < (unlock.invested ?? 0)) {
+      return { open: false, reason: 'invested', required: unlock.invested };
+    }
+    // Point d'extension pour l'issue #6 : une branche entière ou un nœud peut
+    // poser la condition, mais aucun jeton n'est créé ni stocké ici.
+    const requiredPrestige = Math.max(branch?.unlock?.prestige ?? 0, unlock.prestige ?? 0);
+    if ((progression.prestigeTokens ?? 0) < requiredPrestige) {
+      return { open: false, reason: 'prestige', required: requiredPrestige };
+    }
+    return { open: true };
+  }
+
+  function nodeState(node, tree, bank, progression) {
     const level = tree[node.id] ?? 0;
     if (level >= node.max) return { level, status: 'maxed', cost: null };
-    for (const [reqId, reqLvl] of Object.entries(node.requires ?? {})) {
-      if ((tree[reqId] ?? 0) < reqLvl) {
-        return { level, status: 'locked', cost: node.costs[level], blockedBy: NODES.get(reqId), reqLvl };
-      }
-    }
+    const gate = unlockCheck(node, tree, progression);
+    if (!gate.open) return { level, status: 'hidden', cost: node.costs[level], gate };
     const cost = node.costs[level];
     return { level, status: bank >= cost ? 'buyable' : 'poor', cost };
   }
@@ -343,6 +430,8 @@
   let save = loadSave();
   let stats = deriveStats(save.tree);
   let interludeTimer = null;
+  let shopSnapshot = null;
+  let shopDirty = false;
 
   const run = { active: false, round: 1, bank: 0, totalScore: 0 };
 
@@ -403,67 +492,148 @@
 
   // ── rendu de l'arbre ────────────────────────────────────────────────────
 
+  function nodeButton(node, state, mode, opaque = false) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.node = node.id;
+
+    if (opaque && state.level === 0) {
+      const condition = specialtyCondition(node);
+      const open = state.status !== 'hidden';
+      button.className = `node specialty-node opaque ${open ? state.status : 'opaque-locked'}`;
+      button.setAttribute('aria-label', `Module classifié. ${condition}`);
+      button.innerHTML = `
+        <span class="node-head">
+          <span class="node-name">MODULE CLASSIFIÉ</span>
+          <span class="node-dots" aria-hidden="true">◆</span>
+        </span>
+        <span class="node-desc">Icône et statistiques masquées jusqu'au premier achat.</span>
+        <span class="specialty-condition">${condition}</span>
+        <span class="node-foot">
+          <span class="node-cost">${fmt(state.cost)}</span>
+          <span class="node-state">${open ? (state.status === 'poor' ? 'BANQUE INSUFFISANTE' : 'DÉVERROUILLER') : 'CONDITION NON REMPLIE'}</span>
+        </span>`;
+      if (mode === 'shop' && state.status === 'buyable') button.addEventListener('click', () => buy(node));
+      else button.disabled = true;
+      return button;
+    }
+
+    const shownLevel = Math.max(1, state.level + (state.status === 'maxed' ? 0 : 1));
+    const dots = '●'.repeat(state.level) + '○'.repeat(node.max - state.level);
+    let footer;
+    if (state.status === 'maxed') {
+      footer = '<span class="node-cost">—</span><span class="node-state">MAX</span>';
+    } else if (mode === 'readonly') {
+      footer = `<span class="node-cost">${fmt(state.cost)}</span>`
+        + `<span class="node-state">NIVEAU ${state.level} / ${node.max}</span>`;
+    } else {
+      footer = `<span class="node-cost">${fmt(state.cost)}</span>`
+        + `<span class="node-state">${state.status === 'poor' ? 'BANQUE INSUFFISANTE' : 'ACHETER'}</span>`;
+    }
+
+    button.className = `node ${state.status}${mode === 'readonly' ? ' readonly' : ''}`;
+    button.innerHTML = `
+      <span class="node-head">
+        <span class="node-name">${node.name}</span>
+        <span class="node-dots">${dots}</span>
+      </span>
+      <span class="node-desc">${node.desc(shownLevel)}</span>
+      <span class="node-foot">${footer}</span>`;
+    if (mode === 'shop' && state.status === 'buyable') button.addEventListener('click', () => buy(node));
+    else button.disabled = true;
+    return button;
+  }
+
+  function specialtyCondition(node) {
+    const parts = [];
+    const branch = NODES.get(node.id)?.branch;
+    if (node.unlock?.depth) parts.push(`profondeur ${node.unlock.depth}`);
+    if (node.unlock?.invested) parts.push(`${node.unlock.invested} niveaux investis`);
+    const prestige = Math.max(branch?.unlock?.prestige ?? 0, node.unlock?.prestige ?? 0);
+    if (prestige) parts.push(`${prestige} jeton${prestige > 1 ? 's' : ''} de prestige`);
+    return `CONDITION : ${parts.join(' · ')}`;
+  }
+
+  function drawTreeLinks(container) {
+    container.querySelectorAll('.branch-graph').forEach(graph => {
+      const svg = graph.querySelector('.tree-links');
+      if (!svg) return;
+      svg.innerHTML = '';
+      const graphRect = graph.getBoundingClientRect();
+      svg.setAttribute('viewBox', `0 0 ${graphRect.width} ${graphRect.height}`);
+
+      graph.querySelectorAll('.node[data-parent]').forEach(child => {
+        const parent = graph.querySelector(`.node[data-node="${child.dataset.parent}"]`);
+        if (!parent) return;
+        const parentRect = parent.getBoundingClientRect();
+        const childRect = child.getBoundingClientRect();
+        const x1 = parentRect.left - graphRect.left + parentRect.width / 2;
+        const y1 = parentRect.bottom - graphRect.top;
+        const x2 = childRect.left - graphRect.left + childRect.width / 2;
+        const y2 = childRect.top - graphRect.top;
+        const bend = Math.max(10, (y2 - y1) * 0.5);
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${y1 + bend}, ${x2} ${y2 - bend}, ${x2} ${y2}`);
+        svg.appendChild(path);
+      });
+    });
+  }
+
   /** @param mode 'shop' = achetable, 'readonly' = consultation depuis l'accueil. */
   function renderTree(container, mode) {
     const bank = mode === 'shop' ? run.bank : Infinity;
     container.innerHTML = '';
 
     for (const branch of TREE) {
-      const box = document.createElement('div');
+      const box = document.createElement('section');
       box.className = 'branch';
       box.style.setProperty('--branch', branch.color);
-      box.innerHTML = `<h3>${branch.name}</h3><p>${branch.blurb}</p>`;
+      const invested = branchInvestment(branch, save.tree);
+      const depth = branchDepth(branch, save.tree);
+      box.innerHTML = `<h3>${branch.name}</h3><p>${branch.blurb}</p>`
+        + `<div class="branch-meta"><span>${invested} NIVEAU${invested > 1 ? 'X' : ''}</span>`
+        + `<span>PROFONDEUR ${depth}</span></div>`;
 
+      const graph = document.createElement('div');
+      graph.className = 'branch-graph';
+      graph.innerHTML = '<svg class="tree-links" aria-hidden="true"></svg>';
+      let mobileRow = 1;
       for (const node of branch.nodes) {
         const state = nodeState(node, save.tree, bank);
-        const shownLevel = Math.max(1, state.level + (state.status === 'maxed' ? 0 : 1));
-        const dots = '●'.repeat(state.level) + '○'.repeat(node.max - state.level);
-
-        let footer;
-        if (state.status === 'maxed') {
-          footer = '<span class="node-cost">—</span><span class="node-state">MAX</span>';
-        } else if (state.status === 'locked') {
-          footer = `<span class="node-cost">${fmt(state.cost)}</span>`
-            + `<span class="node-state">REQUIERT ${state.blockedBy.name} ${state.reqLvl}</span>`;
-        } else if (mode === 'readonly') {
-          footer = `<span class="node-cost">${fmt(state.cost)}</span>`
-            + `<span class="node-state">NIVEAU ${state.level} / ${node.max}</span>`;
-        } else {
-          footer = `<span class="node-cost">${fmt(state.cost)}</span>`
-            + `<span class="node-state">${state.status === 'poor' ? 'BANQUE INSUFFISANTE' : 'ACHETER'}</span>`;
-        }
-
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `node ${state.status}${mode === 'readonly' ? ' readonly' : ''}`;
-        button.dataset.node = node.id;
-        button.innerHTML = `
-          <span class="node-head">
-            <span class="node-name">${node.name}</span>
-            <span class="node-dots">${dots}</span>
-          </span>
-          <span class="node-desc">${node.desc(shownLevel)}</span>
-          <span class="node-foot">${footer}</span>`;
-
-        if (mode === 'shop' && state.status === 'buyable') {
-          button.addEventListener('click', () => buy(node));
-        } else {
-          button.disabled = mode === 'shop';
-        }
-
-        box.appendChild(button);
+        if (state.status === 'hidden') continue;
+        const button = nodeButton(node, state, mode);
+        button.style.setProperty('--tree-column', node.lane ?? '1 / -1');
+        button.style.setProperty('--tree-row', node.tier ?? 1);
+        button.style.setProperty('--tree-mobile-row', mobileRow++);
+        const [parentId] = Object.keys(node.requires ?? {});
+        if (parentId) button.dataset.parent = parentId;
+        graph.appendChild(button);
       }
+      box.appendChild(graph);
 
+      if (branch.specialties?.length) {
+        const specialties = document.createElement('div');
+        specialties.className = 'specialties';
+        specialties.innerHTML = '<h4>MODULES FLOTTANTS</h4>';
+        for (const node of branch.specialties) {
+          specialties.appendChild(nodeButton(node, nodeState(node, save.tree, bank), mode, true));
+        }
+        box.appendChild(specialties);
+      }
       container.appendChild(box);
     }
+    // L'écran peut encore être masqué pendant le rendu. Attendre une frame
+    // garantit des rectangles mesurables après `show()`.
+    requestAnimationFrame(() => drawTreeLinks(container));
   }
 
   function buy(node) {
+    if (!shopSnapshot) return;
     const state = nodeState(node, save.tree, run.bank);
     if (state.status !== 'buyable') return;
     run.bank -= state.cost;
     save.tree[node.id] = state.level + 1;
-    persist();
+    shopDirty = true;
     stats = deriveStats(save.tree);
     FX.sfx.buy();
     renderShop();
@@ -477,6 +647,40 @@
   }
 
   // ── atelier (fin de manche) ─────────────────────────────────────────────
+
+  function enterShop() {
+    shopSnapshot = { tree: { ...save.tree }, bank: run.bank };
+    shopDirty = false;
+    renderShop();
+    show('scr-shop');
+  }
+
+  function cancelShopPurchases() {
+    if (!shopSnapshot) return false;
+    save.tree = { ...shopSnapshot.tree };
+    run.bank = shopSnapshot.bank;
+    stats = deriveStats(save.tree);
+    shopDirty = false;
+    renderShop();
+    return true;
+  }
+
+  function discardShopChanges() {
+    if (!shopSnapshot) return;
+    save.tree = { ...shopSnapshot.tree };
+    run.bank = shopSnapshot.bank;
+    stats = deriveStats(save.tree);
+    shopSnapshot = null;
+    shopDirty = false;
+  }
+
+  function validateShop() {
+    if (!shopSnapshot) return;
+    persist();
+    shopSnapshot = null;
+    shopDirty = false;
+    startRound();
+  }
 
   function renderShop() {
     const next = quotaFor(run.round, stats);
@@ -501,6 +705,10 @@
     }
 
     renderTree($('shop-tree'), 'shop');
+    $('btn-cancel-shop').disabled = !shopDirty;
+    $('shop-transaction').textContent = shopDirty
+      ? 'Achats en attente — valide la manche suivante pour les conserver.'
+      : 'Aucun achat en attente.';
   }
 
   // ── briefing ────────────────────────────────────────────────────────────
@@ -1225,7 +1433,7 @@
     const finishedManche = isMancheEnd(run.round);
     run.round += 1;
 
-    if (finishedManche) setTimeout(() => { renderShop(); show('scr-shop'); }, 1500);
+    if (finishedManche) setTimeout(enterShop, 1500);
     else setTimeout(showInterlude, 1100);
   }
 
@@ -1298,6 +1506,7 @@
   // ── run ─────────────────────────────────────────────────────────────────
 
   function newRun() {
+    discardShopChanges();
     stats = deriveStats(save.tree);
     run.active = true;
     run.round = 1;
@@ -1312,7 +1521,8 @@
   $('btn-play').addEventListener('click', newRun);
   $('btn-retry').addEventListener('click', newRun);
   $('btn-start-round').addEventListener('click', startRound);
-  $('btn-next-round').addEventListener('click', startRound);
+  $('btn-next-round').addEventListener('click', validateShop);
+  $('btn-cancel-shop').addEventListener('click', cancelShopPurchases);
   $('btn-inter-go').addEventListener('click', goNextRound);
   $('qte').addEventListener('click', attemptQte);
 
@@ -1338,7 +1548,15 @@
     attemptQte();
   });
 
-  window.addEventListener('beforeunload', stopRound);
+  document.querySelector('.corner-tools a[href="/arena/"]').addEventListener('click', discardShopChanges);
+  window.addEventListener('resize', () => {
+    drawTreeLinks($('tree-view'));
+    drawTreeLinks($('shop-tree'));
+  });
+  window.addEventListener('beforeunload', () => {
+    discardShopChanges();
+    stopRound();
+  });
 
   FX.attach($('fx-layer'), $('arena'));
 
@@ -1383,9 +1601,12 @@
   window.__droneQuota = {
     BALANCE, TARGETS, TREE, NODES, ports,
     quotaFor, deriveStats, roundSecondsFor, mancheOf, stepInManche, isMancheEnd,
+    normalizeTree, branchInvestment, branchDepth, unlockCheck, nodeState,
+    renderTree, enterShop, cancelShopPurchases, validateShop, discardShopChanges,
     run, round,
     get save() { return save; },
     get stats() { return stats; },
+    get shopSnapshot() { return shopSnapshot; },
 
     forceSpawn(index, typeId) {
       const port = ports[index];
