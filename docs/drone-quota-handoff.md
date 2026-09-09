@@ -160,13 +160,15 @@ Frapper une sentinelle intacte ouvre un duel :
    parade deviendrait un abri où souffler quand le plateau déborde.
 4. La dalle zoome sur le port (`#glass-inner.duel`, origine du transform
    calée sur le port).
-5. Un curseur balaie `qteSweepMs` (1450 ms) ; une zone de `qteZone` (24 %,
-   élargie par `RÉFLEXE`) est placée au hasard. Clic ou barre d'espace.
+5. Un curseur fait au minimum un aller-retour : chaque traversée dure
+   `qteSweepMs` (1450 ms) et `qteSweepLegs` vaut 2. Une zone de `qteZone`
+   (24 %, élargie par `RÉFLEXE`) est placée au hasard. Le clic ou la barre
+   d'espace sont acceptés dans les deux sens.
 6. **Réussi** : la garde s'ouvre, la sentinelle devient une cible sonnée
    enchaînable. **Raté** : le joueur reste étourdi 1 s, ses clics sont ignorés.
 
-Le balayage est lu au **temps écoulé**, pas à la position CSS du curseur :
-l'issue est donc vérifiable sans dépendre du rendu.
+Le balayage triangulaire est lu au **temps écoulé**, pas à la position CSS du
+curseur : l'issue est donc vérifiable sans dépendre du rendu.
 
 Une tourelle qui tire sur une sentinelle intacte se fait parer **sans**
 déclencher de duel — le joueur n'a pas frappé, il n'a pas à être puni.
@@ -289,8 +291,9 @@ Ces crochets court-circuitent **l'attente, jamais les règles** : un
   terminent quand même.
 - Chrome applique en plus un bridage intensif après quelques minutes d'onglet
   masqué (minuteurs ~1/minute). Un test qui attend en boucle finit en timeout.
-- Un duel expire tout seul après 1450 ms : ouvrir et résoudre le QTE **dans le
-  même appel**, sinon le timeout le résout en échec entre-temps.
+- Un duel expire tout seul après l'aller-retour complet, soit 2900 ms avec les
+  valeurs de base. Pour un test déterministe, ouvrir et appeler
+  `resolveQteNow` dans le même script reste préférable.
 
 ---
 

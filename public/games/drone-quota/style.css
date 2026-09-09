@@ -905,7 +905,7 @@ body {
   border-radius: 2px;
   background: #fff;
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
-  animation: sweep var(--sweep-ms, 1450ms) linear forwards;
+  animation: sweep var(--sweep-ms, 1450ms) linear var(--sweep-legs, 2) alternate forwards;
 }
 @keyframes sweep { from { left: 0; } to { left: calc(100% - 3px); } }
 .qte-hint { font-size: 8.5px; letter-spacing: 0.16em; color: var(--faint); text-align: center; }

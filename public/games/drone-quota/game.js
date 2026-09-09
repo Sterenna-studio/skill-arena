@@ -71,6 +71,7 @@
     // round continue pendant — sinon rater la parade deviendrait un abri où
     // souffler quand le plateau déborde.
     qteSweepMs: 1450,
+    qteSweepLegs: 2,
     qteZone: 0.24,
     playerStunMs: 1000,
     parryBonus: 2.8,
@@ -938,7 +939,15 @@
 
     const zone = Math.min(0.7, BALANCE.qteZone * stats.qteZoneMult);
     const start = Math.random() * (1 - zone);
-    round.qte = { port, startedAt: performance.now(), zoneStart: start, zoneWidth: zone, done: false, timeout: null };
+    // Deux traversées au minimum garantissent un aller-retour lisible. Chaque
+    // jambe dure qteSweepMs et accepte la frappe : le joueur peut agir tout de
+    // suite ou attendre d'avoir observé la trajectoire complète.
+    const legs = Math.max(2, Math.round(BALANCE.qteSweepLegs));
+    const duration = BALANCE.qteSweepMs * legs;
+    round.qte = {
+      port, startedAt: performance.now(), zoneStart: start, zoneWidth: zone,
+      legs, duration, done: false, timeout: null,
+    };
 
     const panel = $('qte');
     panel.hidden = false;
@@ -946,6 +955,7 @@
     panel.style.setProperty('--zone-start', `${start * 100}%`);
     panel.style.setProperty('--zone-width', `${zone * 100}%`);
     panel.style.setProperty('--sweep-ms', `${BALANCE.qteSweepMs}ms`);
+    panel.style.setProperty('--sweep-legs', legs);
     $('qte-verdict').textContent = '';
 
     const cursor = $('qte-cursor');
@@ -968,14 +978,17 @@
     FX.shake(cabinet(), 8);
     setMsg('PARADE — place ton coup.', 'bad');
 
-    round.qte.timeout = setTimeout(() => resolveQte(false), BALANCE.qteSweepMs);
+    round.qte.timeout = setTimeout(() => resolveQte(false), duration);
   }
 
-  /** Le balayage est lu au temps écoulé, pas à la position CSS : testable. */
+  /** Le balayage triangulaire est lu au temps écoulé, pas dans le CSS. */
   function attemptQte() {
     const qte = round.qte;
     if (!qte || qte.done) return;
-    const progress = (performance.now() - qte.startedAt) / BALANCE.qteSweepMs;
+    const elapsed = Math.min(qte.duration, performance.now() - qte.startedAt);
+    const leg = Math.min(qte.legs - 1, Math.floor(elapsed / BALANCE.qteSweepMs));
+    const legProgress = Math.min(1, (elapsed - leg * BALANCE.qteSweepMs) / BALANCE.qteSweepMs);
+    const progress = leg % 2 === 0 ? legProgress : 1 - legProgress;
     resolveQte(progress >= qte.zoneStart && progress <= qte.zoneStart + qte.zoneWidth);
   }
 
