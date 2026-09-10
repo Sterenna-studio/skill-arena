@@ -441,6 +441,11 @@ Ces crochets court-circuitent **l'attente, jamais les règles** : un
 
 ## 8. Ce qui est vérifié, et ce qui ne l'est pas
 
+Les essais de ressenti encore ouverts sont centralisés dans
+l'**issue <https://github.com/Sterenna-studio/skill-arena/issues/9>**. Elle
+contient trois passes courtes et un modèle de commentaire copiable afin de
+comparer les retours sans les reformater.
+
 ### Vérifié en pilotant les vrais modules
 
 Chaîne d'étourdissement (valeurs exactes à chaque cran, mise hors service au
@@ -575,6 +580,7 @@ suffisent à répondre à :
 - Le souffle entre rounds fait-il respirer, ou casse-t-il le rythme ?
 
 Les leviers sont tous groupés dans `BALANCE` en tête de `game.js`.
+Consigner les mesures et impressions avec le formulaire de l'issue #9.
 
 ### Priorité 2 — finir l'habillage (issue #4)
 
