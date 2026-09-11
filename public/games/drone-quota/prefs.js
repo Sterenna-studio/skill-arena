@@ -11,6 +11,7 @@ window.DQPrefs = (() => {
   const KEY = 'drone-quota:prefs:v1';
   const DEFAULTS = Object.freeze({
     cursorMode: 'weapon',
+    keyboardMode: false,
     aimResponsiveness: 7,
     audioEnabled: true,
     effectsEnabled: true,
@@ -28,6 +29,7 @@ window.DQPrefs = (() => {
   function normalize(raw = {}) {
     return {
       cursorMode: raw.cursorMode === 'normal' ? 'normal' : 'weapon',
+      keyboardMode: raw.keyboardMode === true,
       aimResponsiveness: clampNumber(raw.aimResponsiveness, 1, 10, DEFAULTS.aimResponsiveness),
       audioEnabled: raw.audioEnabled !== false,
       effectsEnabled: raw.effectsEnabled !== false,

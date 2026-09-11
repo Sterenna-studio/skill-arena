@@ -357,6 +357,35 @@ body {
 .toggle-setting input { flex: 0 0 auto; width: 24px; height: 24px; accent-color: var(--cyan); cursor: pointer; }
 .settings-card > .btn { width: 100%; min-height: 44px; margin-top: 14px; }
 #scr-settings .btn { min-height: 44px; }
+.keyboard-card { border-color: rgba(255, 95, 168, 0.28); }
+.keyboard-card h3 { color: var(--pink); }
+.keyboard-keys { display: grid; gap: 7px; margin: 12px 0; }
+.keyboard-keys > span {
+  display: grid;
+  grid-template-columns: minmax(132px, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 9px;
+}
+.key-combo { display: flex; align-items: center; gap: 5px; }
+.key-combo i { color: var(--faint); font-size: 9px; font-style: normal; }
+.keyboard-keys kbd {
+  display: inline-grid;
+  min-width: 58px;
+  min-height: 28px;
+  padding: 5px 7px;
+  place-items: center;
+  border: 1px solid rgba(255, 95, 168, 0.48);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: #090b16;
+  color: var(--pink);
+  font: 800 9px var(--mono);
+  letter-spacing: 0.08em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.keyboard-keys small { color: var(--faint); line-height: 1.35; }
 
 /* ── tutoriel express : exactement trois panneaux ───────── */
 .tutorial {
@@ -681,6 +710,7 @@ body {
 .pill { padding: 3px 10px; border: 1px solid var(--border); border-radius: 999px; font-size: 8.5px; letter-spacing: 0.16em; color: var(--faint); opacity: 0.4; }
 .pill.on { opacity: 1; color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 14px rgba(53, 230, 255, 0.22); }
 .pill.on.amber { color: var(--amber); border-color: var(--amber); box-shadow: 0 0 14px rgba(255, 190, 60, 0.22); }
+.keyboard-pill.on { color: var(--pink); border-color: var(--pink); box-shadow: 0 0 14px rgba(255, 95, 168, 0.24); }
 
 /* ── arène et ports ─────────────────────────────────────── */
 .arena { position: relative; display: flex; align-items: stretch; gap: 7px; isolation: isolate; }
@@ -914,6 +944,16 @@ body {
 .port.hit { box-shadow: inset 0 0 0 1px rgba(60, 240, 160, 0.5), 0 0 22px rgba(60, 240, 160, 0.3); }
 .port.bad { box-shadow: inset 0 0 0 1px rgba(255, 77, 99, 0.6), 0 0 26px rgba(255, 77, 99, 0.4); }
 .port.turret-hit { box-shadow: inset 0 0 0 1px rgba(162, 116, 255, 0.55), 0 0 22px rgba(162, 116, 255, 0.34); }
+.port.keyboard-target {
+  z-index: 3;
+  outline: 2px solid var(--pink);
+  outline-offset: -3px;
+  box-shadow: inset 0 0 18px rgba(255, 95, 168, 0.2), 0 0 20px rgba(255, 95, 168, 0.34);
+  animation: keyboard-lock 0.55s ease-in-out infinite alternate;
+}
+.port.keyboard-target .id { color: var(--pink); }
+.port.keyboard-target .id::after { content: ' · ESPACE'; }
+@keyframes keyboard-lock { to { outline-color: var(--amber); filter: brightness(1.12); } }
 
 /* Impacts accumulés sur la tôle : la machine s'abîme pendant la run. */
 .scars { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
@@ -943,7 +983,12 @@ body {
 .pop.neg { color: var(--red); text-shadow: 0 0 12px rgba(255, 77, 99, 0.7), 0 2px 3px #000; }
 .pop.crit { color: var(--amber); font-size: 17px; text-shadow: 0 0 18px rgba(255, 190, 60, 0.9), 0 2px 3px #000; }
 .pop.turret { color: var(--violet); font-size: 11px; }
-@keyframes pop { to { transform: translate(-50%, -190%); opacity: 0; } }
+@keyframes pop {
+  to {
+    transform: translate(calc(-50% + var(--pop-drift-x, 0px)), -190%) rotate(var(--pop-tilt, 0deg));
+    opacity: 0;
+  }
+}
 
 /* Les quatre voix alternent à chaque retour : affiche pop massive, disco
    chromée, cartouche cyber et bulle arcade. Les fontes sont uniquement des
@@ -1022,8 +1067,8 @@ body {
 @keyframes pop-voiced {
   0% { transform: translate(-50%, -25%) scale(0.5); opacity: 0; }
   18% { opacity: 1; }
-  70% { transform: translate(-50%, -120%) scale(1); opacity: 1; }
-  100% { transform: translate(-50%, -185%) scale(0.9); opacity: 0; }
+  70% { transform: translate(calc(-50% + var(--pop-drift-x, 0px)), -120%) rotate(var(--pop-tilt, 0deg)) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--pop-drift-x, 0px)), -185%) rotate(var(--pop-tilt, 0deg)) scale(0.9); opacity: 0; }
 }
 @keyframes voice-slam { from { transform: rotate(-15deg) skewX(-14deg) scale(2.2); filter: blur(2px); } }
 @keyframes voice-disco { 0% { transform: translateX(-8px) rotate(4deg); } 50% { transform: translateX(7px) rotate(-2deg); } }
@@ -1260,7 +1305,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .riser, .flank b, .quota-bar i, .boost-meter > div i { transition-duration: 0.01ms; }
-  .boot span, .quota-bar.done, .node.just-bought, .hud-cell strong.urgent, .boost-meter.surge, .weapon-cursor.firing i { animation: none; }
+  .boot span, .quota-bar.done, .node.just-bought, .hud-cell strong.urgent, .boost-meter.surge, .weapon-cursor.firing i, .port.keyboard-target { animation: none; }
   .pop, .pop.voiced, .pop.voiced b { animation-duration: 0.01ms; }
 }
 
@@ -1514,5 +1559,6 @@ body.reduce-effects .glass-inner.stunned,
 body.reduce-effects .port.stunned .riser .icon,
 body.reduce-effects .port.up.sentinelle .riser .icon,
 body.reduce-effects .boost-meter.surge,
-body.reduce-effects .weapon-cursor.firing i { animation: none; }
+body.reduce-effects .weapon-cursor.firing i,
+body.reduce-effects .port.keyboard-target { animation: none; }
 body.reduce-effects .glass-inner.duel .grid { transform: scale(var(--duel-scale-mid)); }

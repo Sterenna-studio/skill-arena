@@ -72,6 +72,20 @@
         <small>Le navigateur ne permet pas de changer la sensibilité du curseur système ; ce réglage agit sur le suivi du viseur arme.</small>
       </section>
 
+      <section class="settings-card keyboard-card">
+        <h3>FRAPPE AU CLAVIER · TEST</h3>
+        <p>Une alternative moins fatigante au clic répété. La souris et le tactile restent actifs en parallèle.</p>
+        <div class="segmented" role="group" aria-label="Mode de frappe au clavier">
+          <button type="button" data-keyboard-mode="on">ACTIVÉ</button>
+          <button type="button" data-keyboard-mode="off">DÉSACTIVÉ</button>
+        </div>
+        <div class="keyboard-keys" aria-label="Commandes du mode clavier">
+          <span><span class="key-combo"><kbd>ESPACE</kbd></span><small>frappe la cible encadrée</small></span>
+          <span><span class="key-combo"><kbd>MAJ</kbd><i>+</i><kbd>ESPACE</kbd></span><small>coup lourd ×1,65 · recharge 0,7 s</small></span>
+        </div>
+        <small>Le verrou privilégie une cible déjà sonnée, puis celle qui risque de repartir. Maintenir la touche ne répète pas automatiquement les coups.</small>
+      </section>
+
       <section class="settings-card">
         <h3>AUDIO</h3>
         <label class="toggle-setting"><span>SON GLOBAL<small>Coupe toute la sortie audio.</small></span><input id="cfg-audio" type="checkbox" checked></label>
@@ -202,6 +216,7 @@
               <span class="pill" id="pill-coolant">COOLANT</span>
               <span class="pill" id="pill-overclock">OVERCLOCK</span>
               <span class="pill" id="pill-turrets">TOURELLES OFF</span>
+              <span class="pill keyboard-pill" id="pill-keyboard">CLAVIER OFF</span>
             </div>
 
             <div class="arena" id="arena">

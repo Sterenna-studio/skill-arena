@@ -27,7 +27,7 @@
     scar() {}, clearScars() {}, centerOf: () => ({ x: 0, y: 0 }), setReducedEffects() {},
   };
   const PREFS = window.DQPrefs ?? {
-    get: () => ({ cursorMode: 'normal', aimResponsiveness: 7, audioEnabled: true, effectsEnabled: true, ambienceEnabled: true, masterVolume: 80, reducedEffects: false, tutorialSeen: false }),
+    get: () => ({ cursorMode: 'normal', keyboardMode: false, aimResponsiveness: 7, audioEnabled: true, effectsEnabled: true, ambienceEnabled: true, masterVolume: 80, reducedEffects: false, tutorialSeen: false }),
     set(patch) { return { ...this.get(), ...patch }; },
     reset() { return this.get(); }, subscribe() {}, initCursor() {}, hideCursor() {},
   };
@@ -58,6 +58,12 @@
     boostHitBase: 20,
     boostScoreScale: 4,
     boostScoreCap: 34,
+
+    // Variante de confort en essai : le clavier vise automatiquement un port.
+    // Le coup lourd gagne en rendement mais impose une vraie respiration.
+    keyboardHeavyScoreMult: 1.65,
+    keyboardHeavyStunMult: 1.3,
+    keyboardHeavyCooldownMs: 700,
 
     // Chaîne d'étourdissement : une cible frappée reste sonnée sur le port et
     // rapporte de plus en plus tant qu'on l'enchaîne. Chaque coup l'étourdit
@@ -111,6 +117,7 @@
   const MISS_FEEDBACK = ['FIOU !', 'ZIP !', 'OUPS !', 'PLOP !', 'FLOP !', 'FZZT !'];
   let feedbackWordIndex = 0;
   let feedbackStyleIndex = 0;
+  let feedbackArcIndex = Math.floor(Math.random() * 5);
 
   const ROWS = 3;
   const COLS = 4;
@@ -650,6 +657,7 @@
     coolantUntil: 0,
     overclockUntil: 0,
     playerStunUntil: 0,
+    heavyReadyAt: 0,
     qte: null,
     clock: null,
     spawnTimer: null,
@@ -775,6 +783,11 @@
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    document.querySelectorAll('[data-keyboard-mode]').forEach(button => {
+      const active = (button.dataset.keyboardMode === 'on') === preferences.keyboardMode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
     $('cfg-aim').value = preferences.aimResponsiveness;
     $('cfg-aim').disabled = preferences.cursorMode !== 'weapon';
     $('cfg-aim').closest('.range-setting').classList.toggle('disabled', preferences.cursorMode !== 'weapon');
@@ -800,6 +813,7 @@
     if (round.running) FX.hum(preferences.audioEnabled && preferences.ambienceEnabled);
     renderSettings();
     paintMute();
+    paintKeyboardTarget();
   }
 
   function openSettings() {
@@ -1290,8 +1304,21 @@
     const portRect = port.el.getBoundingClientRect();
     const halfWidth = voice ? Math.min(64, arenaRect.width / 3) : 36;
     const centerX = portRect.left - arenaRect.left + portRect.width / 2;
-    pop.style.left = `${Math.max(halfWidth, Math.min(arenaRect.width - halfWidth, centerX))}px`;
-    pop.style.top = `${portRect.top - arenaRect.top + portRect.height * 0.48}px`;
+    // Tirage sur le demi-cercle supérieur : les rafales ne forment plus une
+    // pile verticale au centre du puits, tout en restant bornées dans la dalle.
+    // Cinq points visités dans un ordre croisé, avec un peu de jeu aléatoire :
+    // deux retours successifs ne se recouvrent presque jamais au même endroit.
+    const arcSlot = (feedbackArcIndex * 2) % 5;
+    feedbackArcIndex += 1;
+    const angle = (210 + arcSlot * 30 + (-9 + Math.random() * 18)) * Math.PI / 180;
+    const radiusX = portRect.width * (voice ? 0.58 : 0.38);
+    const radiusY = portRect.height * (voice ? 0.42 : 0.28);
+    const arcX = centerX + Math.cos(angle) * radiusX;
+    const arcY = portRect.top - arenaRect.top + portRect.height * 0.38 + Math.sin(angle) * radiusY;
+    pop.style.left = `${Math.max(halfWidth, Math.min(arenaRect.width - halfWidth, arcX))}px`;
+    pop.style.top = `${Math.max(0, arcY)}px`;
+    pop.style.setProperty('--pop-drift-x', `${Math.round(-16 + Math.random() * 32)}px`);
+    pop.style.setProperty('--pop-tilt', `${(-6 + Math.random() * 12).toFixed(1)}deg`);
     arena.appendChild(pop);
     setTimeout(() => pop.remove(), voice ? 680 : 430);
   }
@@ -1347,6 +1374,7 @@
     round.coolantUntil = 0;
     round.overclockUntil = 0;
     round.playerStunUntil = 0;
+    round.heavyReadyAt = 0;
     round.paused = false;
 
     if (interludeTimer) clearTimeout(interludeTimer);
@@ -1504,7 +1532,71 @@
     updateHud();
   }
 
-  function onPortClick(port) {
+  /** Cible proposée au clavier : chaîne en cours, puis disparition imminente. */
+  function keyboardTarget() {
+    const now = performance.now();
+    const remaining = port => port.ttlTimer
+      ? Math.max(0, port.ttlLeft - (now - port.ttlArmedAt))
+      : (port.stunTimer ? 0 : Number.POSITIVE_INFINITY);
+
+    return ports
+      .filter(port => port.target)
+      .sort((a, b) => {
+        const aStunned = a.stunTimer ? 1 : 0;
+        const bStunned = b.stunTimer ? 1 : 0;
+        if (aStunned !== bStunned) return bStunned - aStunned;
+        if (a.chain !== b.chain) return b.chain - a.chain;
+        return remaining(a) - remaining(b) || a.index - b.index;
+      })[0] ?? null;
+  }
+
+  function paintKeyboardTarget() {
+    const enabled = preferences.keyboardMode && round.running;
+    const target = enabled && !round.paused ? keyboardTarget() : null;
+    ports.forEach(port => port.el.classList.toggle('keyboard-target', port === target));
+
+    const pill = $('pill-keyboard');
+    if (!pill) return target;
+    pill.classList.toggle('on', enabled);
+    if (!enabled) pill.textContent = 'CLAVIER OFF';
+    else if (round.qte && !round.qte.done) pill.textContent = 'ESPACE · PARADE';
+    else {
+      const heavyLeft = Math.max(0, round.heavyReadyAt - performance.now());
+      pill.textContent = heavyLeft > 0 ? `LOURD ${(heavyLeft / 1000).toFixed(1)}s` : 'ESPACE · LOURD PRÊT';
+    }
+    return target;
+  }
+
+  /** Frappe expérimentale sans pointage, activée dans les réglages. */
+  function keyboardStrike(heavy = false) {
+    if (!preferences.keyboardMode || !round.running || round.paused) return false;
+    if (performance.now() < round.playerStunUntil) {
+      FX.sfx.miss(0);
+      return false;
+    }
+
+    const now = performance.now();
+    if (heavy && now < round.heavyReadyAt) {
+      setMsg(`Coup lourd en recharge — ${(round.heavyReadyAt - now) / 1000 < 0.1 ? 'prêt' : `${((round.heavyReadyAt - now) / 1000).toFixed(1)} s`}.`, '');
+      return false;
+    }
+
+    const target = keyboardTarget();
+    if (!target) {
+      const missPort = ports[Math.floor(Math.random() * ports.length)];
+      if (missPort) registerMiss(missPort);
+      paintKeyboardTarget();
+      return -1;
+    }
+
+    const heavyApplies = heavy && target.target.pts > 0 && !target.target.effect;
+    if (heavyApplies) round.heavyReadyAt = now + BALANCE.keyboardHeavyCooldownMs;
+    onPortClick(target, { heavy: heavyApplies });
+    paintKeyboardTarget();
+    return target.index;
+  }
+
+  function onPortClick(port, { heavy = false } = {}) {
     if (!round.running) return;
 
     // Duel en cours : le plateau est figé, c'est le panneau de parade qui prend
@@ -1539,38 +1631,45 @@
 
     // Sentinelle encore sur ses gardes : elle pare, et le duel commence.
     if (type.parry && port.chain === 0) {
-      openQte(port);
+      openQte(port, heavy);
       return;
     }
 
     // Blindé : le bouclier encaisse, et chaque coup prolonge l'étourdissement
     // pour que la fenêtre reste ouverte.
     if (port.shieldLeft > 0) {
-      port.shieldLeft -= 1;
+      port.shieldLeft = Math.max(0, port.shieldLeft - (heavy ? 2 : 1));
       paintShield(port);
       const broken = port.shieldLeft === 0;
-      popText(port, broken ? 'BRISÉ' : `${port.shieldLeft}/${port.shieldMax}`, broken ? 'crit' : 'turret');
-      FX.burst(port.el, broken ? 'crit' : 'turret', broken ? 1.3 : 0.7);
+      const shieldText = broken ? 'BRISÉ' : `${port.shieldLeft}/${port.shieldMax}`;
+      popText(port, heavy ? `LOURD · ${shieldText}` : shieldText, broken ? 'crit' : 'turret');
+      FX.burst(port.el, broken ? 'crit' : 'turret', broken ? (heavy ? 1.65 : 1.3) : (heavy ? 1.05 : 0.7));
       broken ? FX.sfx.crit(panOf(port)) : FX.sfx.shield(panOf(port));
       FX.shake(cabinet(), broken ? 6 : 3);
       FX.scar(port.el, 'hit');
       stunTarget(port, BALANCE.shieldStunMs);
       round.hits += 1;
-      chargeBoost(0, port, 12);
+      chargeBoost(0, port, heavy ? 18 : 12);
       updateHud();
       return;
     }
 
-    strike(port, type);
+    strike(port, type, { heavy });
   }
 
   /** Frappe qui marque : score, chaîne d'étourdissement, onde. */
-  function strike(port, type) {
+  function strike(port, type, { heavy = false } = {}) {
     const chainIndex = port.chain;
     const chainMult = 1 + chainIndex * BALANCE.chainStep;
     const kindMult = type.parry ? BALANCE.parryBonus : type.shield ? BALANCE.shieldBonus : 1;
 
-    const points = scoreHit(port, type, chainMult * kindMult, false, { keep: true, chainIndex });
+    const heavyMult = heavy ? BALANCE.keyboardHeavyScoreMult : 1;
+    const points = scoreHit(port, type, chainMult * kindMult * heavyMult, false, {
+      keep: true,
+      chainIndex,
+      heavy,
+      detailPrefix: heavy ? 'LOURD · ' : '',
+    });
 
     // L'onde part avant l'incrément de combo : les éclats appartiennent à la
     // frappe qui les a produits, ils ne doivent pas encaisser le combo qu'elle
@@ -1590,7 +1689,8 @@
       return;
     }
 
-    stunTarget(port, BALANCE.stunBaseMs * Math.pow(BALANCE.stunFalloff, port.chain - 1));
+    const heavyStun = heavy ? BALANCE.keyboardHeavyStunMult : 1;
+    stunTarget(port, BALANCE.stunBaseMs * Math.pow(BALANCE.stunFalloff, port.chain - 1) * heavyStun);
     updateHud();
   }
 
@@ -1643,7 +1743,9 @@
    * Marque une touche. `keep` laisse la cible en place (chaîne d'étourdissement)
    * au lieu de vider le port.
    */
-  function scoreHit(port, type, share, viaTurret, { keep = false, chainIndex = 0 } = {}) {
+  function scoreHit(port, type, share, viaTurret, {
+    keep = false, chainIndex = 0, heavy = false, detailPrefix = '',
+  } = {}) {
     const overclock = performance.now() < round.overclockUntil;
     const comboFactor = viaTurret && !stats.turretCombo ? 1 : round.combo;
     const crit = !viaTurret && Math.random() < stats.critChance;
@@ -1661,22 +1763,22 @@
 
     const suffix = chainIndex > 0 ? ` ×${(1 + chainIndex * BALANCE.chainStep).toFixed(1)}` : '';
     const voice = !viaTurret && keep ? nextFeedback(HIT_FEEDBACK) : '';
-    popText(port, `+${fmt(points)}${suffix}`, crit ? 'crit' : viaTurret ? 'turret' : '', voice);
+    popText(port, `${detailPrefix}+${fmt(points)}${suffix}`, crit ? 'crit' : viaTurret ? 'turret' : '', voice);
 
     const pan = panOf(port);
     if (viaTurret) {
       FX.burst(port.el, 'turret', 0.8);
     } else if (crit) {
-      FX.burst(port.el, 'crit', 1.4);
+      FX.burst(port.el, 'crit', heavy ? 1.8 : 1.4);
       FX.sfx.crit(pan);
-      FX.shake(cabinet(), 7);
+      FX.shake(cabinet(), heavy ? 10 : 7);
     } else {
       // L'intensité suit le combo et la chaîne : une série longue doit
       // s'entendre et se voir monter.
       const ratio = (round.combo - 1) / Math.max(1, stats.comboCap - 1);
-      FX.burst(port.el, 'hit', 0.85 + ratio * 0.7 + chainIndex * 0.15);
+      FX.burst(port.el, 'hit', 0.85 + ratio * 0.7 + chainIndex * 0.15 + (heavy ? 0.45 : 0));
       FX.sfx.hit(Math.min(1, ratio + chainIndex * 0.12), pan);
-      FX.shake(cabinet(), 2 + ratio * 2.5 + chainIndex);
+      FX.shake(cabinet(), 2 + ratio * 2.5 + chainIndex + (heavy ? 3 : 0));
     }
     FX.scar(port.el, crit ? 'crit' : 'hit');
 
@@ -1702,7 +1804,7 @@
    * joueur a une passe pour placer son coup. Le chrono du round, lui, continue
    * de tourner : le duel n'est pas un abri.
    */
-  function openQte(port) {
+  function openQte(port, heavy = false) {
     round.parries += 1;
     round.paused = true;
     freezeTtls();
@@ -1716,7 +1818,7 @@
     const duration = BALANCE.qteSweepMs * legs;
     round.qte = {
       port, startedAt: performance.now(), zoneStart: start, zoneWidth: zone,
-      legs, duration, done: false, timeout: null,
+      legs, duration, heavy, done: false, timeout: null,
     };
 
     const panel = $('qte');
@@ -1797,7 +1899,7 @@
         // La garde est ouverte : la sentinelle devient une cible sonnée qu'on
         // peut enchaîner.
         port.chain = 0;
-        strike(port, port.target);
+        strike(port, port.target, { heavy: qte.heavy });
       } else if (port.target) {
         escape(port);
       }
@@ -1965,6 +2067,7 @@
     op.textContent = overclock ? `OVERCLOCK ${overclock}s` : 'OVERCLOCK';
     op.classList.toggle('on', overclock > 0);
     op.classList.toggle('amber', overclock > 0);
+    paintKeyboardTarget();
   }
 
   function setMsg(text, kind) {
@@ -1988,6 +2091,7 @@
     FX.hum(false);
     cabinet()?.style.setProperty('--time-heat', '0');
     $('glass-inner')?.classList.remove('stunned');
+    paintKeyboardTarget();
   }
 
   function endRound() {
@@ -2133,6 +2237,9 @@
   document.querySelectorAll('[data-cursor-mode]').forEach(button => {
     button.addEventListener('click', () => PREFS.set({ cursorMode: button.dataset.cursorMode }));
   });
+  document.querySelectorAll('[data-keyboard-mode]').forEach(button => {
+    button.addEventListener('click', () => PREFS.set({ keyboardMode: button.dataset.keyboardMode === 'on' }));
+  });
   $('cfg-aim').addEventListener('input', event => PREFS.set({ aimResponsiveness: event.target.value }));
   $('cfg-audio').addEventListener('change', event => PREFS.set({ audioEnabled: event.target.checked }));
   $('cfg-effects').addEventListener('change', event => PREFS.set({ effectsEnabled: event.target.checked }));
@@ -2149,15 +2256,23 @@
     renderMenu();
   });
 
-  // Barre d'espace pendant un duel : le clavier doit pouvoir parer aussi.
+  // La parade garde la priorité. Hors duel, le mode d'essai transforme chaque
+  // pression physique sur ESPACE en frappe ; maintenir la touche ne suffit pas.
   window.addEventListener('keydown', event => {
     if (event.code === 'Escape' && !$('tutorial').hidden) {
       closeTutorial(false);
       return;
     }
-    if (event.code !== 'Space' || !round.qte || round.qte.done) return;
+    if (event.code !== 'Space') return;
+    if (round.qte && !round.qte.done) {
+      event.preventDefault();
+      attemptQte();
+      return;
+    }
+    if (!preferences.keyboardMode || !round.running) return;
     event.preventDefault();
-    attemptQte();
+    if (event.repeat) return;
+    keyboardStrike(event.shiftKey);
   });
 
   document.querySelector('.corner-tools a[href="/arena/"]').addEventListener('click', discardShopChanges);
@@ -2213,6 +2328,7 @@
     emptyLoadout, normalizeLoadout, loadoutCost, tokenSummary, treeInvestedScore,
     recordClearedRound, setStatPoint, togglePrestigeBuff, clearLoadout,
     renderPrestige, renderTreeReset, resetTree, chargeBoost, registerMiss,
+    keyboardTarget, paintKeyboardTarget, keyboardStrike,
     popText, nextHitFeedback: () => nextFeedback(HIT_FEEDBACK),
     nextMissFeedback: () => nextFeedback(MISS_FEEDBACK),
     openTutorial, openSettings, updateHud, endRound, startRound, newRun,
