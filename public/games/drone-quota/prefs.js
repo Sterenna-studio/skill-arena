@@ -9,9 +9,10 @@ window.DQPrefs = (() => {
   'use strict';
 
   const KEY = 'drone-quota:prefs:v1';
+  const CONTROL_MODES = new Set(['pointer-click', 'pointer-sweep', 'keyboard-tap', 'keyboard-hold']);
   const DEFAULTS = Object.freeze({
     cursorMode: 'weapon',
-    keyboardMode: false,
+    controlMode: 'pointer-click',
     aimResponsiveness: 7,
     audioEnabled: true,
     effectsEnabled: true,
@@ -27,9 +28,12 @@ window.DQPrefs = (() => {
   }
 
   function normalize(raw = {}) {
+    // Migration du premier essai clavier : `true` devient le mode par pressions
+    // et `false` revient au clic historique.
+    const legacyControlMode = raw.keyboardMode === true ? 'keyboard-tap' : DEFAULTS.controlMode;
     return {
       cursorMode: raw.cursorMode === 'normal' ? 'normal' : 'weapon',
-      keyboardMode: raw.keyboardMode === true,
+      controlMode: CONTROL_MODES.has(raw.controlMode) ? raw.controlMode : legacyControlMode,
       aimResponsiveness: clampNumber(raw.aimResponsiveness, 1, 10, DEFAULTS.aimResponsiveness),
       audioEnabled: raw.audioEnabled !== false,
       effectsEnabled: raw.effectsEnabled !== false,

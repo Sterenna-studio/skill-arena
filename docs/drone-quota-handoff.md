@@ -4,8 +4,8 @@ Tout ce qu'il faut pour reprendre le jeu sans contexte préalable : ce qu'il
 est, comment le lancer, ce sur quoi il repose, ce qui est vérifié, ce qui ne
 l'est pas, et par où continuer.
 
-Écrit le 2026-09-09, mis à jour le 2026-09-11 après l'ajout du mode
-clavier expérimental et de la dispersion en arc des retours de frappe.
+Écrit le 2026-09-09, mis à jour le 2026-09-11 après l'ajout des quatre modes
+de frappe expérimentaux et de la dispersion en arc des retours de frappe.
 
 ---
 
@@ -61,11 +61,11 @@ qu'on le demande.
 
 ```txt
 public/games/drone-quota/
-├── index.html   334 l.  écrans, meuble, HUD, tutoriel, réglages, prestige
-├── style.css   1564 l.  meuble, ports, états, écrans et responsive
-├── game.js     2365 l.  règles, économie, boost, arbre, machine à états
+├── index.html   336 l.  écrans, meuble, HUD, tutoriel, réglages, prestige
+├── style.css   1568 l.  meuble, ports, états, écrans et responsive
+├── game.js     2470 l.  règles, économie, boost, arbre, machine à états
 ├── fx.js        648 l.  son, particules, secousses, traces d'usure
-└── prefs.js     169 l.  préférences locales et viseur DOM optionnel
+└── prefs.js     173 l.  préférences locales et viseur DOM optionnel
 ```
 
 Le jeu est aussi déclaré à deux endroits côté hub Next.js :
@@ -267,11 +267,11 @@ les nouveaux champs reçoit leurs valeurs par défaut. Pour une sauvegarde
 ancienne, `bestManche` est amorcé à `floor(bestRound / 3)`.
 
 Préférences d'appareil : `localStorage['drone-quota:prefs:v1']` contient le
-mode de pointeur, le mode clavier expérimental, la réactivité du viseur, son
+mode de pointeur, le mode de frappe expérimental, la réactivité du viseur, son
 global, effets, ambiance, volume, effets visuels réduits et passage du
 tutoriel. Le premier chargement respecte l'ancienne clé de sourdine avant de
-créer ces préférences. Une préférence historique sans `keyboardMode` reste sur
-`false`.
+créer ces préférences. L'ancien booléen `keyboardMode` est migré vers
+`keyboard-tap` s'il valait `true`, sinon vers le clic historique.
 
 ### Prestige — jetons dérivés et loadout réversible
 
@@ -324,12 +324,22 @@ normal reste natif et la réactivité ne s'applique qu'au viseur DOM. Les
 réglages complets ne s'ouvrent pas pendant un round chronométré ; le bouton de
 sourdine immédiate reste disponible.
 
-Le mode clavier est **désactivé par défaut** et cohabite avec souris/tactile.
-`ESPACE` frappe le port encadré : une cible déjà sonnée est prioritaire, puis
-la cible dont le TTL est le plus court. `MAJ + ESPACE` applique un coup lourd
-×1,65, deux dégâts de bouclier et ×1,3 sur l'étourdissement, avec 700 ms de
-recharge. La répétition native d'une touche maintenue est ignorée. Pendant une
-parade, `ESPACE` garde sa fonction historique de validation du QTE.
+Le réglage **MODE DE FRAPPE · TEST** propose quatre variantes persistantes :
+
+- `pointer-click` : clic/toucher historique, mode par défaut ;
+- `pointer-sweep` : maintien du bouton ou du doigt puis traversée des ports,
+  avec une frappe par nouvelle cible survolée. Une case vide traversée est
+  ignorée ; seul un appui initial sur une case vide compte comme raté ;
+- `keyboard-tap` : une pression d'`ESPACE` frappe le port encadré ;
+- `keyboard-hold` : maintenir `ESPACE` frappe toutes les 240 ms la seule cible
+  acquise au départ. Quand elle part, il faut relâcher puis réappuyer : le mode
+  ne joue donc pas automatiquement la cible suivante.
+
+Dans les deux modes clavier, une cible déjà sonnée est prioritaire, puis celle
+dont le TTL est le plus court. Le clic simple reste actif en parallèle.
+`MAJ + ESPACE` applique un coup lourd ×1,65, deux dégâts de bouclier et ×1,3
+sur l'étourdissement, avec 700 ms de recharge ; il ne lance pas le maintien.
+Pendant une parade, `ESPACE` garde sa fonction historique de validation du QTE.
 
 Le jeu applique `user-select: none` et retire le halo tactile sans masquer le
 focus clavier. Sous 620 px, les outils flottants et tous les contrôles du
@@ -422,7 +432,9 @@ dq.mancheOf(r), dq.stepInManche(r), dq.isMancheEnd(r)
 dq.chargeBoost(points, port, fixedGain), dq.registerMiss(port)
 dq.popText(port, detail, kind, voix)
 dq.nextHitFeedback(), dq.nextMissFeedback()
-dq.keyboardTarget(), dq.paintKeyboardTarget(), dq.keyboardStrike(lourd)
+dq.keyboardTarget(), dq.paintKeyboardTarget(), dq.keyboardStrike(lourd, port)
+dq.startKeyboardHold(), dq.stopKeyboardHold()
+dq.startPointerSweep(event, port), dq.movePointerSweep(event), dq.stopPointerSweep()
 dq.updateHud(), dq.endRound(), dq.startRound(), dq.newRun()
 dq.preferences, dq.openTutorial(), dq.openSettings()
 
@@ -544,6 +556,19 @@ Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
   exacte, boutons de réglage à 44 px minimum, verrou et aide HUD visibles.
   Six retours sur le même port ont occupé six abscisses distinctes dans les
   deux largeurs.
+- Les quatre modes de frappe ont ensuite été contrôlés dans Chrome visible.
+  Le clic et `keyboard-tap` ont chacun produit exactement une touche. Les
+  maintiens de 1,08 s ont produit quatre à cinq touches sur leur cible initiale,
+  puis zéro sur une nouvelle cible apparue sans relâchement. Sur une sentinelle,
+  le maintien a ouvert le QTE sans le résoudre automatiquement ; une nouvelle
+  pression d'`ESPACE` l'a bien résolu. Un balayage souris à travers
+  cible, case vide, cible a produit deux touches, zéro raté et des chaînes
+  `[1, 0, 1]`, sans double frappe au relâchement. Un glissement tactile émulé
+  sur deux ports à 375 px a produit deux touches et des chaînes `[1, 1]`. Les
+  quatre choix ont été activés depuis
+  leurs vrais boutons et relus dans `localStorage`. La carte de réglage tient à
+  1100 et 375 px, sans débordement (1100/1100 et 375/375) et avec quatre cibles
+  de 44 px minimum. L'onglet était `visible` pendant ces essais.
 
 ---
 
@@ -589,11 +614,12 @@ Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
   propre, puis frappes répétées tant qu'une cible est présente. Une variante de
   contrôle ferait peu de points mais prolongerait prioritairement un
   étourdissement amorcé par le joueur. Rien de ce modèle n'est encore codé.
-- Le mode clavier retire volontairement le geste de visée et peut donc rendre
-  le jeu trop automatique. Son activation, le verrou sur la cible urgente et
-  les valeurs du coup lourd (×1,65, ×1,3, 700 ms) sont des hypothèses d'essai,
-  pas un nouvel équilibrage validé. Il faut comparer fatigue, plaisir et score
-  avec une manche identique à la souris.
+- Les quatre modes de frappe sont des hypothèses d'essai, pas un nouvel
+  équilibrage validé. Le ciblage clavier retire la visée ; le maintien peut
+  rendre les chaînes trop faciles ; le balayage peut favoriser un passage
+  systématique sur toutes les cases. Il faut comparer fatigue, plaisir, score
+  et impression de contrôle sur une manche identique. La cadence de 240 ms et
+  les valeurs du coup lourd (×1,65, ×1,3, 700 ms) restent provisoires.
 
 ---
 

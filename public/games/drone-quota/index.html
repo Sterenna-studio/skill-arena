@@ -72,18 +72,20 @@
         <small>Le navigateur ne permet pas de changer la sensibilité du curseur système ; ce réglage agit sur le suivi du viseur arme.</small>
       </section>
 
-      <section class="settings-card keyboard-card">
-        <h3>FRAPPE AU CLAVIER · TEST</h3>
-        <p>Une alternative moins fatigante au clic répété. La souris et le tactile restent actifs en parallèle.</p>
-        <div class="segmented" role="group" aria-label="Mode de frappe au clavier">
-          <button type="button" data-keyboard-mode="on">ACTIVÉ</button>
-          <button type="button" data-keyboard-mode="off">DÉSACTIVÉ</button>
+      <section class="settings-card control-card">
+        <h3>MODE DE FRAPPE · TEST</h3>
+        <p>Quatre gestes à comparer. Le clic simple reste utilisable dans les deux modes clavier.</p>
+        <div class="segmented control-modes" role="group" aria-label="Mode de frappe">
+          <button type="button" data-control-mode="pointer-click">CLIC</button>
+          <button type="button" data-control-mode="pointer-sweep">BALAYAGE</button>
+          <button type="button" data-control-mode="keyboard-tap">ESPACE</button>
+          <button type="button" data-control-mode="keyboard-hold">ESPACE MAINTENU</button>
         </div>
         <div class="keyboard-keys" aria-label="Commandes du mode clavier">
-          <span><span class="key-combo"><kbd>ESPACE</kbd></span><small>frappe la cible encadrée</small></span>
+          <span><span class="key-combo"><kbd>ESPACE</kbd></span><small>frappe la cible encadrée, par pression ou à cadence limitée</small></span>
           <span><span class="key-combo"><kbd>MAJ</kbd><i>+</i><kbd>ESPACE</kbd></span><small>coup lourd ×1,65 · recharge 0,7 s</small></span>
         </div>
-        <small>Le verrou privilégie une cible déjà sonnée, puis celle qui risque de repartir. Maintenir la touche ne répète pas automatiquement les coups.</small>
+        <small>Balayage : maintiens le bouton ou le doigt et traverse les cibles ; les cases vides de passage sont ignorées. Espace maintenu : la cadence reste sur une seule cible ; relâche pour en choisir une autre.</small>
       </section>
 
       <section class="settings-card">
@@ -216,7 +218,7 @@
               <span class="pill" id="pill-coolant">COOLANT</span>
               <span class="pill" id="pill-overclock">OVERCLOCK</span>
               <span class="pill" id="pill-turrets">TOURELLES OFF</span>
-              <span class="pill keyboard-pill" id="pill-keyboard">CLAVIER OFF</span>
+              <span class="pill control-pill" id="pill-control">CLIC</span>
             </div>
 
             <div class="arena" id="arena">

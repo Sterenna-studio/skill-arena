@@ -27,7 +27,7 @@
     scar() {}, clearScars() {}, centerOf: () => ({ x: 0, y: 0 }), setReducedEffects() {},
   };
   const PREFS = window.DQPrefs ?? {
-    get: () => ({ cursorMode: 'normal', keyboardMode: false, aimResponsiveness: 7, audioEnabled: true, effectsEnabled: true, ambienceEnabled: true, masterVolume: 80, reducedEffects: false, tutorialSeen: false }),
+    get: () => ({ cursorMode: 'normal', controlMode: 'pointer-click', aimResponsiveness: 7, audioEnabled: true, effectsEnabled: true, ambienceEnabled: true, masterVolume: 80, reducedEffects: false, tutorialSeen: false }),
     set(patch) { return { ...this.get(), ...patch }; },
     reset() { return this.get(); }, subscribe() {}, initCursor() {}, hideCursor() {},
   };
@@ -64,6 +64,7 @@
     keyboardHeavyScoreMult: 1.65,
     keyboardHeavyStunMult: 1.3,
     keyboardHeavyCooldownMs: 700,
+    keyboardHoldIntervalMs: 240,
 
     // Chaîne d'étourdissement : une cible frappée reste sonnée sur le port et
     // rapporte de plus en plus tant qu'on l'enchaîne. Chaque coup l'étourdit
@@ -635,6 +636,12 @@
   let interludeTimer = null;
   let shopSnapshot = null;
   let shopDirty = false;
+  let keyboardHoldTimer = null;
+  let keyboardHeld = false;
+  let keyboardHoldPort = null;
+  let sweepPointerId = null;
+  let sweepLastPort = null;
+  let sweepSuppressClickUntil = 0;
 
   const run = { active: false, round: 1, bank: 0, totalScore: 0 };
 
@@ -783,8 +790,8 @@
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
     });
-    document.querySelectorAll('[data-keyboard-mode]').forEach(button => {
-      const active = (button.dataset.keyboardMode === 'on') === preferences.keyboardMode;
+    document.querySelectorAll('[data-control-mode]').forEach(button => {
+      const active = button.dataset.controlMode === preferences.controlMode;
       button.classList.toggle('active', active);
       button.setAttribute('aria-pressed', String(active));
     });
@@ -801,8 +808,11 @@
   }
 
   function applyPreferences(nextPreferences) {
+    stopKeyboardHold();
+    stopPointerSweep();
     preferences = nextPreferences;
     document.body.classList.toggle('reduce-effects', preferences.reducedEffects);
+    document.body.classList.toggle('control-sweep', preferences.controlMode === 'pointer-sweep');
     FX.configureAudio({
       effectsEnabled: preferences.effectsEnabled,
       ambienceEnabled: preferences.ambienceEnabled,
@@ -1227,6 +1237,7 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'port';
+      button.dataset.portIndex = i;
       button.setAttribute('aria-label', `Port ${i + 1}, vide`);
       button.innerHTML = `<span class="id">P${String(i + 1).padStart(2, '0')}</span>`
         + '<span class="socket"><span class="shaft"></span>'
@@ -1239,7 +1250,15 @@
         ttlTimer: null, ttlLeft: 0, ttlArmedAt: 0,
         stunTimer: null, chain: 0, shieldLeft: 0, shieldMax: 0,
       };
-      button.addEventListener('click', () => onPortClick(port));
+      button.addEventListener('pointerdown', event => startPointerSweep(event, port));
+      button.addEventListener('click', event => {
+        // Le balayage frappe dès l'appui. Son `click` synthétique à la
+        // relâche serait un deuxième coup sur la même case.
+        const sweptClick = preferences.controlMode === 'pointer-sweep'
+          && event.detail > 0
+          && performance.now() < sweepSuppressClickUntil;
+        if (!sweptClick) onPortClick(port);
+      });
       grid.appendChild(button);
       ports.push(port);
     }
@@ -1532,6 +1551,47 @@
     updateHud();
   }
 
+  const keyboardControlActive = () => preferences.controlMode === 'keyboard-tap'
+    || preferences.controlMode === 'keyboard-hold';
+
+  function stopKeyboardHold() {
+    if (keyboardHoldTimer) clearInterval(keyboardHoldTimer);
+    keyboardHoldTimer = null;
+    keyboardHeld = false;
+    keyboardHoldPort = null;
+  }
+
+  function stopPointerSweep(event = null) {
+    if (event && sweepPointerId !== event.pointerId) return;
+    sweepPointerId = null;
+    sweepLastPort = null;
+    // Le navigateur émet `click` après `pointerup` : garde assez de marge pour
+    // ne pas doubler la frappe déjà faite au premier appui.
+    sweepSuppressClickUntil = performance.now() + 500;
+  }
+
+  function startPointerSweep(event, port) {
+    if (preferences.controlMode !== 'pointer-sweep' || !round.running || round.paused) return;
+    if (!event.isPrimary || event.button !== 0) return;
+    event.preventDefault();
+    sweepPointerId = event.pointerId;
+    sweepLastPort = port;
+    sweepSuppressClickUntil = Number.POSITIVE_INFINITY;
+    onPortClick(port);
+  }
+
+  function movePointerSweep(event) {
+    if (sweepPointerId !== event.pointerId || preferences.controlMode !== 'pointer-sweep') return;
+    event.preventDefault();
+    const element = document.elementFromPoint(event.clientX, event.clientY)?.closest?.('.port');
+    const port = element ? ports[Number(element.dataset.portIndex)] : null;
+    if (!port || port === sweepLastPort) return;
+    sweepLastPort = port;
+    // Une case vide traversée est un chemin, pas une nouvelle erreur de visée.
+    // L'appui initial sur une case vide reste en revanche un vrai RATÉ.
+    if (port.target) onPortClick(port);
+  }
+
   /** Cible proposée au clavier : chaîne en cours, puis disparition imminente. */
   function keyboardTarget() {
     const now = performance.now();
@@ -1551,25 +1611,27 @@
   }
 
   function paintKeyboardTarget() {
-    const enabled = preferences.keyboardMode && round.running;
-    const target = enabled && !round.paused ? keyboardTarget() : null;
+    const keyboardEnabled = keyboardControlActive() && round.running;
+    const target = keyboardEnabled && !round.paused ? keyboardTarget() : null;
     ports.forEach(port => port.el.classList.toggle('keyboard-target', port === target));
 
-    const pill = $('pill-keyboard');
+    const pill = $('pill-control');
     if (!pill) return target;
-    pill.classList.toggle('on', enabled);
-    if (!enabled) pill.textContent = 'CLAVIER OFF';
-    else if (round.qte && !round.qte.done) pill.textContent = 'ESPACE · PARADE';
+    pill.classList.toggle('on', preferences.controlMode !== 'pointer-click');
+    if (round.qte && !round.qte.done) pill.textContent = 'ESPACE · PARADE';
+    else if (preferences.controlMode === 'pointer-click') pill.textContent = 'CLIC';
+    else if (preferences.controlMode === 'pointer-sweep') pill.textContent = 'BALAYAGE';
     else {
       const heavyLeft = Math.max(0, round.heavyReadyAt - performance.now());
-      pill.textContent = heavyLeft > 0 ? `LOURD ${(heavyLeft / 1000).toFixed(1)}s` : 'ESPACE · LOURD PRÊT';
+      const mode = preferences.controlMode === 'keyboard-hold' ? 'MAINTIEN' : 'ESPACE';
+      pill.textContent = heavyLeft > 0 ? `LOURD ${(heavyLeft / 1000).toFixed(1)}s` : `${mode} · LOURD PRÊT`;
     }
     return target;
   }
 
   /** Frappe expérimentale sans pointage, activée dans les réglages. */
-  function keyboardStrike(heavy = false) {
-    if (!preferences.keyboardMode || !round.running || round.paused) return false;
+  function keyboardStrike(heavy = false, targetOverride) {
+    if (!keyboardControlActive() || !round.running || round.paused) return false;
     if (performance.now() < round.playerStunUntil) {
       FX.sfx.miss(0);
       return false;
@@ -1581,10 +1643,16 @@
       return false;
     }
 
-    const target = keyboardTarget();
+    // Une cible imposée sert au maintien : si elle part, on ne saute pas vers
+    // une nouvelle cible sans que le joueur relâche puis réappuie.
+    const target = targetOverride === undefined
+      ? keyboardTarget()
+      : (targetOverride?.target ? targetOverride : null);
     if (!target) {
-      const missPort = ports[Math.floor(Math.random() * ports.length)];
-      if (missPort) registerMiss(missPort);
+      if (targetOverride === undefined) {
+        const missPort = ports[Math.floor(Math.random() * ports.length)];
+        if (missPort) registerMiss(missPort);
+      }
       paintKeyboardTarget();
       return -1;
     }
@@ -1594,6 +1662,28 @@
     onPortClick(target, { heavy: heavyApplies });
     paintKeyboardTarget();
     return target.index;
+  }
+
+  /** Maintient une rafale sur la cible choisie, sans acquisition automatique. */
+  function startKeyboardHold() {
+    if (preferences.controlMode !== 'keyboard-hold' || keyboardHeld) return false;
+    keyboardHeld = true;
+    keyboardHoldPort = keyboardTarget();
+    if (!keyboardHoldPort) {
+      keyboardStrike(false);
+      return false;
+    }
+
+    keyboardStrike(false, keyboardHoldPort);
+    if (!keyboardHeld || !keyboardHoldPort?.target) return true;
+    keyboardHoldTimer = setInterval(() => {
+      if (!keyboardHeld || !keyboardHoldPort?.target || round.paused) {
+        stopKeyboardHold();
+        return;
+      }
+      keyboardStrike(false, keyboardHoldPort);
+    }, BALANCE.keyboardHoldIntervalMs);
+    return true;
   }
 
   function onPortClick(port, { heavy = false } = {}) {
@@ -1805,6 +1895,8 @@
    * de tourner : le duel n'est pas un abri.
    */
   function openQte(port, heavy = false) {
+    stopKeyboardHold();
+    stopPointerSweep();
     round.parries += 1;
     round.paused = true;
     freezeTtls();
@@ -2079,6 +2171,8 @@
   // ── fin de round ────────────────────────────────────────────────────────
 
   function stopRound() {
+    stopKeyboardHold();
+    stopPointerSweep();
     round.running = false;
     round.paused = false;
     if (round.clock) clearInterval(round.clock);
@@ -2237,8 +2331,8 @@
   document.querySelectorAll('[data-cursor-mode]').forEach(button => {
     button.addEventListener('click', () => PREFS.set({ cursorMode: button.dataset.cursorMode }));
   });
-  document.querySelectorAll('[data-keyboard-mode]').forEach(button => {
-    button.addEventListener('click', () => PREFS.set({ keyboardMode: button.dataset.keyboardMode === 'on' }));
+  document.querySelectorAll('[data-control-mode]').forEach(button => {
+    button.addEventListener('click', () => PREFS.set({ controlMode: button.dataset.controlMode }));
   });
   $('cfg-aim').addEventListener('input', event => PREFS.set({ aimResponsiveness: event.target.value }));
   $('cfg-audio').addEventListener('change', event => PREFS.set({ audioEnabled: event.target.checked }));
@@ -2256,8 +2350,8 @@
     renderMenu();
   });
 
-  // La parade garde la priorité. Hors duel, le mode d'essai transforme chaque
-  // pression physique sur ESPACE en frappe ; maintenir la touche ne suffit pas.
+  // La parade garde la priorité. Hors duel, ESPACE agit par pression ou lance
+  // une cadence attachée à la cible courante selon le mode choisi.
   window.addEventListener('keydown', event => {
     if (event.code === 'Escape' && !$('tutorial').hidden) {
       closeTutorial(false);
@@ -2269,10 +2363,22 @@
       attemptQte();
       return;
     }
-    if (!preferences.keyboardMode || !round.running) return;
+    if (!keyboardControlActive() || !round.running) return;
     event.preventDefault();
     if (event.repeat) return;
-    keyboardStrike(event.shiftKey);
+    if (event.shiftKey) keyboardStrike(true);
+    else if (preferences.controlMode === 'keyboard-hold') startKeyboardHold();
+    else keyboardStrike(false);
+  });
+  window.addEventListener('keyup', event => {
+    if (event.code === 'Space') stopKeyboardHold();
+  });
+  window.addEventListener('pointermove', movePointerSweep, { passive: false });
+  window.addEventListener('pointerup', stopPointerSweep);
+  window.addEventListener('pointercancel', stopPointerSweep);
+  window.addEventListener('blur', () => {
+    stopKeyboardHold();
+    stopPointerSweep();
   });
 
   document.querySelector('.corner-tools a[href="/arena/"]').addEventListener('click', discardShopChanges);
@@ -2328,7 +2434,8 @@
     emptyLoadout, normalizeLoadout, loadoutCost, tokenSummary, treeInvestedScore,
     recordClearedRound, setStatPoint, togglePrestigeBuff, clearLoadout,
     renderPrestige, renderTreeReset, resetTree, chargeBoost, registerMiss,
-    keyboardTarget, paintKeyboardTarget, keyboardStrike,
+    keyboardTarget, paintKeyboardTarget, keyboardStrike, startKeyboardHold, stopKeyboardHold,
+    startPointerSweep, movePointerSweep, stopPointerSweep,
     popText, nextHitFeedback: () => nextFeedback(HIT_FEEDBACK),
     nextMissFeedback: () => nextFeedback(MISS_FEEDBACK),
     openTutorial, openSettings, updateHud, endRound, startRound, newRun,
