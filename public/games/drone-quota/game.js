@@ -65,6 +65,13 @@
     keyboardHeavyStunMult: 1.3,
     keyboardHeavyCooldownMs: 700,
     keyboardHoldIntervalMs: 240,
+    // Même cadence par cible que le maintien clavier. Sans ce délai, un
+    // va-et-vient entre deux ports voisins refrappait les cibles sonnées à la
+    // vitesse des événements pointeur : deux chaînes complètes en 124 ms.
+    sweepRehitMs: 240,
+    // La trajectoire de manche attend quelques secondes de jeu : avant, un
+    // seul coup chanceux ou raté suffit à la faire mentir.
+    trajectoryWarmupMs: 4000,
 
     // Chaîne d'étourdissement : une cible frappée reste sonnée sur le port et
     // rapporte de plus en plus tant qu'on l'enchaîne. Chaque coup l'étourdit
@@ -632,7 +639,16 @@
 
   let save = loadSave();
   let stats = deriveStats(save.tree, save.loadout);
-  let preferences = PREFS.get();
+  // Les modes de frappe alternatifs sont une expérience d'essai (#9), pas un
+  // choix joueur : ils partagent aujourd'hui les records et les jetons du
+  // clic, alors que le clavier retire la visée. Ils ne sortent donc qu'avec
+  // ?essais dans l'URL. Sans le drapeau, le jeu force le clic sans écraser la
+  // préférence enregistrée, qui revient telle quelle quand on le remet.
+  const TEST_CONTROLS = new URLSearchParams(window.location.search).has('essais');
+  const effectivePreferences = prefs => (TEST_CONTROLS || prefs.controlMode === 'pointer-click'
+    ? prefs
+    : { ...prefs, controlMode: 'pointer-click' });
+  let preferences = effectivePreferences(PREFS.get());
   let interludeTimer = null;
   let shopSnapshot = null;
   let shopDirty = false;
@@ -643,7 +659,18 @@
   let sweepLastPort = null;
   let sweepSuppressClickUntil = 0;
 
-  const run = { active: false, round: 1, bank: 0, totalScore: 0 };
+  function emptyRunTotals() {
+    return { hits: 0, misses: 0, escapes: 0, chainBest: 0, parries: 0, parriesWon: 0, maxCombo: 1 };
+  }
+
+  const run = {
+    active: false, round: 1, bank: 0, totalScore: 0,
+    // Instrumentation des essais (#9) : déroulé round par round et compteurs
+    // cumulés, affichés en fin de run pour ne plus avoir à noter la banque
+    // à la main.
+    log: [], totals: emptyRunTotals(),
+    roundStartBank: 0, mancheStartBank: 0, manchePlayedMs: 0,
+  };
 
   const round = {
     running: false,
@@ -661,6 +688,7 @@
     chainBest: 0,
     parries: 0,
     parriesWon: 0,
+    escapes: 0,
     coolantUntil: 0,
     overclockUntil: 0,
     playerStunUntil: 0,
@@ -756,7 +784,7 @@
 
   function closeTutorial(startRunAfter = false) {
     $('tutorial').hidden = true;
-    preferences = PREFS.set({ tutorialSeen: true });
+    preferences = effectivePreferences(PREFS.set({ tutorialSeen: true }));
     const shouldStart = startRunAfter && tutorialStartsRun;
     tutorialStartsRun = false;
     if (shouldStart) newRun();
@@ -810,7 +838,7 @@
   function applyPreferences(nextPreferences) {
     stopKeyboardHold();
     stopPointerSweep();
-    preferences = nextPreferences;
+    preferences = effectivePreferences(nextPreferences);
     document.body.classList.toggle('reduce-effects', preferences.reducedEffects);
     document.body.classList.toggle('control-sweep', preferences.controlMode === 'pointer-sweep');
     FX.configureAudio({
@@ -1283,6 +1311,7 @@
     port.chain = 0;
     port.shieldLeft = 0;
     port.shieldMax = 0;
+    port.sweepHitAt = 0;
     port.el.className = 'port';
     port.el.querySelector('.icon').textContent = '';
     port.el.querySelector('.name').textContent = 'IDLE';
@@ -1390,11 +1419,21 @@
     round.chainBest = 0;
     round.parries = 0;
     round.parriesWon = 0;
+    round.escapes = 0;
     round.coolantUntil = 0;
     round.overclockUntil = 0;
     round.playerStunUntil = 0;
     round.heavyReadyAt = 0;
     round.paused = false;
+    run.roundStartBank = run.bank;
+    // La trajectoire mesure le rythme de la manche entière, à partir de la
+    // banque disponible après l'atelier.
+    if (stepInManche(run.round) === 1) {
+      run.mancheStartBank = run.bank;
+      run.manchePlayedMs = 0;
+    }
+    $('trajectory').hidden = true;
+    $('quota-projection').hidden = true;
 
     if (interludeTimer) clearTimeout(interludeTimer);
     interludeTimer = null;
@@ -1489,6 +1528,7 @@
     const scoring = port.target.pts > 0 && !port.target.effect;
     clearPort(port);
     if (!scoring) return;
+    round.escapes += 1;
     port.el.classList.add('gone');
     setTimeout(() => port.el.classList.remove('gone'), 240);
     FX.sfx.escape();
@@ -1577,6 +1617,7 @@
     sweepPointerId = event.pointerId;
     sweepLastPort = port;
     sweepSuppressClickUntil = Number.POSITIVE_INFINITY;
+    if (port.target) port.sweepHitAt = performance.now();
     onPortClick(port);
   }
 
@@ -1589,7 +1630,15 @@
     sweepLastPort = port;
     // Une case vide traversée est un chemin, pas une nouvelle erreur de visée.
     // L'appui initial sur une case vide reste en revanche un vrai RATÉ.
-    if (port.target) onPortClick(port);
+    if (!port.target) return;
+    // Une même cible ne se refrappe qu'au rythme du maintien clavier : le
+    // balayage garde son avantage de couverture, pas une cadence infinie.
+    // `clearPort` remet ce délai à zéro, donc une nouvelle cible sur le même
+    // port reste frappable tout de suite.
+    const now = performance.now();
+    if (now - (port.sweepHitAt ?? 0) < BALANCE.sweepRehitMs) return;
+    port.sweepHitAt = now;
+    onPortClick(port);
   }
 
   /** Cible proposée au clavier : chaîne en cours, puis disparition imminente. */
@@ -2110,8 +2159,36 @@
     cabinet()?.style.setProperty('--time-heat', heat.toFixed(3));
     $('glass-inner')?.classList.toggle('stunned', performance.now() < round.playerStunUntil);
 
+    paintTrajectory(left);
     updateEffectPills();
     if (left <= 0) endRound();
+  }
+
+  /**
+   * Projection sans punition : au rythme moyen de la manche, où finira la
+   * banque au moment de la facture ? On ne peut plus perdre aux rounds 1 et
+   * 2 ; cette ligne rend la tension lisible sans rien retirer au joueur.
+   */
+  function paintTrajectory(left) {
+    const line = $('trajectory');
+    const mark = $('quota-projection');
+    const playedMs = run.manchePlayedMs + (round.seconds - left) * 1000;
+    const totalMs = BALANCE.roundsPerManche * round.seconds * 1000;
+    const earned = run.bank - run.mancheStartBank;
+    if (playedMs < BALANCE.trajectoryWarmupMs || earned <= 0 || !round.quota) {
+      line.hidden = true;
+      mark.hidden = true;
+      return;
+    }
+    const projected = run.bank + (earned / playedMs) * Math.max(0, totalMs - playedMs);
+    const delta = Math.round(projected - round.quota);
+    const ahead = delta >= 0;
+    line.hidden = false;
+    line.className = `trajectory ${ahead ? 'good' : 'bad'}`;
+    line.textContent = `AU RYTHME ACTUEL · ${ahead ? '+' : '−'}${fmt(Math.abs(delta))} ${ahead ? 'DE MARGE' : 'MANQUANTS'}`;
+    mark.hidden = false;
+    mark.classList.toggle('bad', !ahead);
+    mark.style.left = `${Math.min(100, (projected / round.quota) * 100)}%`;
   }
 
   function updateHud() {
@@ -2185,12 +2262,15 @@
     FX.hum(false);
     cabinet()?.style.setProperty('--time-heat', '0');
     $('glass-inner')?.classList.remove('stunned');
+    $('trajectory').hidden = true;
+    $('quota-projection').hidden = true;
     paintKeyboardTarget();
   }
 
   function endRound() {
     if (!round.running) return;
     stopRound();
+    const logEntry = recordRoundStats();
 
     const finishedManche = isMancheEnd(run.round);
     if (!finishedManche) {
@@ -2201,6 +2281,9 @@
       setTimeout(showInterlude, 1100);
       return;
     }
+
+    logEntry.quota = round.quota;
+    logEntry.paid = run.bank >= round.quota;
 
     if (run.bank < round.quota) {
       setMsg(`Objectif de manche manqué — il manquait ${fmt(round.quota - run.bank)}.`, 'bad');
@@ -2261,6 +2344,57 @@
     startRound();
   }
 
+  /** Cumule le round qui vient de finir dans les statistiques de la run. */
+  function recordRoundStats() {
+    const totals = run.totals;
+    totals.hits += round.hits;
+    totals.misses += round.misses;
+    totals.escapes += round.escapes;
+    totals.parries += round.parries;
+    totals.parriesWon += round.parriesWon;
+    totals.chainBest = Math.max(totals.chainBest, round.chainBest);
+    totals.maxCombo = Math.max(totals.maxCombo, round.maxCombo);
+    run.manchePlayedMs += round.seconds * 1000;
+    const entry = {
+      manche: mancheOf(run.round),
+      step: stepInManche(run.round),
+      gain: run.bank - run.roundStartBank,
+      bank: run.bank,
+      quota: null,
+      paid: null,
+    };
+    run.log.push(entry);
+    return entry;
+  }
+
+  function renderRunStats() {
+    const totals = run.totals;
+    const attempts = totals.hits + totals.misses;
+    $('over-hits').textContent = fmt(totals.hits);
+    $('over-accuracy').textContent = attempts ? `${Math.round((totals.hits / attempts) * 100)} %` : '—';
+    $('over-chain').textContent = totals.chainBest
+      ? `${totals.chainBest} coup${totals.chainBest > 1 ? 's' : ''}`
+      : '—';
+    $('over-parries').textContent = totals.parries ? `${totals.parriesWon} / ${totals.parries}` : '—';
+    $('over-boost').textContent = `×${totals.maxCombo}`;
+    $('over-escapes').textContent = fmt(totals.escapes);
+
+    const list = $('over-log');
+    list.innerHTML = '';
+    for (const entry of run.log) {
+      const item = document.createElement('li');
+      const sign = entry.gain >= 0 ? '+' : '−';
+      const verdict = entry.quota === null
+        ? ''
+        : `<em class="${entry.paid ? 'paid' : 'missed'}">FACTURE ${fmt(entry.quota)} · ${entry.paid ? 'RÉGLÉE' : 'MANQUÉE'}</em>`;
+      if (entry.quota !== null) item.className = 'manche-end';
+      item.innerHTML = `<span>M${entry.manche} · R${entry.step}</span>`
+        + `<strong>${sign}${fmt(Math.abs(entry.gain))}</strong>`
+        + `<b>BANQUE ${fmt(entry.bank)}</b>${verdict}`;
+      list.appendChild(item);
+    }
+  }
+
   function gameOver() {
     const missing = Math.max(0, round.quota - run.bank);
     run.active = false;
@@ -2275,6 +2409,7 @@
     $('over-score').textContent = fmt(run.totalScore);
     $('over-best').textContent = save.bestRound ? `#${save.bestRound}` : '—';
     $('over-nodes').textContent = fmt(ownedNodeCount(save.tree));
+    renderRunStats();
 
     const owned = ownedNodeCount(save.tree);
     $('over-hint').innerHTML = owned
@@ -2294,6 +2429,11 @@
     run.round = 1;
     run.bank = stats.startingBank;
     run.totalScore = 0;
+    run.log = [];
+    run.totals = emptyRunTotals();
+    run.roundStartBank = run.bank;
+    run.mancheStartBank = run.bank;
+    run.manchePlayedMs = 0;
     renderBrief();
     show('scr-brief');
   }
@@ -2392,6 +2532,11 @@
   });
 
   FX.attach($('fx-layer'), $('arena'));
+
+  // Sans ?essais, la carte de choix du mode de frappe et son indicateur de HUD
+  // disparaissent : le joueur n'a qu'un seul geste, le clic.
+  document.querySelector('.control-card').hidden = !TEST_CONTROLS;
+  $('pill-control').hidden = !TEST_CONTROLS;
 
   PREFS.initCursor($('weapon-cursor'));
   PREFS.subscribe(applyPreferences);

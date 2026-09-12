@@ -5,7 +5,9 @@ est, comment le lancer, ce sur quoi il repose, ce qui est vérifié, ce qui ne
 l'est pas, et par où continuer.
 
 Écrit le 2026-09-09, mis à jour le 2026-09-11 après l'ajout des quatre modes
-de frappe expérimentaux et de la dispersion en arc des retours de frappe.
+de frappe expérimentaux et de la dispersion en arc des retours de frappe, puis
+le 2026-09-12 pour l'instrumentation des essais : cadence du balayage, drapeau
+`?essais`, trajectoire de manche et écran de fin de run.
 
 ---
 
@@ -316,6 +318,20 @@ et une barre qui se vide sur la durée réelle de `stunTarget()`. Le HUD sépare
 nettement l'objectif cumulé et le BOOST ; chaque touche affiche `TOUCHÉ`, chaque
 clic vide affiche son rang dans la tolérance.
 
+Sous la barre d'objectif, la **trajectoire de manche** extrapole le rythme
+moyen de la manche jusqu'à la facture : `AU RYTHME ACTUEL · −2 433 MANQUANTS`
+en rouge, ou `· +… DE MARGE` en vert, avec un repère sur la barre. Elle reste
+masquée pendant les 4 premières secondes jouées de la manche
+(`trajectoryWarmupMs`), où un seul coup suffirait à la faire mentir. Elle ne
+sanctionne rien : c'est la tension des rounds 1 et 2, où l'on ne peut plus
+perdre. La mesure part de la banque disponible **après** l'atelier.
+
+L'**écran de fin de run** ajoute six compteurs cumulés sur toute la run —
+frappes, précision, plus longue chaîne, parades gagnées, BOOST max, cibles
+échappées — et le **déroulé round par round** : gain du round, banque en fin
+de round, puis facture réglée ou manquée en fin de manche. Il remplace le
+relevé manuel de la banque demandé par la passe A de l'issue #9.
+
 `#scr-settings` configure : pointeur normal ou viseur arme, réactivité du viseur
 1–10, frappe clavier de test, son global, effets, ambiance, volume 0–100 et
 effets visuels réduits. Une
@@ -324,12 +340,23 @@ normal reste natif et la réactivité ne s'applique qu'au viseur DOM. Les
 réglages complets ne s'ouvrent pas pendant un round chronométré ; le bouton de
 sourdine immédiate reste disponible.
 
-Le réglage **MODE DE FRAPPE · TEST** propose quatre variantes persistantes :
+Le réglage **MODE DE FRAPPE · TEST** n'apparaît qu'avec le drapeau `?essais`
+dans l'URL (`/arena/games/drone-quota/?essais`). Sans lui, la carte et
+l'indicateur de HUD sont masqués et le jeu force le clic **sans écraser** la
+préférence enregistrée, qui revient telle quelle dès qu'on remet le drapeau.
+Raison : ces modes partagent les records et les jetons du clic alors que le
+clavier retire la visée, et une partie d'essai jouée en balayage fausserait
+les mesures de l'issue #9.
+
+Avec le drapeau, il propose quatre variantes persistantes :
 
 - `pointer-click` : clic/toucher historique, mode par défaut ;
 - `pointer-sweep` : maintien du bouton ou du doigt puis traversée des ports,
   avec une frappe par nouvelle cible survolée. Une case vide traversée est
-  ignorée ; seul un appui initial sur une case vide compte comme raté ;
+  ignorée ; seul un appui initial sur une case vide compte comme raté. Une
+  même cible ne se refrappe qu'après `sweepRehitMs` (240 ms, la cadence du
+  maintien clavier), délai remis à zéro quand le port se vide. Sans lui, un
+  va-et-vient entre deux ports voisins terminait deux chaînes en 124 ms ;
 - `keyboard-tap` : une pression d'`ESPACE` frappe le port encadré ;
 - `keyboard-hold` : maintenir `ESPACE` frappe toutes les 240 ms la seule cible
   acquise au départ. Quand elle part, il faut relâcher puis réappuyer : le mode
@@ -528,6 +555,33 @@ Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
 - à 375 px : largeur exacte 375/375, ports à 63 px, jauge boost à 311 px,
   réglages en une colonne de 359 px.
 
+
+**Instrumentation des essais, vérifiée le 2026-09-12** dans le harnais local,
+onglet masqué (donc `requestAnimationFrame` suspendu : le glissement du repère
+de trajectoire et les animations n'ont pas été jugés en mouvement) :
+
+- Sans `?essais` : carte des modes et pastille de HUD masquées, mode effectif
+  clic, et une préférence `pointer-sweep` déjà enregistrée reste intacte dans
+  `localStorage`.
+- Avec `?essais`, balayage : la rafale qui produisait **10 frappes et deux
+  chaînes complètes en 124 ms** avant correctif (12 passages entre deux ports
+  voisins) n'en produit plus que **2** (chaînes `1|1`). Après 320 ms de pause,
+  quatre passages ajoutent 2 frappes (`2|2`). Zéro raté. Une cible neuve posée
+  sur un port tout juste frappé est frappée immédiatement : `clearPort` remet
+  bien le délai à zéro.
+- Clic inchangé : chaîne de 3 sur un drone, parade gagnée.
+- Trajectoire : masquée sous 4 s jouées dans la manche. Sur un état connu
+  (26 s jouées, 6 s dans le round suivant, 2 000 gagnés, facture 7 125), elle
+  affiche `−2 433 MANQUANTS` pour `−2 442` recalculé à la lecture — un tick
+  d'écart — et place le repère à 65,85 % pour 65,7 % attendu.
+- Fin de run, trois rounds joués jusqu'à la facture manquée : les six compteurs
+  affichés sont identiques aux totaux internes (11 frappes, 85 % = 11/13,
+  chaîne de 3, parades 1/1, BOOST ×4). Le déroulé liste `R1 +2 000`,
+  `R2 +12`, `R3 +0 · FACTURE 7 125 · MANQUÉE`, et « manquait » vaut 5 113,
+  soit 7 125 − 2 012.
+- 375 px : largeur de document 375/375, lignes du déroulé à 357 px, compteurs
+  sur deux colonnes. Aucune erreur console sur l'ensemble du parcours.
+
 ### Pas vérifié
 
 - **Le jeu n'a jamais été joué à la manette.** Les contrôles de l'arbre et du
@@ -583,15 +637,18 @@ Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
 - Le regroupement des paliers en facture de manche conserve le coût total mais
   autorise le rattrapage. Il faut vérifier si cette sécurité améliore la lecture
   sans rendre les deux premiers rounds trop peu tendus.
+- La trajectoire de manche extrapole **linéairement**. Le BOOST accélérant le
+  revenu au fil de la manche, elle est pessimiste en début de manche : au
+  round 1, elle annoncera souvent un manque que la montée du multiplicateur
+  comblera. À observer en essai — motive-t-elle, ou décourage-t-elle ?
 - Le viseur arme est un dessin CSS provisoire. L'issue #8 précise les formats,
   états et arbitrages nécessaires avant un éventuel remplacement par sprite.
 - Le blindé immobilise huit frappes. C'est le pari le plus engageant du jeu,
   mais rien ne prévient le joueur de ce qu'il s'apprête à investir.
 - `run.active` est écrit mais jamais lu.
-- Il n'y a pas de meilleur score **par round atteint** au-delà de `bestRound`,
-  ni de statistiques de fin de run (précision, plus longue chaîne, parades
-  gagnées) alors que `round.chainBest`, `round.parries` et `round.parriesWon`
-  sont déjà comptés.
+- Il n'y a toujours pas de meilleur score **par round atteint** au-delà de
+  `bestRound`. Les statistiques de fin de run existent désormais, mais elles
+  ne sont pas conservées d'une run à l'autre.
 - Le zoom du duel déborde de la dalle sur les ports de bord (masqué par
   `overflow: hidden`). Ça passe, mais ce n'est pas cadré.
 - La migration de l'arbre privilégie la conservation : un descendant ancien
@@ -620,6 +677,10 @@ Pour la passe UX du 2026-09-10, dans un onglet Chrome visible :
   systématique sur toutes les cases. Il faut comparer fatigue, plaisir, score
   et impression de contrôle sur une manche identique. La cadence de 240 ms et
   les valeurs du coup lourd (×1,65, ×1,3, 700 ms) restent provisoires.
+  Ces modes sont désormais masqués sans `?essais`, et le balayage a une
+  cadence par cible. **Quand le drapeau est actif, les records et les jetons
+  restent partagés avec le clic** : une run d'essai clavier ou balayage peut
+  encore faire progresser `bestManche`.
 
 ---
 
@@ -635,9 +696,14 @@ suffisent à répondre à :
 - Cinq ratés pardonnent-ils sans encourager le spam ?
 - La parade est-elle lisible, ou juste une interruption pénible ?
 - Le souffle entre rounds fait-il respirer, ou casse-t-il le rythme ?
+- La trajectoire de manche motive-t-elle, ou décourage-t-elle au round 1 ?
 
 Les leviers sont tous groupés dans `BALANCE` en tête de `game.js`.
 Consigner les mesures et impressions avec le formulaire de l'issue #9.
+
+Jouer en **mode clic**, sans `?essais` : les autres modes faussent la mesure.
+L'écran de fin de run affiche le déroulé round par round et les compteurs à
+reporter, sans rien noter pendant la partie.
 
 ### Priorité 2 — finir l'habillage (issue #4)
 
@@ -651,8 +717,10 @@ et un mode dégradé si le coût devient sensible sur mobile.
 ### Priorité 3 — retour au joueur
 
 La passe UX apporte tutoriel, objectif cumulé, cible sonnée, BOOST et réglages.
-Il reste surtout un écran de fin de run qui exploite les compteurs déjà
-collectés et les essais réels listés au §9.
+L'écran de fin de run exploite désormais les compteurs collectés, déroulé
+round par round compris, et la trajectoire de manche rend la tension lisible
+sans défaite. Restent les essais réels listés au §9 et, éventuellement, la
+conservation des statistiques d'une run à l'autre.
 
 ### Priorité 4 — concevoir les terrains et l'équipement (issue #7)
 

@@ -1566,3 +1566,69 @@ body.reduce-effects .boost-meter.surge,
 body.reduce-effects .weapon-cursor.firing i,
 body.reduce-effects .port.keyboard-target { animation: none; }
 body.reduce-effects .glass-inner.duel .grid { transform: scale(var(--duel-scale-mid)); }
+
+
+/* ══ INSTRUMENTATION DES ESSAIS ═════════════════════════════════════════ */
+
+/* Trajectoire de manche : un repère sur la barre d'objectif et une ligne
+   courte. Elle informe, elle ne sanctionne jamais. */
+.quota-projection {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  z-index: 3;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+  transition: left 0.35s ease-out;
+}
+.quota-projection.bad { background: var(--red); box-shadow: 0 0 8px rgba(255, 77, 99, 0.8); }
+.trajectory {
+  margin: -6px 0 8px;
+  text-align: center;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.trajectory.good { color: var(--green); }
+.trajectory.bad { color: var(--red); }
+.glass-inner.duel .trajectory { opacity: 0.22; transition: opacity 0.18s; }
+
+/* Écran de fin de run : ce que les essais doivent relever. */
+.run-stats .stat strong { font-size: 1.1rem; color: var(--text); }
+.run-log { max-width: 640px; margin: 0 auto 20px; }
+.run-log h3 { margin-bottom: 8px; font-size: 9.5px; letter-spacing: 0.22em; color: var(--faint); text-align: center; }
+.run-log ol {
+  list-style: none;
+  max-height: 40vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+.run-log li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 4px 12px;
+  align-items: baseline;
+  padding: 7px 12px;
+  font-size: 10.5px;
+  border-bottom: 1px solid rgba(120, 140, 220, 0.08);
+  font-variant-numeric: tabular-nums;
+}
+.run-log li:last-child { border-bottom: 0; }
+.run-log li span { color: var(--faint); letter-spacing: 0.12em; }
+.run-log li strong { color: var(--amber); }
+.run-log li b { color: var(--muted); font-weight: 400; letter-spacing: 0.08em; }
+.run-log li em { grid-column: 1 / -1; font-style: normal; font-size: 9px; letter-spacing: 0.16em; }
+.run-log li em.paid { color: var(--green); }
+.run-log li em.missed { color: var(--red); }
+.run-log li.manche-end { background: rgba(255, 190, 60, 0.04); }
+
+body.reduce-effects .quota-projection { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .quota-projection { transition: none; }
+}

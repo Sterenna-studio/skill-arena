@@ -206,7 +206,8 @@
               <div class="hud-cell"><span>TEMPS</span><strong id="hud-time">26</strong></div>
             </div>
 
-            <div class="quota-bar"><i id="quota-fill"></i><em id="quota-label">OBJECTIF · 0 %</em></div>
+            <div class="quota-bar"><i id="quota-fill"></i><b class="quota-projection" id="quota-projection" hidden></b><em id="quota-label">OBJECTIF · 0 %</em></div>
+            <p class="trajectory" id="trajectory" aria-live="off" hidden></p>
 
             <div class="boost-meter" id="boost-meter">
               <span>BOOST <strong id="boost-mult">×1</strong></span>
@@ -301,6 +302,20 @@
       <div class="stat"><span>MEILLEUR ROUND</span><strong id="over-best">—</strong></div>
       <div class="stat"><span>NŒUDS ACQUIS</span><strong id="over-nodes">0</strong></div>
     </div>
+
+    <div class="menu-stats run-stats" aria-label="Statistiques de la run">
+      <div class="stat"><span>FRAPPES</span><strong id="over-hits">0</strong></div>
+      <div class="stat"><span>PRÉCISION</span><strong id="over-accuracy">—</strong></div>
+      <div class="stat"><span>PLUS LONGUE CHAÎNE</span><strong id="over-chain">—</strong></div>
+      <div class="stat"><span>PARADES GAGNÉES</span><strong id="over-parries">—</strong></div>
+      <div class="stat"><span>BOOST MAX</span><strong id="over-boost">×1</strong></div>
+      <div class="stat"><span>CIBLES ÉCHAPPÉES</span><strong id="over-escapes">0</strong></div>
+    </div>
+
+    <section class="run-log">
+      <h3>DÉROULÉ DE LA RUN · BANQUE EN FIN DE ROUND</h3>
+      <ol id="over-log"></ol>
+    </section>
 
     <p class="brief-hint" id="over-hint"></p>
 
