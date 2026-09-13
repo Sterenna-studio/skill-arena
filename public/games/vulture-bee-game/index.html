@@ -14,6 +14,19 @@
       --protein: #9acd32;
     }
     * { box-sizing: border-box; }
+    /* #overlay déclare display:flex, qui l'emportait sur l'attribut hidden :
+       l'écran de fin s'affichait dès le lancement. */
+    [hidden] { display: none !important; }
+    .back {
+      position: fixed;
+      top: 10px;
+      left: 12px;
+      color: var(--fg);
+      font-size: 0.85rem;
+      text-decoration: none;
+      opacity: 0.7;
+    }
+    .back:hover { opacity: 1; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -41,6 +54,7 @@
     }
     #game-container {
       position: relative;
+      max-width: calc(100% - 16px);
       margin: 8px auto 16px;
       padding: 8px;
       border-radius: 12px;
@@ -49,6 +63,10 @@
     }
     canvas {
       display: block;
+      width: 640px;
+      max-width: 100%;
+      height: auto;
+      touch-action: none;
       background: #222;
       border-radius: 8px;
     }
@@ -141,9 +159,10 @@
   </style>
 </head>
 <body>
+  <a class="back" href="/arena/">← Arena</a>
   <header>
     <h1>Nécrobutinage</h1>
-    <p>Mini jeu HTML5 inspiré des abeilles nécrophages (*Trigona*).</p>
+    <p>Mini jeu HTML5 inspiré des abeilles nécrophages (<em>Trigona</em>).</p>
   </header>
 
   <section id="game-container">
@@ -178,7 +197,7 @@
   </section>
 
   <section id="log">
-    <p><strong>Contrôles :</strong> ZQSD ou flèches pour déplacer l’abeille. Touchez les zones vertes pour récolter des protéines, évitez trop longtemps les zones rouges (microbes).</p>
+    <p><strong>Contrôles :</strong> ZQSD ou flèches pour déplacer l’abeille, ou maintenez le doigt sur le terrain pour qu’elle le suive. Touchez les zones vertes pour récolter des protéines, évitez trop longtemps les zones rouges (microbes).</p>
   </section>
 
   <footer>

@@ -156,6 +156,17 @@ export const GAMES: GameMeta[] = [
     external: '/arena/games/tank-protocol/',
   },
   {
+    slug: 'vulture-bee-game',
+    title: 'Nécrobutinage',
+    description: 'Récolte les protéines d’une carcasse en limitant l’infection microbienne, le plus vite possible.',
+    icon: '🐝',
+    category: 'arcade',
+    unit: 's',
+    higherIsBetter: false,
+    available: true,
+    external: '/arena/games/vulture-bee-game/',
+  },
+  {
     slug: 'reaction',
     title: 'Reaction Time',
     description: 'Clique dès que le signal apparaît. Teste tes réflexes purs.',

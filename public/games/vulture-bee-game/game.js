@@ -10,8 +10,31 @@ const overlayText = document.getElementById('overlay-text');
 const restartButton = document.getElementById('restart');
 
 const keys = {};
-addEventListener('keydown', e => { keys[e.key] = true; });
+const SCROLL_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+addEventListener('keydown', e => {
+  keys[e.key] = true;
+  // Les flèches feraient défiler la page pendant qu'on joue.
+  if (SCROLL_KEYS.includes(e.key)) e.preventDefault();
+});
 addEventListener('keyup', e => { keys[e.key] = false; });
+// Une touche relâchée hors de la fenêtre resterait enfoncée.
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+
+// Tactile et souris : l'abeille suit le doigt tant qu'il reste posé.
+let pointer = null;
+function toCanvas(e) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left) * canvas.width / rect.width,
+    y: (e.clientY - rect.top) * canvas.height / rect.height,
+  };
+}
+canvas.addEventListener('pointerdown', e => {
+  canvas.setPointerCapture(e.pointerId);
+  pointer = toCanvas(e);
+});
+canvas.addEventListener('pointermove', e => { if (pointer) pointer = toCanvas(e); });
+['pointerup', 'pointercancel'].forEach(type => canvas.addEventListener(type, () => { pointer = null; }));
 
 const GAME_STATE = {
   RUNNING: 'running',
@@ -47,18 +70,23 @@ function spawnPatch() {
     y: rand(margin, canvas.height - margin),
     r: rand(10, 16),
     value: rand(8, 18),
-    collected: false,
   });
 }
 
 function spawnMicrobe() {
   const margin = 60;
-  microbes.push({
-    x: rand(margin, canvas.width - margin),
-    y: rand(margin, canvas.height - margin),
-    r: rand(14, 22),
-    rate: rand(12, 24),
-  });
+  const center = { x: canvas.width / 2, y: canvas.height / 2 };
+  let microbe;
+  // Jamais sur le point de départ : l'abeille s'infecterait avant d'avoir bougé.
+  do {
+    microbe = {
+      x: rand(margin, canvas.width - margin),
+      y: rand(margin, canvas.height - margin),
+      r: rand(14, 22),
+      rate: rand(12, 24),
+    };
+  } while (distance(microbe, center) < microbe.r + bee.r + 40);
+  microbes.push(microbe);
 }
 
 function resetGame() {
@@ -99,16 +127,31 @@ function update(dt) {
   if (keys['ArrowLeft'] || keys['q'] || keys['Q']) bee.x -= bee.speed * dt;
   if (keys['ArrowRight'] || keys['d'] || keys['D']) bee.x += bee.speed * dt;
 
+  if (pointer) {
+    const dx = pointer.x - bee.x;
+    const dy = pointer.y - bee.y;
+    const d = Math.hypot(dx, dy);
+    if (d > 2) {
+      const step = Math.min(d, bee.speed * dt);
+      bee.x += (dx / d) * step;
+      bee.y += (dy / d) * step;
+    }
+  }
+
   bee.x = Math.max(bee.r, Math.min(canvas.width - bee.r, bee.x));
   bee.y = Math.max(bee.r, Math.min(canvas.height - bee.r, bee.y));
 
-  patches.forEach(p => {
-    if (p.collected) return;
+  // Chaque zone récoltée en fait apparaître une autre : les 9 zones de départ
+  // valent en moyenne 117 pour un objectif de 120, et sans renouvellement la
+  // majorité des parties ne pouvaient plus se terminer.
+  for (let i = patches.length - 1; i >= 0; i--) {
+    const p = patches[i];
     if (distance(bee, p) < bee.r + p.r) {
-      p.collected = true;
+      patches.splice(i, 1);
       protein += p.value;
+      spawnPatch();
     }
-  });
+  }
 
   microbes.forEach(m => {
     if (distance(bee, m) < bee.r + m.r) {
@@ -154,7 +197,6 @@ function render() {
   ctx.fill();
 
   patches.forEach(p => {
-    if (p.collected) return;
     ctx.fillStyle = '#9acd32';
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -195,16 +237,19 @@ function render() {
   ctx.fill();
   ctx.restore();
 
-  ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.fillRect(12, canvas.height - 28, 280, 20);
-  ctx.fillStyle = '#ddd';
+  const hint = 'ZQSD, flèches ou glisser : déplacer l’abeille – Collecter les verts, limiter les rouges.';
   ctx.font = '11px system-ui, sans-serif';
-  ctx.fillText('ZQSD / flèches : déplacer l’abeille – Collecter les verts, limiter les rouges.', 18, canvas.height - 14);
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillRect(12, canvas.height - 28, ctx.measureText(hint).width + 12, 20);
+  ctx.fillStyle = '#ddd';
+  ctx.fillText(hint, 18, canvas.height - 14);
 }
 
 let last = performance.now();
 function loop(now) {
-  const dt = (now - last) / 1000;
+  // Plafonné : au retour d'un onglet masqué, un pas énorme téléportait
+  // l'abeille et faisait bondir l'infection.
+  const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   update(dt);
   render();
