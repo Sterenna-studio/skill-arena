@@ -1,4 +1,20 @@
-# Games — zone de staging
+# Journal des jeux importés
+
+> **Fusion du 2026-09-14.** L'atelier `games/` décrit ci-dessous a été
+> supprimé : `public/games/<slug>/` est désormais la **seule** source de
+> chaque jeu, et on y travaille directement. Le dernier état de l'atelier
+> reste consultable sur la branche [`archive/games-atelier-2026-09-14`](https://github.com/Sterenna-studio/skill-arena/tree/archive/games-atelier-2026-09-14/games).
+>
+> Ce qui n'existait que dans l'atelier :
+>
+> - le moteur d'effets procédural de Dungeon Elf (commit `c26227b`), intégré
+>   à la version originale : `public/games/dungeon-elf-sound/legacy/assets/`
+>   (`vfx-engine.js`, `vfx-bridge.js`) ;
+> - Magnet Maze v134, variante multijoueur à serveur Node, injouable sur un
+>   hébergement statique : archivée seulement ;
+> - les README de chaque jeu et leur mention de statut : archivés.
+>
+> La suite est l'historique tel qu'il était tenu avant la fusion.
 
 Ce dossier est l'**atelier** : chaque sous-dossier est le code source d'un jeu,
 avant curation manuelle vers `public/games/<slug>/` (la copie réellement servie
@@ -15,9 +31,9 @@ et ajoute une entrée dans `src/lib/games.ts` + `src/app/page.tsx`.
 | BZH Breach Storm | `bzh-breach-storm/` | `bzh-breach-storm` | ✅ Oui | Vanilla JS / Canvas 2D | Un lien cassé a été corrigé (voir plus bas) |
 | BZH Nemeton Lockdown | `bzh-nemeton-lockdown/` | `bzh-nemeton-lockdown` | ✅ Oui | Vanilla JS / DOM + Canvas | RAS |
 | Spirit Overdrive | `spirit-overdrive/` | `spirit-overdrive` | ✅ Oui | Vanilla JS / ESM | RAS |
-| Gold Garden Pro | `lab_garden/` | `lab-garden` | ✅ Oui | Vanilla JS, 100% localStorage | Ex-Supabase, migré ([voir README](lab_garden/README.md)) |
+| Gold Garden Pro | `lab_garden/` | `lab-garden` | ✅ Oui | Vanilla JS, 100% localStorage | Ex-Supabase, migré ([voir README](https://github.com/Sterenna-studio/skill-arena/tree/archive/games-atelier-2026-09-14/games/lab_garden/README.md)) |
 | Cyber Cellules v3 | `lab_roguelite/` | `lab-roguelite` | ✅ Oui | Vanilla JS / Canvas | RAS |
-| Magnet Maze | `magnet-maze/` | `magnet-maze` | ✅ Oui (v12 seulement) | Vanilla JS | 2 versions restantes (v12 + v134), voir [magnet-maze/README.md](magnet-maze/README.md) |
+| Magnet Maze | `magnet-maze/` | `magnet-maze` | ✅ Oui (v12 seulement) | Vanilla JS | 2 versions restantes (v12 + v134), voir [magnet-maze/README.md](https://github.com/Sterenna-studio/skill-arena/tree/archive/games-atelier-2026-09-14/games/magnet-maze/README.md) |
 | Escape Game Manager | *(hors repo, voir note)* | `escape-game-manager` | ✅ Oui | Vanilla JS / Canvas 2D | Import direct 2026-08-17, voir plus bas |
 | Sniky | *(hors repo, voir note)* | `sniky` | ✅ Oui | Vanilla JS / ESM / Canvas 2D | Import direct 2026-08-17, voir plus bas |
 | Tank Protocol | *(hors repo, voir note)* | `tank-protocol` | ✅ Oui | Vanilla JS / ESM / Canvas 2D | Import direct 2026-08-17, voir plus bas |
@@ -122,7 +138,7 @@ part ; récupérable sur la branche `archive/cleanup-2026-07-11` :
 - **`magnet-maze/magnet-maze-v13/`** et **`magnet-maze-v133/`** — versions
   intermédiaires dépassées (v133 réécrivait v13 en quasi-totalité ; v134,
   conservée, ne différait de v133 que par un fichier). Voir
-  [magnet-maze/README.md](magnet-maze/README.md).
+  [magnet-maze/README.md](https://github.com/Sterenna-studio/skill-arena/tree/archive/games-atelier-2026-09-14/games/magnet-maze/README.md).
 - **`lab_garden/{SUPABASE_SETUP.sql, achievements.json, seed_system.json,
   lab-css-additions.css}`** — reliquats de l'ère Supabase, non référencés
   depuis la migration 100% localStorage.

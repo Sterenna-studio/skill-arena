@@ -423,10 +423,9 @@ qui crée le mur, pas la base.
    punition se paie en secondes, pas en compteur de cœurs.
 5. **Le chrono ne s'arrête jamais**, duel compris.
 6. **Séparation `fx.js` / `game.js`** (§3).
-7. **Ne pas écrire dans `games/`.** L'arbre `games/` est l'atelier historique
-   et il **diverge** de `public/games/` (chantier ouvert, cf.
-   `docs/arcade-audit-2026-09-08.md`). Ce jeu-ci n'existe que dans `public/`,
-   qui est l'arbre déployé. Ne pas en créer une copie dans `games/`.
+7. **Une seule source : `public/games/drone-quota/`.** L'ancien atelier
+   `games/` a été fusionné le 2026-09-14 (cf. `docs/games-journal.md`) ;
+   ne pas le recréer ni dupliquer le jeu ailleurs.
 8. **Le français partout** : interface, commentaires, messages de commit.
 
 ---

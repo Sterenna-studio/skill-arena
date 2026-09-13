@@ -1,7 +1,0 @@
-[
-  { "id": "shard_drops",     "desc": "Les Éclats ont 20% de chance de drop un fragment supplémentaire" },
-  { "id": "boss_heal",       "desc": "Après chaque boss tué, régénère 15 HP" },
-  { "id": "ricochet_hits",   "desc": "Chaque ricochet compte comme un hit supplémentaire" },
-  { "id": "dash_invincible", "desc": "Invincible pendant le dash" },
-  { "id": "fragment_start",  "desc": "Commence chaque run avec 1 Fragment aléatoire" }
-]

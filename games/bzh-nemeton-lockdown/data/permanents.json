@@ -1,7 +1,0 @@
-[
-  { "id": "free_module",      "label": "Mémoire Nemeton",      "desc": "Commence avec 1 module gratuit aléatoire posé" },
-  { "id": "forge_tech",       "label": "Forge Ancienne",        "desc": "La Forge booste aussi les modules [TECH]" },
-  { "id": "core_hp",          "label": "Résilience Originelle", "desc": "Cœur Nemeton commence avec +5 HP max" },
-  { "id": "trap_rearm",       "label": "Piège Automatique",     "desc": "Le Piège se réarme après 8 secondes" },
-  { "id": "signal_cancel",    "label": "Signal Brouillé",       "desc": "Tous les bonus Signal annulés en début de vague" }
-]

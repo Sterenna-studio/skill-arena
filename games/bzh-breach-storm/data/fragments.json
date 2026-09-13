@@ -1,9 +1,0 @@
-[
-  { "id": "ricochet",    "label": "Ricochet",       "desc": "Les balles rebondissent 1× sur les murs" },
-  { "id": "perforation", "label": "Perforation",    "desc": "Les balles traversent les ennemis" },
-  { "id": "parasite",    "label": "Onde Parasite",  "desc": "Chaque kill crée une impulsion AOE" },
-  { "id": "surcharge",   "label": "Surcharge",      "desc": "Tir ×2 pendant 4s après un dash" },
-  { "id": "replication", "label": "Réplication",    "desc": "Chaque 3e tir duplique la balle" },
-  { "id": "virus",       "label": "Virus",          "desc": "Les ennemis touchés ralentissent et contaminent" },
-  { "id": "echo",        "label": "Echo MiniStar",  "desc": "La dernière balle est répétée 0.3s plus tard" }
-]

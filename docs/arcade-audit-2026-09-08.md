@@ -203,3 +203,7 @@ commit `c26227b` n'existe que dans `games/dungeon_elf_sound/` (index.html de
 37 l. qui charge `vfx-engine.js`), alors que `public/games/dungeon-elf-sound/`
 sert encore l'ancienne version de 155 l. **Le travail VFX n'est pas en ligne**,
 et il n'existe aucun script de synchronisation entre les deux arbres.
+
+**Résolu le 2026-09-14** : moteur intégré à `dungeon-elf-sound/legacy/`
+(la version qu'il enveloppait) et atelier `games/` fusionné dans
+`public/games/`, cf. `docs/games-journal.md`.
