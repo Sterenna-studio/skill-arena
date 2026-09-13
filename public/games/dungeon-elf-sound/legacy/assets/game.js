@@ -4,15 +4,88 @@ function getAC(){if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)(
 function toggleMute(){muted=!muted;if(masterGain)masterGain.gain.value=muted?0:.55;document.getElementById('sound-indicator').textContent=muted?'🔇 Muet':'🔊 Son';}
 function osc(freq,type,start,dur,vol=.3,detune=0){const ac=getAC();const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=freq;o.detune.value=detune;g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(0.001,start+dur);o.connect(g);g.connect(masterGain);o.start(start);o.stop(start+dur+.05);}
 function noise(start,dur,vol=.15,lpFreq=800){const ac=getAC();const buf=ac.createBuffer(1,Math.floor(ac.sampleRate*.5),ac.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const src=ac.createBufferSource(),filt=ac.createBiquadFilter(),g=ac.createGain();src.buffer=buf;src.loop=true;filt.type='lowpass';filt.frequency.value=lpFreq;g.gain.setValueAtTime(vol,start);g.gain.exponentialRampToValueAtTime(0.001,start+dur);src.connect(filt);filt.connect(g);g.connect(masterGain);src.start(start);src.stop(start+dur+.05);}
-let villageLoopActive=false,villageLoop=null;
-const V_SCALE=[261.63,293.66,329.63,349.23,392,440,493.88,523.25];
-const V_BASS=[130.81,164.81,196,130.81];
-function startVillageMusic(){if(villageLoopActive)return;villageLoopActive=true;let step=0;function tick(){if(!villageLoopActive)return;const ac=getAC(),now=ac.currentTime;const i=step%V_SCALE.length;osc(V_SCALE[i],'square',now,.18,.12);osc(V_SCALE[(i+2)%8],'square',now+.09,.18,.08);if(step%4===0)osc(V_BASS[Math.floor(step/4)%4],'triangle',now,.36,.1);if(step%8===0)noise(now,.08,.12,200);if(step%8===4)noise(now,.06,.07,600);step++;villageLoop=setTimeout(tick,120);}tick();}
-function stopVillageMusic(){villageLoopActive=false;clearTimeout(villageLoop);}
-let dungeonLoopActive=false,dungeonLoop=null;
-const D_SCALE=[138.59,155.56,174.61,185,207.65,233.08];
-function startDungeonMusic(){if(dungeonLoopActive)return;dungeonLoopActive=true;let step=0;function tick(){if(!dungeonLoopActive)return;const ac=getAC(),now=ac.currentTime;const i=step%D_SCALE.length;osc(D_SCALE[i],'sawtooth',now,.22,.07,-10);osc(D_SCALE[i]*2,'sawtooth',now,.22,.04,10);if(step%6===0)osc(D_SCALE[0]*.5,'triangle',now,.7,.09);if(step%8===0){osc(80,'sine',now,.12,.18);noise(now,.06,.1,150);}if(step%8===4)noise(now,.05,.06,900);if(step%12===0)osc(D_SCALE[3]*2,'sine',now,.4,.05);step++;dungeonLoop=setTimeout(tick,160);}tick();}
-function stopDungeonMusic(){dungeonLoopActive=false;clearTimeout(dungeonLoop);}
+// ── Musique : coupée par défaut, activable depuis le coin supérieur gauche ──
+// Séquenceur à motifs : progression de huit accords, phrases qui montent puis
+// redescendent avec des silences, basse et arpèges qui varient d'une mesure à
+// l'autre. L'ancienne boucle rejouait la même gamme montante sans fin.
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+const _=null;
+const TRACKS={
+  village:{step:.13,wave:'square',detune:0,leadVol:.1,arpVol:.035,bassVol:.1,arpEvery:1,
+    // do – la m – fa – sol – do – mi m – fa – sol
+    chords:[[48,52,55],[45,48,52],[41,45,48],[43,47,50],[48,52,55],[40,43,47],[41,45,48],[43,47,50]],
+    bass:[0,_,_,_,_,_,_,_,7,_,_,_,12,_,7,_],
+    // une ligne par mesure, seize doubles-croches, notes MIDI
+    melody:[
+      [72,_,76,_,79,_,76,_,74,_,72,_,_,_,67,_],
+      [69,_,72,_,76,_,_,74,72,_,69,_,_,_,_,_],
+      [65,_,69,_,72,_,74,_,76,_,74,_,72,_,69,_],
+      [71,_,_,72,74,_,71,_,67,_,_,_,_,_,_,_],
+      [76,_,74,_,72,_,74,76,79,_,_,_,76,_,72,_],
+      [71,_,72,_,74,_,71,_,67,_,64,_,_,_,_,_],
+      [69,_,72,_,77,_,76,_,74,_,72,_,69,_,_,_],
+      [67,_,71,_,74,_,72,_,71,_,_,_,72,_,_,_],
+    ]},
+  dungeon:{step:.16,wave:'sawtooth',detune:-8,leadVol:.06,arpVol:.03,bassVol:.09,arpEvery:2,
+    // do# m – la – fa# m – sol# – do# m – fa# m – la – sol#
+    chords:[[37,40,44],[33,37,40],[42,45,49],[44,48,51],[37,40,44],[42,45,49],[33,37,40],[44,48,51]],
+    bass:[0,_,_,0,_,_,12,_,0,_,_,0,_,_,7,_],
+    melody:[
+      [61,_,_,_,64,_,63,_,61,_,_,_,56,_,_,_],
+      [57,_,61,_,64,_,_,_,66,_,64,_,_,_,_,_],
+      [66,_,_,69,68,_,66,_,64,_,_,_,61,_,_,_],
+      [68,_,_,_,72,_,71,_,68,_,_,_,_,_,_,_],
+      [73,_,_,_,71,_,68,_,69,_,68,_,64,_,_,_],
+      [66,_,69,_,73,_,_,_,71,_,69,_,66,_,_,_],
+      [64,_,_,_,61,_,64,_,69,_,68,_,64,_,_,_],
+      [63,_,_,_,68,_,_,_,60,_,_,_,_,_,_,_],
+    ]},
+};
+const ARP=[0,1,2,1];
+let musicOn=false,musicTrack=null,musicLoop=null;
+try{musicOn=localStorage.getItem('dungeon-elf:musique')==='on';}catch(e){}
+function musicTick(step){
+  const t=TRACKS[musicTrack];
+  if(!t||!musicOn){musicLoop=null;return;}
+  const ac=getAC(),now=ac.currentTime,s=step%16,bar=Math.floor(step/16)%t.melody.length;
+  const chord=t.chords[bar],note=t.melody[bar][s],bass=t.bass[s];
+  if(note)osc(mtof(note),t.wave,now,t.step*2.4,t.leadVol,t.detune);
+  if(bass!==null)osc(mtof(chord[0]-12+bass),'triangle',now,t.step*(s===0?6:2.5),t.bassVol);
+  if(s%2===1&&bar%t.arpEvery===0)osc(mtof(chord[ARP[(s>>1)%4]]+12),'square',now,t.step*1.2,t.arpVol);
+  if(musicTrack==='village'){
+    if(s%8===0)noise(now,.08,.12,200);
+    if(s%8===4)noise(now,.06,.07,600);
+    if(bar===7&&s>=12&&s%2===0)noise(now,.05,.06,1200);
+  }else{
+    if(s===0||s===8)osc(80,'sine',now,.12,.18);
+    if(s%8===4)noise(now,.05,.06,900);
+    if(bar%4===3&&s===14)osc(mtof(chord[0]),'sine',now,.35,.08);
+  }
+  musicLoop=setTimeout(()=>musicTick(step+1),t.step*1000);
+}
+function stopMusicLoop(){clearTimeout(musicLoop);musicLoop=null;}
+function startMusic(name){
+  if(musicTrack!==name){stopMusicLoop();musicTrack=name;}
+  if(musicOn&&!musicLoop)musicTick(0);
+}
+function stopMusic(name){if(musicTrack===name){stopMusicLoop();musicTrack=null;}}
+function startVillageMusic(){startMusic('village');}
+function stopVillageMusic(){stopMusic('village');}
+function startDungeonMusic(){startMusic('dungeon');}
+function stopDungeonMusic(){stopMusic('dungeon');}
+function updateMusicIndicator(){const el=document.getElementById('music-indicator');if(el)el.textContent=musicOn?'🎵 Musique':'🎵 Musique coupée';}
+function toggleMusic(){
+  musicOn=!musicOn;
+  try{localStorage.setItem('dungeon-elf:musique',musicOn?'on':'off');}catch(e){}
+  stopMusicLoop();
+  if(musicOn&&musicTrack)musicTick(0);
+  updateMusicIndicator();
+}
+window.toggleMusic=toggleMusic;
+// Scripts en defer : le DOM est prêt. Le bouton son n'était relié à rien.
+document.getElementById('sound-indicator')?.addEventListener('click',toggleMute);
+document.getElementById('music-indicator')?.addEventListener('click',toggleMusic);
+updateMusicIndicator();
 const SFX={
   slice(){const ac=getAC(),t=ac.currentTime;osc(880,'sawtooth',t,.04,.2);osc(660,'sawtooth',t+.02,.06,.15);noise(t,.05,.15,2000);},
   hurt(){const ac=getAC(),t=ac.currentTime;osc(180,'sawtooth',t,.15,.3);osc(160,'sawtooth',t+.05,.15,.2,-20);noise(t,.12,.15,300);},

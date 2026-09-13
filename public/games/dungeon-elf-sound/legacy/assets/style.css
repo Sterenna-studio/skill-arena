@@ -49,7 +49,8 @@ canvas{display:block;position:absolute;top:0;left:0;width:100vw;height:100vh}
 #hurt-vignette{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:38;opacity:0;background:radial-gradient(ellipse at center,transparent 40%,#e74c3c88 100%);transition:opacity .15s}
 #gameover-screen,#victory-screen,#loot-screen{position:absolute;top:0;left:0;width:100%;height:100%;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;pointer-events:all}
 #sound-indicator{position:absolute;top:10px;left:10px;font-size:10px;color:#4a2a7a;pointer-events:all;z-index:45;cursor:pointer}
-#sound-indicator:hover{color:#9b8ec4}
+#sound-indicator:hover,#music-indicator:hover{color:#9b8ec4}
+#music-indicator{position:absolute;top:24px;left:10px;font-size:10px;color:#4a2a7a;pointer-events:all;z-index:45;cursor:pointer}
 /* Arc zone overlay */
 #arc-canvas{position:absolute;top:0;left:0;pointer-events:none;z-index:19}
 
