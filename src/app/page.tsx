@@ -110,6 +110,15 @@ const FULLGAMES = [
     tagColor: '--c-red',
     external: '/arena/games/tank-protocol/',
   },
+  {
+    slug: 'vulture-bee-game',
+    title: 'Nécrobutinage',
+    desc: 'Gestion de colonie — dirige des abeilles-vautours, exploite les carcasses de la forêt, fais mûrir la viande en pots et tiens quatre saisons face à l’infection et aux raids de fourmis.',
+    icon: '🐝',
+    tag: 'GESTION',
+    tagColor: '--c-amber',
+    external: '/arena/games/vulture-bee-game/',
+  },
 ]
 
 export default function HomePage() {

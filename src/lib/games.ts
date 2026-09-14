@@ -156,6 +156,17 @@ export const GAMES: GameMeta[] = [
     external: '/arena/games/tank-protocol/',
   },
   {
+    slug: 'vulture-bee-game',
+    title: 'Nécrobutinage',
+    description: 'Gestion de colonie d’abeilles-vautours : carcasses, pots de cérumen, infection et raids, sur quatre saisons.',
+    icon: '🐝',
+    category: 'arcade',
+    unit: 'points',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/games/vulture-bee-game/',
+  },
+  {
     slug: 'reaction',
     title: 'Reaction Time',
     description: 'Clique dès que le signal apparaît. Teste tes réflexes purs.',
