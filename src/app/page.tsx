@@ -110,15 +110,6 @@ const FULLGAMES = [
     tagColor: '--c-red',
     external: '/arena/games/tank-protocol/',
   },
-  {
-    slug: 'vulture-bee-game',
-    title: 'Nécrobutinage',
-    desc: 'Incarne une abeille-vautour — récolte les protéines d’une carcasse sans laisser l’infection microbienne submerger la colonie.',
-    icon: '🐝',
-    tag: 'ARCADE',
-    tagColor: '--c-amber',
-    external: '/arena/games/vulture-bee-game/',
-  },
 ]
 
 export default function HomePage() {
