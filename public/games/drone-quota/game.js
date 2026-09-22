@@ -2567,6 +2567,14 @@
 
   renderMenu();
 
+  // Contrat de lecture du rendu : aucune mutation des règles par la vue 3D.
+  window.DQView = {
+    ports: () => ports.map(port => ({
+      el: port.el, index: port.index, type: port.target?.id ?? null,
+      chain: port.chain, shield: port.shieldLeft,
+    })),
+  };
+
   // Couture de mise au point : vérifier la courbe de palier, l'effet des nœuds
   // et les chemins pilotés par minuteur (parade, tourelles, chaîne) sans avoir
   // à jouer vingt rounds à la main. Ces crochets court-circuitent uniquement

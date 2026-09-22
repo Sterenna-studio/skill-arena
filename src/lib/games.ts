@@ -13,6 +13,17 @@ export interface GameMeta {
 
 export const GAMES: GameMeta[] = [
   {
+    slug: 'drone-quota-3d',
+    title: 'Drone Quota 3D',
+    description: 'Le terminal en trois dimensions : drones en volume, chaînes de frappes, duels et progression partagée avec Drone Quota.',
+    icon: '🤖',
+    category: 'arcade',
+    unit: 'round',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/games/drone-quota/?view=3d',
+  },
+  {
     slug: 'drone-quota',
     title: 'Drone Quota',
     description: 'Whack-a-mole roguelite — règle un quota qui monte à chaque round, trois vies par round, arbre de compétences permanent.',

@@ -3,6 +3,15 @@ import { GAMES, CATEGORY_LABELS } from '@/lib/games'
 
 const FULLGAMES = [
   {
+    slug: 'drone-quota-3d',
+    title: 'Drone Quota 3D',
+    desc: 'Un plateau en perspective et des drones en volume. Retrouve les quotas, les duels et ton arbre de compétences dans la version 3D.',
+    icon: '🤖',
+    tag: 'ARCADE 3D',
+    tagColor: '--c-cyan',
+    external: '/arena/games/drone-quota/?view=3d',
+  },
+  {
     slug: 'drone-quota',
     title: 'Drone Quota',
     desc: 'Whack-a-mole roguelite — frappe les drones sur 12 ports, règle un quota qui monte à chaque round et remonte un arbre de compétences permanent.',

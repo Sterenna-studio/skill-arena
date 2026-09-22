@@ -1,0 +1,19 @@
+.view3d .serial { color: #65efff; }
+.view3d .arena { display: block; aspect-ratio: 1.7; min-height: 270px; }
+.dq-world { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 12px; pointer-events: none; }
+.view3d .arena .grid { position: absolute; inset: 0; display: block; z-index: 2; transform: none !important; animation: none !important; }
+.view3d .arena .port { position: absolute; min-width: 44px; min-height: 44px; aspect-ratio: auto; background: transparent; box-shadow: none; border: 1px solid transparent; border-radius: 12px; overflow: visible; transform: none; transition: border-color .12s; }
+.view3d .port .socket, .view3d .port .scars, .view3d .port::after { display: none; }
+.view3d .port .id { top: 0; left: 4px; color: #8299ad; font-size: 8px; }
+.view3d .port .name { bottom: 0; color: #b3cbda; font-size: clamp(6px, 1.6vw, 9px); text-shadow: 0 1px 4px #000; letter-spacing: .06em; }
+.view3d .port:hover, .view3d .port:focus-visible, .view3d .port.keyboard-target { border-color: #80f7ff; outline: none; background: #65edff0a; box-shadow: 0 0 15px #65edff22; }
+.view3d .port.parrying { border-color: #ff5379; }
+.view3d .port .stun-state { bottom: 15px; }
+.view3d .port .shieldbar { top: 12px; }
+.view3d .flank { display: none; }
+.view3d .glass-inner.duel { transform: none !important; }
+.view3d-note { text-align: center; color: #8bb7c7; font: 10px/1.6 monospace; margin: 12px auto; max-width: 52ch; }
+@media (max-width: 480px) {
+  .view3d .arena { aspect-ratio: 1.12; }
+  .view3d .port .id { font-size: 7px; }
+}
