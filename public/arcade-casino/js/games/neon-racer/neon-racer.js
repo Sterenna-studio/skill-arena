@@ -47,7 +47,7 @@ const ROUTE = [
   { id: 's-b', name: 'TRISKEL NORD', label: 'S GAUCHE', length: 470, curve: -0.66, palette: ['#10091f', '#281f46', '#05050c'] },
   { id: 'fast', name: 'AVENUE LASER', label: 'PLEIN GAZ', length: 780, curve: 0.16, palette: ['#080313', '#14113a', '#05050c'] },
   { id: 'hard-r', name: 'PÉRIPH DATA', label: 'VIRAGE DROITE', length: 680, curve: 1.05, palette: ['#050b18', '#111e3d', '#05050c'] },
-  { id: 'cooldown', name: 'QUAI CHRONICLES', label: 'LIGNE CLAIRE', length: 520, curve: -0.04, palette: ['#061312', '#102920', '#05050c'] },
+  { id: 'cooldown', name: 'QUAI STAR TOKENS', label: 'LIGNE CLAIRE', length: 520, curve: -0.04, palette: ['#061312', '#102920', '#05050c'] },
   { id: 'final-l', name: 'CÔTE GWEN HA', label: 'GAUCHE LONG', length: 720, curve: -0.82, palette: ['#120712', '#2a1530', '#05050c'] },
 ];
 const ROUTE_TOTAL = ROUTE.reduce((sum, seg) => sum + seg.length, 0);

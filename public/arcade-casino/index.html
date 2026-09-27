@@ -63,23 +63,6 @@
     }
 
     async function installStarTokenFinish(arcade) {
-      const normalize = () => {
-        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-        const nodes = [];
-        while (walker.nextNode()) nodes.push(walker.currentNode);
-        for (const node of nodes) {
-          let text = node.nodeValue;
-          text = text.split('CHRONICLES').join('STAR TOKENS');
-          text = text.split('Chronicles').join('Star Tokens');
-          text = text.split('CRÉDITS INSUFFISANTS').join('STAR TOKENS INSUFFISANTS');
-          text = text.split('CRÉDITS').join('STAR TOKENS');
-          text = text.split('RTP CIBLE').join('MODE LOCAL');
-          text = text.split('RTP ALPHA ~90%').join('TOKENS LOCAUX');
-          text = text.replace(/([+\-]?\d[\d\s.,]*) C\b/g, '$1 ST');
-          if (text !== node.nodeValue) node.nodeValue = text;
-        }
-      };
-
       const welcomeGrant = async () => {
         const key = `star-arcade:welcome-grant-10000:v1:${arcade.userId || 'guest'}`;
         if (localStorage.getItem(key)) return;
@@ -109,15 +92,11 @@
         btn.addEventListener('click', async () => {
           arcade.credits += 1000;
           await arcade.saveCredits();
-          normalize();
         });
         bar.appendChild(btn);
       };
 
-      const tick = () => { normalize(); };
       await welcomeGrant();
-      tick();
-      new MutationObserver(tick).observe(document.body, { childList: true, characterData: true, subtree: true });
     }
   </script>
 </body>

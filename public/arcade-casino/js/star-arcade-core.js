@@ -176,7 +176,7 @@ export class StarArcadeCore {
         <section class="casino-lobby" id="view-lobby">
           <div class="lobby-hero">
             <h1 class="lobby-hero-title">ARCADE</h1>
-            <p class="lobby-hero-sub">4 MINI-JEUX · STAR TOKENS LOCAUX · CONVERSION CHRONICLES PLUS TARD</p>
+            <p class="lobby-hero-sub">4 MINI-JEUX · STAR TOKENS LOCAUX</p>
             <span class="lobby-hero-line"></span>
           </div>
 
@@ -189,7 +189,7 @@ export class StarArcadeCore {
           <div class="jackpot-banner" style="width:100%;max-width:620px;margin-bottom:32px">
             <span class="jp-icon">🪙</span>
             <span class="jp-label">MODE LOCAL ACTIVÉ</span>
-            <span class="jp-val" id="jp-val">CHRONICLES BLOQUÉS</span>
+            <span class="jp-val" id="jp-val">STAR TOKENS</span>
           </div>
 
           <div class="lobby-grid">

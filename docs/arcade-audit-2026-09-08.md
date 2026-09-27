@@ -99,7 +99,7 @@ Hyperjump attend la rupture plutôt que le cashout pour lever le verrou.
 Coin Reactor capturait déjà sa mise dans `spin()` ; il a reçu le verrou pour
 la cohérence.
 
-### Perf — le hack de renommage tourne à 60 fps
+### Perf — le hack de renommage tourne à 60 fps (corrigé le 27 septembre 2026)
 
 `index.html:120` observe `document.body` en `characterData + subtree`, et
 chaque mutation relance un `createTreeWalker` sur tout le document
@@ -112,6 +112,9 @@ reprendre `star-arcade-core.js:179` et `:192`, qui donnent d'ailleurs
 « CONVERSION STAR TOKENS PLUS TARD » et « STAR TOKENS BLOQUÉS » après
 remplacement — des phrases qui ne veulent plus rien dire. `slot-machine.js`
 est déjà passé aux Star Tokens.
+
+Correction du 27 septembre 2026 : suppression du parcours global et de
+l’observer ; libellés du lobby et du quai Neon Circuit définis à la source.
 
 ### Tactile — absent partout
 
@@ -188,9 +191,9 @@ côté, l'arcade se lance quand même mais sans thème ni sprites.
 1. ~~Harnais local~~ — fait.
 2. ~~Capturer la mise au lancement, verrouiller le bet panel pendant la run~~
    — fait (`31f9f45`).
-3. Supprimer l'observer de renommage en corrigeant les chaînes à la source.
-   Reste `star-arcade-core.js:179` et `:192` — `slot-machine.js` est déjà
-   passé aux Star Tokens.
+3. ~~Supprimer l'observer de renommage en corrigeant les chaînes à la source~~
+   — fait le 27 septembre 2026 : lobby et nom du quai Neon Circuit corrigés ;
+   bonus d’accueil et portefeuille conservés.
 4. Contrôles tactiles partagés, Neon Circuit en premier.
 5. Finir Neon Circuit : tours, checkpoints, objectifs, wallet du core.
 6. Coin Reactor : modules roguelite, puis simulateur RTP.
