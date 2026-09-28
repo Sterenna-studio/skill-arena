@@ -1,0 +1,2376 @@
+{
+  "source": "C:/DEV/toCheck/from_ghs/corebots",
+  "destination": "public/games/core-defense",
+  "files": [
+    {
+      "path": "app.js",
+      "sourceSha256": "c5f0f841cccfe1482980b44407077d56f802e8e102f8a664a1a02fdce5a8f374",
+      "importedSha256": "c5f0f841cccfe1482980b44407077d56f802e8e102f8a664a1a02fdce5a8f374"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear/appear_00.png",
+      "sourceSha256": "417e5a1a914139b7b662e69fbf755262971f82abeccc286d94bda47486b87146",
+      "importedSha256": "417e5a1a914139b7b662e69fbf755262971f82abeccc286d94bda47486b87146"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear/appear_01.png",
+      "sourceSha256": "c785e83dac660f277842fa89bfca87ab5b17e29ddef694cd645f62a7ba590305",
+      "importedSha256": "c785e83dac660f277842fa89bfca87ab5b17e29ddef694cd645f62a7ba590305"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear/appear_02.png",
+      "sourceSha256": "dcbde26fa52d413505090f4c609ea33f1e98d683d0de77c534066a66df5c02ad",
+      "importedSha256": "dcbde26fa52d413505090f4c609ea33f1e98d683d0de77c534066a66df5c02ad"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear/appear_03.png",
+      "sourceSha256": "1460c7854c5f79821b498784d55e73f3440d0277f14b9c4928127dba6cd5dc26",
+      "importedSha256": "1460c7854c5f79821b498784d55e73f3440d0277f14b9c4928127dba6cd5dc26"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear/appear_04.png",
+      "sourceSha256": "ab1a0914d47f2937e16445ab9e209fae27fbe16a86b94a4521c2f575d18bcf33",
+      "importedSha256": "ab1a0914d47f2937e16445ab9e209fae27fbe16a86b94a4521c2f575d18bcf33"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear/appear_05.png",
+      "sourceSha256": "294d65ff890d4d9ced04fe35d070b6f04578dc3b2710502ef69b3e29a300eba5",
+      "importedSha256": "294d65ff890d4d9ced04fe35d070b6f04578dc3b2710502ef69b3e29a300eba5"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear/appear_06.png",
+      "sourceSha256": "dda1e388dc48cc8f46cfd06b9eb73680a861c42e5687ab075e6c484f27295d98",
+      "importedSha256": "dda1e388dc48cc8f46cfd06b9eb73680a861c42e5687ab075e6c484f27295d98"
+    },
+    {
+      "path": "assets/hover_drone/blue/appear_sheet.png",
+      "sourceSha256": "7f8a225c60aca53151e418728123671feb37526f03cee3537d2711ed8ec1a7c9",
+      "importedSha256": "7f8a225c60aca53151e418728123671feb37526f03cee3537d2711ed8ec1a7c9"
+    },
+    {
+      "path": "assets/hover_drone/blue/back_idle/back_idle_00.png",
+      "sourceSha256": "0c3a2058ec799fd487058002f6c486700fa43acc44028debcd9fdd08f2e1950f",
+      "importedSha256": "0c3a2058ec799fd487058002f6c486700fa43acc44028debcd9fdd08f2e1950f"
+    },
+    {
+      "path": "assets/hover_drone/blue/back_idle/back_idle_01.png",
+      "sourceSha256": "55cfc21fec08a997765f54f1569b74dc677b583ed21dc20fbdebd10d8ddb0ef0",
+      "importedSha256": "55cfc21fec08a997765f54f1569b74dc677b583ed21dc20fbdebd10d8ddb0ef0"
+    },
+    {
+      "path": "assets/hover_drone/blue/back_idle/back_idle_02.png",
+      "sourceSha256": "f60a88594268a44cdc58d343108b73ad3a303972c6feb6fd78e74427df2a91f6",
+      "importedSha256": "f60a88594268a44cdc58d343108b73ad3a303972c6feb6fd78e74427df2a91f6"
+    },
+    {
+      "path": "assets/hover_drone/blue/back_idle/back_idle_03.png",
+      "sourceSha256": "c2f714180f03fbb302bb4555a1dcf5fac230a14a9fe380ae51c66d03084177ba",
+      "importedSha256": "c2f714180f03fbb302bb4555a1dcf5fac230a14a9fe380ae51c66d03084177ba"
+    },
+    {
+      "path": "assets/hover_drone/blue/back_idle_sheet.png",
+      "sourceSha256": "39f235e38abd86b92bfd848dca3de73f64d511b7a44f13713826e931d225d7a6",
+      "importedSha256": "39f235e38abd86b92bfd848dca3de73f64d511b7a44f13713826e931d225d7a6"
+    },
+    {
+      "path": "assets/hover_drone/blue/die/die_00.png",
+      "sourceSha256": "7a2ebb7755f0b72c05c857fbc64431810784383a9c4a809be458644b511c5e1e",
+      "importedSha256": "7a2ebb7755f0b72c05c857fbc64431810784383a9c4a809be458644b511c5e1e"
+    },
+    {
+      "path": "assets/hover_drone/blue/die/die_01.png",
+      "sourceSha256": "21804dabf8ac2da534bfbcd4eb7c15cc1676a9913be14a18b43f1458590174d7",
+      "importedSha256": "21804dabf8ac2da534bfbcd4eb7c15cc1676a9913be14a18b43f1458590174d7"
+    },
+    {
+      "path": "assets/hover_drone/blue/die/die_02.png",
+      "sourceSha256": "3b254c9f1360064d89bceae8c0cd5c1793a94f5b53c83f535ff77c7321e5eef4",
+      "importedSha256": "3b254c9f1360064d89bceae8c0cd5c1793a94f5b53c83f535ff77c7321e5eef4"
+    },
+    {
+      "path": "assets/hover_drone/blue/die/die_03.png",
+      "sourceSha256": "f46b4d44645de9a98805f500704ed46864fa6c11b610e65c329abd6d735b126f",
+      "importedSha256": "f46b4d44645de9a98805f500704ed46864fa6c11b610e65c329abd6d735b126f"
+    },
+    {
+      "path": "assets/hover_drone/blue/die/die_04.png",
+      "sourceSha256": "1ea25857e79f6cbe7edb72ad0c27429541b4d548bb0182fcb02634a1508499a5",
+      "importedSha256": "1ea25857e79f6cbe7edb72ad0c27429541b4d548bb0182fcb02634a1508499a5"
+    },
+    {
+      "path": "assets/hover_drone/blue/die_sheet.png",
+      "sourceSha256": "ecfde20a3cbd3f6160a3c5e3faf3850ab51016d04614651bd64436399369eb20",
+      "importedSha256": "ecfde20a3cbd3f6160a3c5e3faf3850ab51016d04614651bd64436399369eb20"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_attack/front_attack_00.png",
+      "sourceSha256": "c9608f2d286aed5bf19fd38d222c0a4c30278ba904a560c3ad6ca72a2c5a697c",
+      "importedSha256": "c9608f2d286aed5bf19fd38d222c0a4c30278ba904a560c3ad6ca72a2c5a697c"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_attack/front_attack_01.png",
+      "sourceSha256": "34047d771a57e24b5f2328aeff29c0faf0f58aee29f834747f52f9bf1c59ed92",
+      "importedSha256": "34047d771a57e24b5f2328aeff29c0faf0f58aee29f834747f52f9bf1c59ed92"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_attack/front_attack_02.png",
+      "sourceSha256": "879f3486c0fde72f184139760f218e7e32e77b5c821665bf5ece62239f292034",
+      "importedSha256": "879f3486c0fde72f184139760f218e7e32e77b5c821665bf5ece62239f292034"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_attack/front_attack_03.png",
+      "sourceSha256": "0fcb42804d8ebcf38f19b7a58ae53108fcd76912d3982ab1ffd97ee2d401c4e3",
+      "importedSha256": "0fcb42804d8ebcf38f19b7a58ae53108fcd76912d3982ab1ffd97ee2d401c4e3"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_attack_sheet.png",
+      "sourceSha256": "c4d97711ab2ecb1c62d454dd83eea6615b2e47e897650cf56644f4b5a56441ef",
+      "importedSha256": "c4d97711ab2ecb1c62d454dd83eea6615b2e47e897650cf56644f4b5a56441ef"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_idle/front_idle_00.png",
+      "sourceSha256": "b36c58ae1a3fbe5493efb12912d968d2aae1c5502e1a6f36f64c80d93672918d",
+      "importedSha256": "b36c58ae1a3fbe5493efb12912d968d2aae1c5502e1a6f36f64c80d93672918d"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_idle/front_idle_01.png",
+      "sourceSha256": "37ea9eba55511d82b471421b93d2c45b4d834fd8c48ebae193d4d42f5ec7c0a3",
+      "importedSha256": "37ea9eba55511d82b471421b93d2c45b4d834fd8c48ebae193d4d42f5ec7c0a3"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_idle/front_idle_02.png",
+      "sourceSha256": "4d2601127972c4530b9cb2e420686c514c56c5f0d827e95439e5ed200a78a9db",
+      "importedSha256": "4d2601127972c4530b9cb2e420686c514c56c5f0d827e95439e5ed200a78a9db"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_idle/front_idle_03.png",
+      "sourceSha256": "0e66ce75d477bbfc3ae2ed5dc7517a018fa030c8f6a3890f8f13e7e85123c205",
+      "importedSha256": "0e66ce75d477bbfc3ae2ed5dc7517a018fa030c8f6a3890f8f13e7e85123c205"
+    },
+    {
+      "path": "assets/hover_drone/blue/front_idle_sheet.png",
+      "sourceSha256": "556bc0c7a699a0c8adaa4aa180a7311dc6c5f2e68ea93fa6fccddfe7698de534",
+      "importedSha256": "556bc0c7a699a0c8adaa4aa180a7311dc6c5f2e68ea93fa6fccddfe7698de534"
+    },
+    {
+      "path": "assets/hover_drone/blue/left_idle/left_idle_00.png",
+      "sourceSha256": "c91bc98b26d3eeed9caa7eceb9b8fea1e3283bed359ea8cf1e9a2fcc8b6a2191",
+      "importedSha256": "c91bc98b26d3eeed9caa7eceb9b8fea1e3283bed359ea8cf1e9a2fcc8b6a2191"
+    },
+    {
+      "path": "assets/hover_drone/blue/left_idle/left_idle_01.png",
+      "sourceSha256": "9e0002372add23f0aa640426b05ab58ad1d7e69c668fd84168f5bfcb52e293f9",
+      "importedSha256": "9e0002372add23f0aa640426b05ab58ad1d7e69c668fd84168f5bfcb52e293f9"
+    },
+    {
+      "path": "assets/hover_drone/blue/left_idle/left_idle_02.png",
+      "sourceSha256": "a84ff6f285f600648b5443265f9f06bc6650c406d6348fc952348a8937a0b8a3",
+      "importedSha256": "a84ff6f285f600648b5443265f9f06bc6650c406d6348fc952348a8937a0b8a3"
+    },
+    {
+      "path": "assets/hover_drone/blue/left_idle/left_idle_03.png",
+      "sourceSha256": "7ced0a6dbbdbb569867038d80cfd5a8bdecf4ea5037c75a1e07f3b7739281c3d",
+      "importedSha256": "7ced0a6dbbdbb569867038d80cfd5a8bdecf4ea5037c75a1e07f3b7739281c3d"
+    },
+    {
+      "path": "assets/hover_drone/blue/left_idle_sheet.png",
+      "sourceSha256": "4bea82877ea5b7e86becc901f18b4fcf63313b548ec5d4c0eb3ab0bc7c52e6fc",
+      "importedSha256": "4bea82877ea5b7e86becc901f18b4fcf63313b548ec5d4c0eb3ab0bc7c52e6fc"
+    },
+    {
+      "path": "assets/hover_drone/blue/right_idle/right_idle_00.png",
+      "sourceSha256": "c67499d8ef20c8ff8a2f44ea76853db4b1aa0c1e24c38702948042eed00ad812",
+      "importedSha256": "c67499d8ef20c8ff8a2f44ea76853db4b1aa0c1e24c38702948042eed00ad812"
+    },
+    {
+      "path": "assets/hover_drone/blue/right_idle/right_idle_01.png",
+      "sourceSha256": "af3a22efb615f50f0a1b7c6e15104eddbcefa1acb27023c424ff3fe387307bfd",
+      "importedSha256": "af3a22efb615f50f0a1b7c6e15104eddbcefa1acb27023c424ff3fe387307bfd"
+    },
+    {
+      "path": "assets/hover_drone/blue/right_idle/right_idle_02.png",
+      "sourceSha256": "6be5fd86635128bec19d471f001c8d7b136679c50dc89cce9456ed18c1b2af6a",
+      "importedSha256": "6be5fd86635128bec19d471f001c8d7b136679c50dc89cce9456ed18c1b2af6a"
+    },
+    {
+      "path": "assets/hover_drone/blue/right_idle/right_idle_03.png",
+      "sourceSha256": "ec15a8cadb64e00563616cbf9b2e31a70fedfb0beca93b790694c8f44a3e9a67",
+      "importedSha256": "ec15a8cadb64e00563616cbf9b2e31a70fedfb0beca93b790694c8f44a3e9a67"
+    },
+    {
+      "path": "assets/hover_drone/blue/right_idle_sheet.png",
+      "sourceSha256": "3fa7c378efa960c1af5cfdcf9eb83dbbfa2bc372310ef54df42b984e8a4a3dec",
+      "importedSha256": "3fa7c378efa960c1af5cfdcf9eb83dbbfa2bc372310ef54df42b984e8a4a3dec"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear/appear_00.png",
+      "sourceSha256": "a409fec0231c1189889da1c46d722abc55b7a662a2f5b79c8e491c3ec0560dbf",
+      "importedSha256": "a409fec0231c1189889da1c46d722abc55b7a662a2f5b79c8e491c3ec0560dbf"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear/appear_01.png",
+      "sourceSha256": "9eb55d8330d7b81bafdadbaca9037c0940b7b724df056ec7395659b23ebd63ef",
+      "importedSha256": "9eb55d8330d7b81bafdadbaca9037c0940b7b724df056ec7395659b23ebd63ef"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear/appear_02.png",
+      "sourceSha256": "a1344ec94b885755d7969dd662b04d48a7e6180111a6150a58d1d939250e95dd",
+      "importedSha256": "a1344ec94b885755d7969dd662b04d48a7e6180111a6150a58d1d939250e95dd"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear/appear_03.png",
+      "sourceSha256": "c8bfc159edca67652417dba11d8ef2f7866a1097521daf4ffa73425896bbf5b4",
+      "importedSha256": "c8bfc159edca67652417dba11d8ef2f7866a1097521daf4ffa73425896bbf5b4"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear/appear_04.png",
+      "sourceSha256": "ab76055eda3029e1355082be1153f2b0f775e5578082fe28687a244fd0f72df5",
+      "importedSha256": "ab76055eda3029e1355082be1153f2b0f775e5578082fe28687a244fd0f72df5"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear/appear_05.png",
+      "sourceSha256": "5deaaff12313a2f24c8423085fa3ccaa1a148cfbf3784f05d83cb2b6ff05570d",
+      "importedSha256": "5deaaff12313a2f24c8423085fa3ccaa1a148cfbf3784f05d83cb2b6ff05570d"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear/appear_06.png",
+      "sourceSha256": "bb95bf9b60e554f7120226696c2178716d1cc83d3b45b538865cc6e6a69bbea8",
+      "importedSha256": "bb95bf9b60e554f7120226696c2178716d1cc83d3b45b538865cc6e6a69bbea8"
+    },
+    {
+      "path": "assets/hover_drone/gold/appear_sheet.png",
+      "sourceSha256": "3707ad80e85688071bef8809e22ed25ea6935eb1a8a8cdacec2231ea94364970",
+      "importedSha256": "3707ad80e85688071bef8809e22ed25ea6935eb1a8a8cdacec2231ea94364970"
+    },
+    {
+      "path": "assets/hover_drone/gold/back_idle/back_idle_00.png",
+      "sourceSha256": "13972fbf44da8f3469dfb4c5680a69f772e6927c3f837fecdf458308108354ff",
+      "importedSha256": "13972fbf44da8f3469dfb4c5680a69f772e6927c3f837fecdf458308108354ff"
+    },
+    {
+      "path": "assets/hover_drone/gold/back_idle/back_idle_01.png",
+      "sourceSha256": "285faf84905d55ce53f8f4247fa24a63e1b46e90f8816c7f646cfe311161d177",
+      "importedSha256": "285faf84905d55ce53f8f4247fa24a63e1b46e90f8816c7f646cfe311161d177"
+    },
+    {
+      "path": "assets/hover_drone/gold/back_idle/back_idle_02.png",
+      "sourceSha256": "d86a3657a0bda10b29c6b0b7942cec573a3b3c06244c846e10d754805b6ca826",
+      "importedSha256": "d86a3657a0bda10b29c6b0b7942cec573a3b3c06244c846e10d754805b6ca826"
+    },
+    {
+      "path": "assets/hover_drone/gold/back_idle/back_idle_03.png",
+      "sourceSha256": "e494b879b348dbf6880b0932c999750dc9e71a640b44576182a17d9c6f84c826",
+      "importedSha256": "e494b879b348dbf6880b0932c999750dc9e71a640b44576182a17d9c6f84c826"
+    },
+    {
+      "path": "assets/hover_drone/gold/back_idle_sheet.png",
+      "sourceSha256": "2b2dff2073318fe975866da0e13759459cdaf473893444970ff22adee786afcb",
+      "importedSha256": "2b2dff2073318fe975866da0e13759459cdaf473893444970ff22adee786afcb"
+    },
+    {
+      "path": "assets/hover_drone/gold/die/die_00.png",
+      "sourceSha256": "e87806d842ed2bdb3ad271a9900e5839d981a32fab64c214f41a48a786bac2bf",
+      "importedSha256": "e87806d842ed2bdb3ad271a9900e5839d981a32fab64c214f41a48a786bac2bf"
+    },
+    {
+      "path": "assets/hover_drone/gold/die/die_01.png",
+      "sourceSha256": "fd7dcf827134f0a2f6985a273339db10737cb8788483e2fe45065ecc65c08dff",
+      "importedSha256": "fd7dcf827134f0a2f6985a273339db10737cb8788483e2fe45065ecc65c08dff"
+    },
+    {
+      "path": "assets/hover_drone/gold/die/die_02.png",
+      "sourceSha256": "0e5c1332b608002824317f5c4808f9627f4eae4a7767454a1477abdfcc4311d4",
+      "importedSha256": "0e5c1332b608002824317f5c4808f9627f4eae4a7767454a1477abdfcc4311d4"
+    },
+    {
+      "path": "assets/hover_drone/gold/die/die_03.png",
+      "sourceSha256": "8df5a5178a2241c11ed8c66e551fd11dede47b4e01f6fe3141d87838a187b0b3",
+      "importedSha256": "8df5a5178a2241c11ed8c66e551fd11dede47b4e01f6fe3141d87838a187b0b3"
+    },
+    {
+      "path": "assets/hover_drone/gold/die/die_04.png",
+      "sourceSha256": "40ffcf2446125f1c58ddaff94a042ff6dc5bfdd841d6054246a596345e70259c",
+      "importedSha256": "40ffcf2446125f1c58ddaff94a042ff6dc5bfdd841d6054246a596345e70259c"
+    },
+    {
+      "path": "assets/hover_drone/gold/die_sheet.png",
+      "sourceSha256": "8234e73cf651bf0b2becee52df8488205adb435bbc3da61273f64c0fe1296cf2",
+      "importedSha256": "8234e73cf651bf0b2becee52df8488205adb435bbc3da61273f64c0fe1296cf2"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_attack/front_attack_00.png",
+      "sourceSha256": "98e21f7401ccd0dc9cd8b62b1e0d9abea34716de427c2ad6d460fca91126f34d",
+      "importedSha256": "98e21f7401ccd0dc9cd8b62b1e0d9abea34716de427c2ad6d460fca91126f34d"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_attack/front_attack_01.png",
+      "sourceSha256": "8a4ae3f862f3bf585a8970ef29e819372c9c30d00d7e1fe33255832787e73e48",
+      "importedSha256": "8a4ae3f862f3bf585a8970ef29e819372c9c30d00d7e1fe33255832787e73e48"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_attack/front_attack_02.png",
+      "sourceSha256": "60edfd57e79afeecf4f0614a6a6e539750cabeeaf355b4ce7e9ccce8535f26f3",
+      "importedSha256": "60edfd57e79afeecf4f0614a6a6e539750cabeeaf355b4ce7e9ccce8535f26f3"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_attack/front_attack_03.png",
+      "sourceSha256": "bcd9dff582a1e1245d302db688e966982bd7545635493dc49c04f05a672658f1",
+      "importedSha256": "bcd9dff582a1e1245d302db688e966982bd7545635493dc49c04f05a672658f1"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_attack_sheet.png",
+      "sourceSha256": "969f6aa2d1c202b7b0251d2dc4643c9891aef680579fabc7ce1a6421b34e4e86",
+      "importedSha256": "969f6aa2d1c202b7b0251d2dc4643c9891aef680579fabc7ce1a6421b34e4e86"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_idle/front_idle_00.png",
+      "sourceSha256": "9b1f3d00b7ac7c42569fc6eb4fef6717c0d04a66fe365131013a0d564045ea43",
+      "importedSha256": "9b1f3d00b7ac7c42569fc6eb4fef6717c0d04a66fe365131013a0d564045ea43"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_idle/front_idle_01.png",
+      "sourceSha256": "ecae9dd85d7ba4783eb0f9eaeed6ffa7620cd970a0a393dd90c1d02cb2b52fd4",
+      "importedSha256": "ecae9dd85d7ba4783eb0f9eaeed6ffa7620cd970a0a393dd90c1d02cb2b52fd4"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_idle/front_idle_02.png",
+      "sourceSha256": "6a5acdef89a73e2e71e2ea163e7db23871fe09a108be6b0c3b5c1e396ec8f88f",
+      "importedSha256": "6a5acdef89a73e2e71e2ea163e7db23871fe09a108be6b0c3b5c1e396ec8f88f"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_idle/front_idle_03.png",
+      "sourceSha256": "8deff5649c143bbaacee68b3af686666c32775e7fa20cefd7086d136a18d11a6",
+      "importedSha256": "8deff5649c143bbaacee68b3af686666c32775e7fa20cefd7086d136a18d11a6"
+    },
+    {
+      "path": "assets/hover_drone/gold/front_idle_sheet.png",
+      "sourceSha256": "6168cf3a582c623c89df45cc09ac480eb4014c3704bad6d25178ebbb6be8418b",
+      "importedSha256": "6168cf3a582c623c89df45cc09ac480eb4014c3704bad6d25178ebbb6be8418b"
+    },
+    {
+      "path": "assets/hover_drone/gold/left_idle/left_idle_00.png",
+      "sourceSha256": "658078965c94c078580751cd77a22ea958f48934ea72f45bac18e0b547fd2080",
+      "importedSha256": "658078965c94c078580751cd77a22ea958f48934ea72f45bac18e0b547fd2080"
+    },
+    {
+      "path": "assets/hover_drone/gold/left_idle/left_idle_01.png",
+      "sourceSha256": "b7990603f2265eff92d7f1c5098dff2a143e643c7ab2dc809effcecf7f38eaca",
+      "importedSha256": "b7990603f2265eff92d7f1c5098dff2a143e643c7ab2dc809effcecf7f38eaca"
+    },
+    {
+      "path": "assets/hover_drone/gold/left_idle/left_idle_02.png",
+      "sourceSha256": "d348049b77f473a03faaa09ac0f7720111a7cf8016f7b04a3aee59d5d2d67542",
+      "importedSha256": "d348049b77f473a03faaa09ac0f7720111a7cf8016f7b04a3aee59d5d2d67542"
+    },
+    {
+      "path": "assets/hover_drone/gold/left_idle/left_idle_03.png",
+      "sourceSha256": "f2881cbf5579aebf65d202d86077447389c923501ba2e50f79d2ee32d53ee87c",
+      "importedSha256": "f2881cbf5579aebf65d202d86077447389c923501ba2e50f79d2ee32d53ee87c"
+    },
+    {
+      "path": "assets/hover_drone/gold/left_idle_sheet.png",
+      "sourceSha256": "c640714717ca78e0faf8227a27dae78be020b249c17206a36c6ce5d7c1782f96",
+      "importedSha256": "c640714717ca78e0faf8227a27dae78be020b249c17206a36c6ce5d7c1782f96"
+    },
+    {
+      "path": "assets/hover_drone/gold/right_idle/right_idle_00.png",
+      "sourceSha256": "697e1bf87d6991cf32978dabd987dd195dbd2e3ad975d43c98b86163aacb004c",
+      "importedSha256": "697e1bf87d6991cf32978dabd987dd195dbd2e3ad975d43c98b86163aacb004c"
+    },
+    {
+      "path": "assets/hover_drone/gold/right_idle/right_idle_01.png",
+      "sourceSha256": "acb9f4ed7722cecd0aa273ad71c0c4bcccf918b612be3a3785c945e65d9035c3",
+      "importedSha256": "acb9f4ed7722cecd0aa273ad71c0c4bcccf918b612be3a3785c945e65d9035c3"
+    },
+    {
+      "path": "assets/hover_drone/gold/right_idle/right_idle_02.png",
+      "sourceSha256": "65e1b254c98fd2ed8cc235939cf679f529554cda3847bad7b9559f47f1914e02",
+      "importedSha256": "65e1b254c98fd2ed8cc235939cf679f529554cda3847bad7b9559f47f1914e02"
+    },
+    {
+      "path": "assets/hover_drone/gold/right_idle/right_idle_03.png",
+      "sourceSha256": "9ac76c58fd5f86289d7c15feecb747ba125d6f2fc0fa7756dcf7eece40b33c24",
+      "importedSha256": "9ac76c58fd5f86289d7c15feecb747ba125d6f2fc0fa7756dcf7eece40b33c24"
+    },
+    {
+      "path": "assets/hover_drone/gold/right_idle_sheet.png",
+      "sourceSha256": "e88ac3199cb3fdc87e83bbffbf01af15803e7fb0be888fafbf9ecfdd0a0f3b69",
+      "importedSha256": "e88ac3199cb3fdc87e83bbffbf01af15803e7fb0be888fafbf9ecfdd0a0f3b69"
+    },
+    {
+      "path": "assets/hover_drone/green/appear/appear_00.png",
+      "sourceSha256": "16d2d9ea3f860ef1dca21aa47f4ceef3b755e1205a654f81535fea903891860e",
+      "importedSha256": "16d2d9ea3f860ef1dca21aa47f4ceef3b755e1205a654f81535fea903891860e"
+    },
+    {
+      "path": "assets/hover_drone/green/appear/appear_01.png",
+      "sourceSha256": "42d76c798376aceb20be4752c2f51e766c1361a2507f49d2cfc71ab270a6e433",
+      "importedSha256": "42d76c798376aceb20be4752c2f51e766c1361a2507f49d2cfc71ab270a6e433"
+    },
+    {
+      "path": "assets/hover_drone/green/appear/appear_02.png",
+      "sourceSha256": "8d325d0ef97004bc5d5cff75d19fcb6b7ef5800503ea3ba9cc87fbbbc81ec9a2",
+      "importedSha256": "8d325d0ef97004bc5d5cff75d19fcb6b7ef5800503ea3ba9cc87fbbbc81ec9a2"
+    },
+    {
+      "path": "assets/hover_drone/green/appear/appear_03.png",
+      "sourceSha256": "a2922435ca0f1160a1882374d49e81e0176b80e5d9cb87a87ae43f43678c6e4a",
+      "importedSha256": "a2922435ca0f1160a1882374d49e81e0176b80e5d9cb87a87ae43f43678c6e4a"
+    },
+    {
+      "path": "assets/hover_drone/green/appear/appear_04.png",
+      "sourceSha256": "15aa1729574a1521307d06953c0c2696d9366a24a0dead56bd27ebe08d60014f",
+      "importedSha256": "15aa1729574a1521307d06953c0c2696d9366a24a0dead56bd27ebe08d60014f"
+    },
+    {
+      "path": "assets/hover_drone/green/appear/appear_05.png",
+      "sourceSha256": "5bf3e80129c39daff24563f27aa0e378441c9ac6037a07815e814dea16ec792b",
+      "importedSha256": "5bf3e80129c39daff24563f27aa0e378441c9ac6037a07815e814dea16ec792b"
+    },
+    {
+      "path": "assets/hover_drone/green/appear/appear_06.png",
+      "sourceSha256": "17e773b0af9b406e955aba2497c8e34ebe59610e33afbd1039f8ea71eede2283",
+      "importedSha256": "17e773b0af9b406e955aba2497c8e34ebe59610e33afbd1039f8ea71eede2283"
+    },
+    {
+      "path": "assets/hover_drone/green/appear_sheet.png",
+      "sourceSha256": "068e7225ee7c16e578e226bc7091169fa2109d3d660248d967be997feb9ab935",
+      "importedSha256": "068e7225ee7c16e578e226bc7091169fa2109d3d660248d967be997feb9ab935"
+    },
+    {
+      "path": "assets/hover_drone/green/back_idle/back_idle_00.png",
+      "sourceSha256": "33c61390ee42df1f734fead236abc63a20d2bfe186ee2d3ec5b71074dcec5426",
+      "importedSha256": "33c61390ee42df1f734fead236abc63a20d2bfe186ee2d3ec5b71074dcec5426"
+    },
+    {
+      "path": "assets/hover_drone/green/back_idle/back_idle_01.png",
+      "sourceSha256": "f6685da44cd72e842d31c67e74f993ba97ae0ed4aa87005830802ad4567f0ac0",
+      "importedSha256": "f6685da44cd72e842d31c67e74f993ba97ae0ed4aa87005830802ad4567f0ac0"
+    },
+    {
+      "path": "assets/hover_drone/green/back_idle/back_idle_02.png",
+      "sourceSha256": "68e797fd77ae03b6c9537fbb4459d4088da8996baf10181efbb206217fb7368e",
+      "importedSha256": "68e797fd77ae03b6c9537fbb4459d4088da8996baf10181efbb206217fb7368e"
+    },
+    {
+      "path": "assets/hover_drone/green/back_idle/back_idle_03.png",
+      "sourceSha256": "e7701ca81d9a04d4f747e2a63596b8a67b815a005a8f519c09836b1b18e6f1d9",
+      "importedSha256": "e7701ca81d9a04d4f747e2a63596b8a67b815a005a8f519c09836b1b18e6f1d9"
+    },
+    {
+      "path": "assets/hover_drone/green/back_idle_sheet.png",
+      "sourceSha256": "74782d73620bf9d7c5a630e9d4b0ce4d226e9dac004facc3352f469f327be289",
+      "importedSha256": "74782d73620bf9d7c5a630e9d4b0ce4d226e9dac004facc3352f469f327be289"
+    },
+    {
+      "path": "assets/hover_drone/green/die/die_00.png",
+      "sourceSha256": "3518e34a0412537b959c4fe78c34ad01c3ca8a2eed66cedf451dedbd529ef8c9",
+      "importedSha256": "3518e34a0412537b959c4fe78c34ad01c3ca8a2eed66cedf451dedbd529ef8c9"
+    },
+    {
+      "path": "assets/hover_drone/green/die/die_01.png",
+      "sourceSha256": "3ed6b855f0c2ed88c9d2529848bff2bfcf5794f730091d70945a3175dcc30f59",
+      "importedSha256": "3ed6b855f0c2ed88c9d2529848bff2bfcf5794f730091d70945a3175dcc30f59"
+    },
+    {
+      "path": "assets/hover_drone/green/die/die_02.png",
+      "sourceSha256": "911b3d2e7201209a1387886fc2f1d3d2d48e41f25327f31653341cf2e4807eff",
+      "importedSha256": "911b3d2e7201209a1387886fc2f1d3d2d48e41f25327f31653341cf2e4807eff"
+    },
+    {
+      "path": "assets/hover_drone/green/die/die_03.png",
+      "sourceSha256": "75634c944e5f221cfd48e787ba5133b26aef42a089cf00834cdc06068917d05b",
+      "importedSha256": "75634c944e5f221cfd48e787ba5133b26aef42a089cf00834cdc06068917d05b"
+    },
+    {
+      "path": "assets/hover_drone/green/die/die_04.png",
+      "sourceSha256": "809a5842586f3bfdc4a55d3f3b3bce34b876fca0ee51de0047f2c9e089bb78e0",
+      "importedSha256": "809a5842586f3bfdc4a55d3f3b3bce34b876fca0ee51de0047f2c9e089bb78e0"
+    },
+    {
+      "path": "assets/hover_drone/green/die_sheet.png",
+      "sourceSha256": "daaee7e0a285770d38682949eef6ba4566a0e8615c547bcce8779d528035b617",
+      "importedSha256": "daaee7e0a285770d38682949eef6ba4566a0e8615c547bcce8779d528035b617"
+    },
+    {
+      "path": "assets/hover_drone/green/front_attack/front_attack_00.png",
+      "sourceSha256": "503ae662fcf0957cdd2e5d2a4bbb03fefd8f261ca115b9ca90a09c60d9d0c243",
+      "importedSha256": "503ae662fcf0957cdd2e5d2a4bbb03fefd8f261ca115b9ca90a09c60d9d0c243"
+    },
+    {
+      "path": "assets/hover_drone/green/front_attack/front_attack_01.png",
+      "sourceSha256": "d2f6e63ea2d46437dbd4c87470262df4cd3733951f3c0adcc6f9ee9737c6b6e6",
+      "importedSha256": "d2f6e63ea2d46437dbd4c87470262df4cd3733951f3c0adcc6f9ee9737c6b6e6"
+    },
+    {
+      "path": "assets/hover_drone/green/front_attack/front_attack_02.png",
+      "sourceSha256": "079687f0abb6af613c2fca216119670ce3e0ae78a609dd3e01db3e2b97caa5ef",
+      "importedSha256": "079687f0abb6af613c2fca216119670ce3e0ae78a609dd3e01db3e2b97caa5ef"
+    },
+    {
+      "path": "assets/hover_drone/green/front_attack/front_attack_03.png",
+      "sourceSha256": "23f722d3a3e3ad4b73dcc776d46e491b789dac39d0f511d108ab71547f3350e5",
+      "importedSha256": "23f722d3a3e3ad4b73dcc776d46e491b789dac39d0f511d108ab71547f3350e5"
+    },
+    {
+      "path": "assets/hover_drone/green/front_attack_sheet.png",
+      "sourceSha256": "2388c11bcb8e8bfb7776fa0fcdb78981a0846bd9133f52630f00e3225e74ecff",
+      "importedSha256": "2388c11bcb8e8bfb7776fa0fcdb78981a0846bd9133f52630f00e3225e74ecff"
+    },
+    {
+      "path": "assets/hover_drone/green/front_idle/front_idle_00.png",
+      "sourceSha256": "e9022043451e1eb0a4abb525bc16d5b3cfe53a81133d0e928ee18b40a729966b",
+      "importedSha256": "e9022043451e1eb0a4abb525bc16d5b3cfe53a81133d0e928ee18b40a729966b"
+    },
+    {
+      "path": "assets/hover_drone/green/front_idle/front_idle_01.png",
+      "sourceSha256": "74a56788e32b8e976ccf647acc2c432d7ba10642c28af967245f21d070f48340",
+      "importedSha256": "74a56788e32b8e976ccf647acc2c432d7ba10642c28af967245f21d070f48340"
+    },
+    {
+      "path": "assets/hover_drone/green/front_idle/front_idle_02.png",
+      "sourceSha256": "593f3dec87e70f45e3141255cdb168101a21b250382c7aeca955a10db4b670f7",
+      "importedSha256": "593f3dec87e70f45e3141255cdb168101a21b250382c7aeca955a10db4b670f7"
+    },
+    {
+      "path": "assets/hover_drone/green/front_idle/front_idle_03.png",
+      "sourceSha256": "95f89c15338e6b02897ba23443dd1943a6d618a4a9c9bb1c5724e414a6d35e3b",
+      "importedSha256": "95f89c15338e6b02897ba23443dd1943a6d618a4a9c9bb1c5724e414a6d35e3b"
+    },
+    {
+      "path": "assets/hover_drone/green/front_idle_sheet.png",
+      "sourceSha256": "03ae47f4e3754ec5e2c850db2e18324b080091b6a23164b443dc0cebaf5e39b9",
+      "importedSha256": "03ae47f4e3754ec5e2c850db2e18324b080091b6a23164b443dc0cebaf5e39b9"
+    },
+    {
+      "path": "assets/hover_drone/green/left_idle/left_idle_00.png",
+      "sourceSha256": "4f351e92278f7deafe0386342b7ffa8116038472ae2ebd3cae8073f1157a4204",
+      "importedSha256": "4f351e92278f7deafe0386342b7ffa8116038472ae2ebd3cae8073f1157a4204"
+    },
+    {
+      "path": "assets/hover_drone/green/left_idle/left_idle_01.png",
+      "sourceSha256": "9d876dd06281f4441e7b7844ae0b88929461fbf8a0640c4d45f7f08284429945",
+      "importedSha256": "9d876dd06281f4441e7b7844ae0b88929461fbf8a0640c4d45f7f08284429945"
+    },
+    {
+      "path": "assets/hover_drone/green/left_idle/left_idle_02.png",
+      "sourceSha256": "438fb44941e43da67c74fe79d1fb55cc3c52e8e5511b822e77c30d8fa6ca16a2",
+      "importedSha256": "438fb44941e43da67c74fe79d1fb55cc3c52e8e5511b822e77c30d8fa6ca16a2"
+    },
+    {
+      "path": "assets/hover_drone/green/left_idle/left_idle_03.png",
+      "sourceSha256": "0604b686a6a1db5fe0291149e4767ee2e2c1729672cfd8d3c956115cab52ebf9",
+      "importedSha256": "0604b686a6a1db5fe0291149e4767ee2e2c1729672cfd8d3c956115cab52ebf9"
+    },
+    {
+      "path": "assets/hover_drone/green/left_idle_sheet.png",
+      "sourceSha256": "70e90d38432d53023ebee6fd2ecd36cbc037bba19d72e345a586637db5714a10",
+      "importedSha256": "70e90d38432d53023ebee6fd2ecd36cbc037bba19d72e345a586637db5714a10"
+    },
+    {
+      "path": "assets/hover_drone/green/right_idle/right_idle_00.png",
+      "sourceSha256": "989a3e0a7409750bea840be0d38e78d32a42b1cc62f9aeea6fc2af326108ebc7",
+      "importedSha256": "989a3e0a7409750bea840be0d38e78d32a42b1cc62f9aeea6fc2af326108ebc7"
+    },
+    {
+      "path": "assets/hover_drone/green/right_idle/right_idle_01.png",
+      "sourceSha256": "5c6dea2b747b4f46949faa2e5b8acbbce64c8b5cd2a9ecf10d1bc474f1bc6b06",
+      "importedSha256": "5c6dea2b747b4f46949faa2e5b8acbbce64c8b5cd2a9ecf10d1bc474f1bc6b06"
+    },
+    {
+      "path": "assets/hover_drone/green/right_idle/right_idle_02.png",
+      "sourceSha256": "ee14f5f19ba054e3c75163fc2ae3a20d6b7d5dbebd4805151f214a44add414d0",
+      "importedSha256": "ee14f5f19ba054e3c75163fc2ae3a20d6b7d5dbebd4805151f214a44add414d0"
+    },
+    {
+      "path": "assets/hover_drone/green/right_idle/right_idle_03.png",
+      "sourceSha256": "0c264a5a728c45e72dca549ef16035aaabd85388f1ebee8cadaa791a63b39106",
+      "importedSha256": "0c264a5a728c45e72dca549ef16035aaabd85388f1ebee8cadaa791a63b39106"
+    },
+    {
+      "path": "assets/hover_drone/green/right_idle_sheet.png",
+      "sourceSha256": "bbb09ee77fc73a5698ab74b22b8cbcf6f36430ea0845db6312396c2db1937e2f",
+      "importedSha256": "bbb09ee77fc73a5698ab74b22b8cbcf6f36430ea0845db6312396c2db1937e2f"
+    },
+    {
+      "path": "assets/hover_drone/hover_drone_atlas_source.png",
+      "sourceSha256": "6b392a3c6c83aa0b37c0f04cc34a3888acf105c5889f7c2c2451943f3129e07d",
+      "importedSha256": "6b392a3c6c83aa0b37c0f04cc34a3888acf105c5889f7c2c2451943f3129e07d"
+    },
+    {
+      "path": "assets/hover_drone/manifest.json",
+      "sourceSha256": "02aa65e56c3cc6cccf92621f530cd65755a071036abf92015c7d080f1ae76186",
+      "importedSha256": "02aa65e56c3cc6cccf92621f530cd65755a071036abf92015c7d080f1ae76186"
+    },
+    {
+      "path": "assets/hover_drone/original/appear/appear_00.png",
+      "sourceSha256": "f231469b01f6593cacf670f297c4c6aa55fc3b4b0744fd5b16bd6bbd758eff15",
+      "importedSha256": "f231469b01f6593cacf670f297c4c6aa55fc3b4b0744fd5b16bd6bbd758eff15"
+    },
+    {
+      "path": "assets/hover_drone/original/appear/appear_01.png",
+      "sourceSha256": "277d2353edacd90c39c57957b0f8ea66edb55b516d244d5db3fb00e4d146f646",
+      "importedSha256": "277d2353edacd90c39c57957b0f8ea66edb55b516d244d5db3fb00e4d146f646"
+    },
+    {
+      "path": "assets/hover_drone/original/appear/appear_02.png",
+      "sourceSha256": "a26ccc45ce6f854fc10d9ae07adb53d8303820817db428509032d6bcda4e5b93",
+      "importedSha256": "a26ccc45ce6f854fc10d9ae07adb53d8303820817db428509032d6bcda4e5b93"
+    },
+    {
+      "path": "assets/hover_drone/original/appear/appear_03.png",
+      "sourceSha256": "6b1e2fefc0d6567f17669b8a44807e4be39e76fc030151cf56eee9374e975203",
+      "importedSha256": "6b1e2fefc0d6567f17669b8a44807e4be39e76fc030151cf56eee9374e975203"
+    },
+    {
+      "path": "assets/hover_drone/original/appear/appear_04.png",
+      "sourceSha256": "0091dad5c903e66ad2ee04f09418735148e3cee4ea6b133f963eb8a42a2e752b",
+      "importedSha256": "0091dad5c903e66ad2ee04f09418735148e3cee4ea6b133f963eb8a42a2e752b"
+    },
+    {
+      "path": "assets/hover_drone/original/appear/appear_05.png",
+      "sourceSha256": "fd31e20e90921e875797b18b9507e1a0b9827436c835b40edcc86b9df66e2b51",
+      "importedSha256": "fd31e20e90921e875797b18b9507e1a0b9827436c835b40edcc86b9df66e2b51"
+    },
+    {
+      "path": "assets/hover_drone/original/appear/appear_06.png",
+      "sourceSha256": "3f234d8624dc99a91e3a6f83ea24315d8e57b6ab0e0158f03b4701a7d18b71d3",
+      "importedSha256": "3f234d8624dc99a91e3a6f83ea24315d8e57b6ab0e0158f03b4701a7d18b71d3"
+    },
+    {
+      "path": "assets/hover_drone/original/appear_sheet.png",
+      "sourceSha256": "07193d6429b174c41ccbc4243acf647d74f998e7f96b1f93d6524fe3e2aeebeb",
+      "importedSha256": "07193d6429b174c41ccbc4243acf647d74f998e7f96b1f93d6524fe3e2aeebeb"
+    },
+    {
+      "path": "assets/hover_drone/original/back_idle/back_idle_00.png",
+      "sourceSha256": "8c95be97a14129e163cea6846599c27728de0e5611638bd8714644bd6ff35703",
+      "importedSha256": "8c95be97a14129e163cea6846599c27728de0e5611638bd8714644bd6ff35703"
+    },
+    {
+      "path": "assets/hover_drone/original/back_idle/back_idle_01.png",
+      "sourceSha256": "1a1d3e0e3efbb0545db177a22c0b48eaf9dec33bfaccf4e9a4192087cce44586",
+      "importedSha256": "1a1d3e0e3efbb0545db177a22c0b48eaf9dec33bfaccf4e9a4192087cce44586"
+    },
+    {
+      "path": "assets/hover_drone/original/back_idle/back_idle_02.png",
+      "sourceSha256": "8fcf24045a41562792a13f952e57b5988b1378f0c594a5cc21b0e44130b61ed1",
+      "importedSha256": "8fcf24045a41562792a13f952e57b5988b1378f0c594a5cc21b0e44130b61ed1"
+    },
+    {
+      "path": "assets/hover_drone/original/back_idle/back_idle_03.png",
+      "sourceSha256": "0b87eeebe4a290bd37aaef2c7ab97a609c9fa1083ec6fa362bbc5385f1930645",
+      "importedSha256": "0b87eeebe4a290bd37aaef2c7ab97a609c9fa1083ec6fa362bbc5385f1930645"
+    },
+    {
+      "path": "assets/hover_drone/original/back_idle_sheet.png",
+      "sourceSha256": "869ec6312714dd40e87cbc4f5f8cc18207dff054e8c09a8cf02721f800036279",
+      "importedSha256": "869ec6312714dd40e87cbc4f5f8cc18207dff054e8c09a8cf02721f800036279"
+    },
+    {
+      "path": "assets/hover_drone/original/die/die_00.png",
+      "sourceSha256": "f357958a66763e05f3cf02985fb69c6a2d8f8070ba046d40e582519263144d5b",
+      "importedSha256": "f357958a66763e05f3cf02985fb69c6a2d8f8070ba046d40e582519263144d5b"
+    },
+    {
+      "path": "assets/hover_drone/original/die/die_01.png",
+      "sourceSha256": "46f405e7935f88284d8d537c2571a4e25a8bf2e55a564fba5eb49c0844c2210b",
+      "importedSha256": "46f405e7935f88284d8d537c2571a4e25a8bf2e55a564fba5eb49c0844c2210b"
+    },
+    {
+      "path": "assets/hover_drone/original/die/die_02.png",
+      "sourceSha256": "1d6828ed006a01d960ecef00949ed7c445276cc5a5148f8d1efadf1bb5cd28b6",
+      "importedSha256": "1d6828ed006a01d960ecef00949ed7c445276cc5a5148f8d1efadf1bb5cd28b6"
+    },
+    {
+      "path": "assets/hover_drone/original/die/die_03.png",
+      "sourceSha256": "3d332c381910a132f7f5f5d8a07e8d3ffa1bd982a8fc46372f6846b959f9e5d9",
+      "importedSha256": "3d332c381910a132f7f5f5d8a07e8d3ffa1bd982a8fc46372f6846b959f9e5d9"
+    },
+    {
+      "path": "assets/hover_drone/original/die/die_04.png",
+      "sourceSha256": "ac1b44ace946d3ff2efed9d7ce0a1b81c955ab474147176af57b86b650604ab0",
+      "importedSha256": "ac1b44ace946d3ff2efed9d7ce0a1b81c955ab474147176af57b86b650604ab0"
+    },
+    {
+      "path": "assets/hover_drone/original/die_sheet.png",
+      "sourceSha256": "e8465b36f2f903ccf4758a56ffa7a9c72361fb7e9784d83f46d1380743919be0",
+      "importedSha256": "e8465b36f2f903ccf4758a56ffa7a9c72361fb7e9784d83f46d1380743919be0"
+    },
+    {
+      "path": "assets/hover_drone/original/front_attack/front_attack_00.png",
+      "sourceSha256": "914614cb806fa40d8069e1313c44e3fbf7961ec6e0967cbd9b565b1f75a1c7bc",
+      "importedSha256": "914614cb806fa40d8069e1313c44e3fbf7961ec6e0967cbd9b565b1f75a1c7bc"
+    },
+    {
+      "path": "assets/hover_drone/original/front_attack/front_attack_01.png",
+      "sourceSha256": "1056530c21c1d098b50a7795dad5a60d799837e51e5584c1c4e251b3a989aded",
+      "importedSha256": "1056530c21c1d098b50a7795dad5a60d799837e51e5584c1c4e251b3a989aded"
+    },
+    {
+      "path": "assets/hover_drone/original/front_attack/front_attack_02.png",
+      "sourceSha256": "a2d353431dd4a5cd9a4a6c762a806ecebd71748023ad4d5c878cd9bf79d14a0a",
+      "importedSha256": "a2d353431dd4a5cd9a4a6c762a806ecebd71748023ad4d5c878cd9bf79d14a0a"
+    },
+    {
+      "path": "assets/hover_drone/original/front_attack/front_attack_03.png",
+      "sourceSha256": "9e940150c55b0c97058cbdf0949428621af30427a9dd5c6a83256cf177d9a02d",
+      "importedSha256": "9e940150c55b0c97058cbdf0949428621af30427a9dd5c6a83256cf177d9a02d"
+    },
+    {
+      "path": "assets/hover_drone/original/front_attack_sheet.png",
+      "sourceSha256": "0326e35f12ff6ebacc87620d538e1515401383ff989bb7fba32fffd4ea58682a",
+      "importedSha256": "0326e35f12ff6ebacc87620d538e1515401383ff989bb7fba32fffd4ea58682a"
+    },
+    {
+      "path": "assets/hover_drone/original/front_idle/front_idle_00.png",
+      "sourceSha256": "9b86760e67209f283c2d3e9e899579c92cad9f6780da9addbcc35da13e4313f9",
+      "importedSha256": "9b86760e67209f283c2d3e9e899579c92cad9f6780da9addbcc35da13e4313f9"
+    },
+    {
+      "path": "assets/hover_drone/original/front_idle/front_idle_01.png",
+      "sourceSha256": "5e13d974dbdaddb72458b017abeb943738d12f62173734e2fd209cdee74fa150",
+      "importedSha256": "5e13d974dbdaddb72458b017abeb943738d12f62173734e2fd209cdee74fa150"
+    },
+    {
+      "path": "assets/hover_drone/original/front_idle/front_idle_02.png",
+      "sourceSha256": "63c8996711d7b93816fce20b8cbbf9724cd2abcbae25fa301c530c8edae9d826",
+      "importedSha256": "63c8996711d7b93816fce20b8cbbf9724cd2abcbae25fa301c530c8edae9d826"
+    },
+    {
+      "path": "assets/hover_drone/original/front_idle/front_idle_03.png",
+      "sourceSha256": "8765d3d3a3fed48048c86003bb0d89dd662d5360cd008fc47a02a7cd20d2c086",
+      "importedSha256": "8765d3d3a3fed48048c86003bb0d89dd662d5360cd008fc47a02a7cd20d2c086"
+    },
+    {
+      "path": "assets/hover_drone/original/front_idle_sheet.png",
+      "sourceSha256": "b06b5f35adca7947636364c9cb1b66146eafab23f2c69116b4b7ac8d64eb4ff3",
+      "importedSha256": "b06b5f35adca7947636364c9cb1b66146eafab23f2c69116b4b7ac8d64eb4ff3"
+    },
+    {
+      "path": "assets/hover_drone/original/left_idle/left_idle_00.png",
+      "sourceSha256": "48e25f1a0fd5ffb782e01fe8d790ff0dd21cadf9f0bfe430a06a661f2f40abd9",
+      "importedSha256": "48e25f1a0fd5ffb782e01fe8d790ff0dd21cadf9f0bfe430a06a661f2f40abd9"
+    },
+    {
+      "path": "assets/hover_drone/original/left_idle/left_idle_01.png",
+      "sourceSha256": "6eae8225f64cf27913503cfaa518ef132761dcc985e28a63a419d8accd2ed8c4",
+      "importedSha256": "6eae8225f64cf27913503cfaa518ef132761dcc985e28a63a419d8accd2ed8c4"
+    },
+    {
+      "path": "assets/hover_drone/original/left_idle/left_idle_02.png",
+      "sourceSha256": "1934607026677ed8cc64ef0b392c959aa815c140b1886026f335bdfdb1c0a51f",
+      "importedSha256": "1934607026677ed8cc64ef0b392c959aa815c140b1886026f335bdfdb1c0a51f"
+    },
+    {
+      "path": "assets/hover_drone/original/left_idle/left_idle_03.png",
+      "sourceSha256": "41d7d3171b5d5eb77a554d52a01f35b5e7abc1ef82dd15de7bd9fdb8751a9503",
+      "importedSha256": "41d7d3171b5d5eb77a554d52a01f35b5e7abc1ef82dd15de7bd9fdb8751a9503"
+    },
+    {
+      "path": "assets/hover_drone/original/left_idle_sheet.png",
+      "sourceSha256": "f34cea4618b8493f034a92b7d275e6fe990e0f347e26a69ce7564f8d0a575b64",
+      "importedSha256": "f34cea4618b8493f034a92b7d275e6fe990e0f347e26a69ce7564f8d0a575b64"
+    },
+    {
+      "path": "assets/hover_drone/original/right_idle/right_idle_00.png",
+      "sourceSha256": "b409ac3e34575f9d94ca3e75a863bf1bb6610932d5d17c04a2ad1ea2433abc7c",
+      "importedSha256": "b409ac3e34575f9d94ca3e75a863bf1bb6610932d5d17c04a2ad1ea2433abc7c"
+    },
+    {
+      "path": "assets/hover_drone/original/right_idle/right_idle_01.png",
+      "sourceSha256": "b025cdab8d24669894da324a14bbd564c15b5b649a6a7f31ebdb3257d8e64596",
+      "importedSha256": "b025cdab8d24669894da324a14bbd564c15b5b649a6a7f31ebdb3257d8e64596"
+    },
+    {
+      "path": "assets/hover_drone/original/right_idle/right_idle_02.png",
+      "sourceSha256": "d790132a4be7a40005b8bb863218aa30516e4077495bfa8c8363f8a466bdb6f7",
+      "importedSha256": "d790132a4be7a40005b8bb863218aa30516e4077495bfa8c8363f8a466bdb6f7"
+    },
+    {
+      "path": "assets/hover_drone/original/right_idle/right_idle_03.png",
+      "sourceSha256": "ceb8b1299501204622717f25bab2b7c42f7c69c1b4c7bafc4f671fd86cf622e2",
+      "importedSha256": "ceb8b1299501204622717f25bab2b7c42f7c69c1b4c7bafc4f671fd86cf622e2"
+    },
+    {
+      "path": "assets/hover_drone/original/right_idle_sheet.png",
+      "sourceSha256": "577e044a13c5e7a94be0407e156c49b3495e54c17956aaf7749f6e03a9382029",
+      "importedSha256": "577e044a13c5e7a94be0407e156c49b3495e54c17956aaf7749f6e03a9382029"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear/appear_00.png",
+      "sourceSha256": "d414f55dc21db9cb7add3ee0816f82ba710398e149a055354def2f35a4176735",
+      "importedSha256": "d414f55dc21db9cb7add3ee0816f82ba710398e149a055354def2f35a4176735"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear/appear_01.png",
+      "sourceSha256": "cf512ad53de738a453c2bf8eaa33fc5ec48aec7300ac889c66ad750dd620200c",
+      "importedSha256": "cf512ad53de738a453c2bf8eaa33fc5ec48aec7300ac889c66ad750dd620200c"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear/appear_02.png",
+      "sourceSha256": "5f675e690b2dbbbb9be466ba75fb5baedbc6fb8b544f294c33d6abec75f1e9f0",
+      "importedSha256": "5f675e690b2dbbbb9be466ba75fb5baedbc6fb8b544f294c33d6abec75f1e9f0"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear/appear_03.png",
+      "sourceSha256": "dc41accf9357c46232c517e099ae2c9f157a0935382d8abff624a763322bf9f6",
+      "importedSha256": "dc41accf9357c46232c517e099ae2c9f157a0935382d8abff624a763322bf9f6"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear/appear_04.png",
+      "sourceSha256": "bbbba7cf983ba5b6b5b4355d6373f887fa9d4cc4ca7b5c873af2240a46f62427",
+      "importedSha256": "bbbba7cf983ba5b6b5b4355d6373f887fa9d4cc4ca7b5c873af2240a46f62427"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear/appear_05.png",
+      "sourceSha256": "6ba7e552e3b7fb6b9cb108a305f5042ff0e344eca1525e0329ab8952b8ebab81",
+      "importedSha256": "6ba7e552e3b7fb6b9cb108a305f5042ff0e344eca1525e0329ab8952b8ebab81"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear/appear_06.png",
+      "sourceSha256": "a45afdca537e2df3aaf6f12007dc93af852a1fc9920b871ddadd19f55f3e83f3",
+      "importedSha256": "a45afdca537e2df3aaf6f12007dc93af852a1fc9920b871ddadd19f55f3e83f3"
+    },
+    {
+      "path": "assets/hover_drone/purple/appear_sheet.png",
+      "sourceSha256": "9780a01ae81025c94f7f1e9549d94035db43f6df8b6b426b81e8b18ff2f2531d",
+      "importedSha256": "9780a01ae81025c94f7f1e9549d94035db43f6df8b6b426b81e8b18ff2f2531d"
+    },
+    {
+      "path": "assets/hover_drone/purple/back_idle/back_idle_00.png",
+      "sourceSha256": "d06e365d0eef7b3176c5c200de4ce26a920c84f96eade7b095d37cff4ac764e0",
+      "importedSha256": "d06e365d0eef7b3176c5c200de4ce26a920c84f96eade7b095d37cff4ac764e0"
+    },
+    {
+      "path": "assets/hover_drone/purple/back_idle/back_idle_01.png",
+      "sourceSha256": "635a08ef4c37e5cb589dbee084691950a832e52e8907b5e639a8fd6c43f1e27d",
+      "importedSha256": "635a08ef4c37e5cb589dbee084691950a832e52e8907b5e639a8fd6c43f1e27d"
+    },
+    {
+      "path": "assets/hover_drone/purple/back_idle/back_idle_02.png",
+      "sourceSha256": "4276adf2174379e28eb9a895250d708beb8bc177731261cc33245db7add668e2",
+      "importedSha256": "4276adf2174379e28eb9a895250d708beb8bc177731261cc33245db7add668e2"
+    },
+    {
+      "path": "assets/hover_drone/purple/back_idle/back_idle_03.png",
+      "sourceSha256": "8c607076cf1a32dbf619107bf238fa8b7e98b7ed798294fcde0601e81a6b3644",
+      "importedSha256": "8c607076cf1a32dbf619107bf238fa8b7e98b7ed798294fcde0601e81a6b3644"
+    },
+    {
+      "path": "assets/hover_drone/purple/back_idle_sheet.png",
+      "sourceSha256": "c4150dab3af4a4992731f7a3db6c1f6bf3c98267ce15696a7accf6f5c504693a",
+      "importedSha256": "c4150dab3af4a4992731f7a3db6c1f6bf3c98267ce15696a7accf6f5c504693a"
+    },
+    {
+      "path": "assets/hover_drone/purple/die/die_00.png",
+      "sourceSha256": "bbea554042f56716120af4c20a25bdd7ab500854120ab936955eadfce8a3103c",
+      "importedSha256": "bbea554042f56716120af4c20a25bdd7ab500854120ab936955eadfce8a3103c"
+    },
+    {
+      "path": "assets/hover_drone/purple/die/die_01.png",
+      "sourceSha256": "8933d05e5897be3b784f3fd1627bf08c87a336269c3a1f078ac9516560391603",
+      "importedSha256": "8933d05e5897be3b784f3fd1627bf08c87a336269c3a1f078ac9516560391603"
+    },
+    {
+      "path": "assets/hover_drone/purple/die/die_02.png",
+      "sourceSha256": "022dae99b53bbd1c7aebccf92b0fbcb24272b86d2ed8b186bc03144d84ee3415",
+      "importedSha256": "022dae99b53bbd1c7aebccf92b0fbcb24272b86d2ed8b186bc03144d84ee3415"
+    },
+    {
+      "path": "assets/hover_drone/purple/die/die_03.png",
+      "sourceSha256": "15f8727f4b6d7b6f385799db3dae4fef4e0635ca5102d8653c45c54606b5a847",
+      "importedSha256": "15f8727f4b6d7b6f385799db3dae4fef4e0635ca5102d8653c45c54606b5a847"
+    },
+    {
+      "path": "assets/hover_drone/purple/die/die_04.png",
+      "sourceSha256": "a7484d1b799a1e1355f940b177677077b13ed78640175b1db9d1e76d568b0785",
+      "importedSha256": "a7484d1b799a1e1355f940b177677077b13ed78640175b1db9d1e76d568b0785"
+    },
+    {
+      "path": "assets/hover_drone/purple/die_sheet.png",
+      "sourceSha256": "b18e04c509c28119269d55fc3b08d9e2c6141b999c578b3cead12bf1d3996576",
+      "importedSha256": "b18e04c509c28119269d55fc3b08d9e2c6141b999c578b3cead12bf1d3996576"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_attack/front_attack_00.png",
+      "sourceSha256": "54b86af8acec1bf5504008ec7440a39f7a90fc895c704478b31f268518a88c12",
+      "importedSha256": "54b86af8acec1bf5504008ec7440a39f7a90fc895c704478b31f268518a88c12"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_attack/front_attack_01.png",
+      "sourceSha256": "57c2fb0c78844b749b3e7925102eb3a0dfe6a54c9f810712183e9a0da2991bb4",
+      "importedSha256": "57c2fb0c78844b749b3e7925102eb3a0dfe6a54c9f810712183e9a0da2991bb4"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_attack/front_attack_02.png",
+      "sourceSha256": "eb147ad6696050e8edf3a055b32ea1fa25033cb70c50595b5f1ec21dea8a54eb",
+      "importedSha256": "eb147ad6696050e8edf3a055b32ea1fa25033cb70c50595b5f1ec21dea8a54eb"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_attack/front_attack_03.png",
+      "sourceSha256": "147a1f50b9413e7127db802e118596ad6fac92ca5b3fe2128bda02265591447c",
+      "importedSha256": "147a1f50b9413e7127db802e118596ad6fac92ca5b3fe2128bda02265591447c"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_attack_sheet.png",
+      "sourceSha256": "33dd7cfd60a8020cbac765f303682dde39d27672d7406872f91a9916946c5324",
+      "importedSha256": "33dd7cfd60a8020cbac765f303682dde39d27672d7406872f91a9916946c5324"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_idle/front_idle_00.png",
+      "sourceSha256": "550bc9ba8e0c10e31d4acbfcd8727491d030e9e074b9d8f222678b7dac8237ba",
+      "importedSha256": "550bc9ba8e0c10e31d4acbfcd8727491d030e9e074b9d8f222678b7dac8237ba"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_idle/front_idle_01.png",
+      "sourceSha256": "e1e2f3e8c7afbf250b248462b33166233aa132f0ae847c879d8c88fb376f273c",
+      "importedSha256": "e1e2f3e8c7afbf250b248462b33166233aa132f0ae847c879d8c88fb376f273c"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_idle/front_idle_02.png",
+      "sourceSha256": "eb95d599db96020313864e03ff544d9af58531671891f3aa9f19dbb5a321625b",
+      "importedSha256": "eb95d599db96020313864e03ff544d9af58531671891f3aa9f19dbb5a321625b"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_idle/front_idle_03.png",
+      "sourceSha256": "583d9e6e8d0ac75e9860bf546f38f22e32a672beff0a81a8fbc24039be794ef9",
+      "importedSha256": "583d9e6e8d0ac75e9860bf546f38f22e32a672beff0a81a8fbc24039be794ef9"
+    },
+    {
+      "path": "assets/hover_drone/purple/front_idle_sheet.png",
+      "sourceSha256": "4555a044be8bbfdd6ec6423c74b72a08a9cccbe11913b88d85e45ce3ac66d0e8",
+      "importedSha256": "4555a044be8bbfdd6ec6423c74b72a08a9cccbe11913b88d85e45ce3ac66d0e8"
+    },
+    {
+      "path": "assets/hover_drone/purple/left_idle/left_idle_00.png",
+      "sourceSha256": "6d1bfeb80c55dd17d66c02ff41439960a5efebe6c90937e7a7eee4fd41e48058",
+      "importedSha256": "6d1bfeb80c55dd17d66c02ff41439960a5efebe6c90937e7a7eee4fd41e48058"
+    },
+    {
+      "path": "assets/hover_drone/purple/left_idle/left_idle_01.png",
+      "sourceSha256": "80bcc5f09ad9a18ae456578e23041c4bf7704557300524fbcef03b981be6faf5",
+      "importedSha256": "80bcc5f09ad9a18ae456578e23041c4bf7704557300524fbcef03b981be6faf5"
+    },
+    {
+      "path": "assets/hover_drone/purple/left_idle/left_idle_02.png",
+      "sourceSha256": "8c94fccdf55ef5c021109154eaa42ff7d772c431f151ce2e2399148db50ea5ce",
+      "importedSha256": "8c94fccdf55ef5c021109154eaa42ff7d772c431f151ce2e2399148db50ea5ce"
+    },
+    {
+      "path": "assets/hover_drone/purple/left_idle/left_idle_03.png",
+      "sourceSha256": "2cb856cbaa2bb60394860bea6f3a6d9b6630784b0b87064770daec3f1fc11a97",
+      "importedSha256": "2cb856cbaa2bb60394860bea6f3a6d9b6630784b0b87064770daec3f1fc11a97"
+    },
+    {
+      "path": "assets/hover_drone/purple/left_idle_sheet.png",
+      "sourceSha256": "f635c5028521c124de3101bfb13346342a83d3b8878bdef82cad9e2e1c70bd8d",
+      "importedSha256": "f635c5028521c124de3101bfb13346342a83d3b8878bdef82cad9e2e1c70bd8d"
+    },
+    {
+      "path": "assets/hover_drone/purple/right_idle/right_idle_00.png",
+      "sourceSha256": "aa256ce26eb42cad8ce2adf17ca380222375504e89c4df08b9ed4cbb1913b8f2",
+      "importedSha256": "aa256ce26eb42cad8ce2adf17ca380222375504e89c4df08b9ed4cbb1913b8f2"
+    },
+    {
+      "path": "assets/hover_drone/purple/right_idle/right_idle_01.png",
+      "sourceSha256": "9f0a7fb63fce5fe8e519bf96df433220503ccfd0fb0908cb372a6f5cd87c2137",
+      "importedSha256": "9f0a7fb63fce5fe8e519bf96df433220503ccfd0fb0908cb372a6f5cd87c2137"
+    },
+    {
+      "path": "assets/hover_drone/purple/right_idle/right_idle_02.png",
+      "sourceSha256": "1b28a344dbfd99575fee68f9b07161849e010438007fab57787546b34b4065c4",
+      "importedSha256": "1b28a344dbfd99575fee68f9b07161849e010438007fab57787546b34b4065c4"
+    },
+    {
+      "path": "assets/hover_drone/purple/right_idle/right_idle_03.png",
+      "sourceSha256": "94143bb989158ff897121136fd30b481b9ef3ec422b5cb962fc17b0aa76a46a2",
+      "importedSha256": "94143bb989158ff897121136fd30b481b9ef3ec422b5cb962fc17b0aa76a46a2"
+    },
+    {
+      "path": "assets/hover_drone/purple/right_idle_sheet.png",
+      "sourceSha256": "59163881b7ccc5ca56b179fc9bccb62d8284e83dfeea3b33e2a9e7010888e977",
+      "importedSha256": "59163881b7ccc5ca56b179fc9bccb62d8284e83dfeea3b33e2a9e7010888e977"
+    },
+    {
+      "path": "assets/hover_drone/red/appear/appear_00.png",
+      "sourceSha256": "d5ad2add390c7604c077074522d75f4b58059fae640cb389dd245252b8d0ce3c",
+      "importedSha256": "d5ad2add390c7604c077074522d75f4b58059fae640cb389dd245252b8d0ce3c"
+    },
+    {
+      "path": "assets/hover_drone/red/appear/appear_01.png",
+      "sourceSha256": "2e9be7a28f8cf459055c83050d0551af9e3b60c521e5a46df6650f5a093a7ad0",
+      "importedSha256": "2e9be7a28f8cf459055c83050d0551af9e3b60c521e5a46df6650f5a093a7ad0"
+    },
+    {
+      "path": "assets/hover_drone/red/appear/appear_02.png",
+      "sourceSha256": "33912d91d4d005c3b06f402672065935f835dd999d2ee14b680f40107183ba63",
+      "importedSha256": "33912d91d4d005c3b06f402672065935f835dd999d2ee14b680f40107183ba63"
+    },
+    {
+      "path": "assets/hover_drone/red/appear/appear_03.png",
+      "sourceSha256": "be3e6710bc64069c9fb07b413605e23cd19a110ad0c35d04c15f77c52f1895c8",
+      "importedSha256": "be3e6710bc64069c9fb07b413605e23cd19a110ad0c35d04c15f77c52f1895c8"
+    },
+    {
+      "path": "assets/hover_drone/red/appear/appear_04.png",
+      "sourceSha256": "969ba8791d9b8f143be6e63418f138d2aa4e96e28f63e0d35f915f688ce9c29c",
+      "importedSha256": "969ba8791d9b8f143be6e63418f138d2aa4e96e28f63e0d35f915f688ce9c29c"
+    },
+    {
+      "path": "assets/hover_drone/red/appear/appear_05.png",
+      "sourceSha256": "4774ee9ca3b0d112a30c8f817ec4a6cef8d3de7c466c5e129b2135cd358a630b",
+      "importedSha256": "4774ee9ca3b0d112a30c8f817ec4a6cef8d3de7c466c5e129b2135cd358a630b"
+    },
+    {
+      "path": "assets/hover_drone/red/appear/appear_06.png",
+      "sourceSha256": "714b1080e68683d74468cbbeab150eefed524d0dc3831df5158ce6e6a6e0e5c3",
+      "importedSha256": "714b1080e68683d74468cbbeab150eefed524d0dc3831df5158ce6e6a6e0e5c3"
+    },
+    {
+      "path": "assets/hover_drone/red/appear_sheet.png",
+      "sourceSha256": "d9b8bd9c59c218a6715813e6a1e2595c8ba9bd42156c35817f064fe00d24020b",
+      "importedSha256": "d9b8bd9c59c218a6715813e6a1e2595c8ba9bd42156c35817f064fe00d24020b"
+    },
+    {
+      "path": "assets/hover_drone/red/back_idle/back_idle_00.png",
+      "sourceSha256": "06449832e4e4d274b7ae419ef5561723a3719ddbf51da6584c952e195fdf2f95",
+      "importedSha256": "06449832e4e4d274b7ae419ef5561723a3719ddbf51da6584c952e195fdf2f95"
+    },
+    {
+      "path": "assets/hover_drone/red/back_idle/back_idle_01.png",
+      "sourceSha256": "47896f4a2f49d473cade2b160ef22781555c7c18e9dada4bfdb48d873bbd3a86",
+      "importedSha256": "47896f4a2f49d473cade2b160ef22781555c7c18e9dada4bfdb48d873bbd3a86"
+    },
+    {
+      "path": "assets/hover_drone/red/back_idle/back_idle_02.png",
+      "sourceSha256": "3e5b5b11f2717ae9ed1aa2d25d395cde60740923cb3b7bd7a3c4c338e4edf809",
+      "importedSha256": "3e5b5b11f2717ae9ed1aa2d25d395cde60740923cb3b7bd7a3c4c338e4edf809"
+    },
+    {
+      "path": "assets/hover_drone/red/back_idle/back_idle_03.png",
+      "sourceSha256": "ff9408e6914f7e0ae32fa1b966da77063387e291d78d2c78079405fb471b353a",
+      "importedSha256": "ff9408e6914f7e0ae32fa1b966da77063387e291d78d2c78079405fb471b353a"
+    },
+    {
+      "path": "assets/hover_drone/red/back_idle_sheet.png",
+      "sourceSha256": "c57bf3b9dbdfe6d0d9ceee918dbf825cc000468196e717ae0521d4252f1d758b",
+      "importedSha256": "c57bf3b9dbdfe6d0d9ceee918dbf825cc000468196e717ae0521d4252f1d758b"
+    },
+    {
+      "path": "assets/hover_drone/red/die/die_00.png",
+      "sourceSha256": "5b934d89e3e902b991128fc5ee40d17a553d3ccd6619c8a62411c5b55a6fa2be",
+      "importedSha256": "5b934d89e3e902b991128fc5ee40d17a553d3ccd6619c8a62411c5b55a6fa2be"
+    },
+    {
+      "path": "assets/hover_drone/red/die/die_01.png",
+      "sourceSha256": "4387af58fbae5f0416f8e69e7cc22d7d44b84fbd7c058f6c83ac160a5e766396",
+      "importedSha256": "4387af58fbae5f0416f8e69e7cc22d7d44b84fbd7c058f6c83ac160a5e766396"
+    },
+    {
+      "path": "assets/hover_drone/red/die/die_02.png",
+      "sourceSha256": "e50c1cdfaf1ca6762e8d50c8bcffd21541315831320c40c134a528ed60fee18b",
+      "importedSha256": "e50c1cdfaf1ca6762e8d50c8bcffd21541315831320c40c134a528ed60fee18b"
+    },
+    {
+      "path": "assets/hover_drone/red/die/die_03.png",
+      "sourceSha256": "9218c298edf2d13aa57f48b8a1cdaa8107d1b2a153e5c59b88e3d9fcef54d126",
+      "importedSha256": "9218c298edf2d13aa57f48b8a1cdaa8107d1b2a153e5c59b88e3d9fcef54d126"
+    },
+    {
+      "path": "assets/hover_drone/red/die/die_04.png",
+      "sourceSha256": "6a7e3fd32c3b84f12e55792cf87ac6873f07ad5b07d5598826842e517ffacd76",
+      "importedSha256": "6a7e3fd32c3b84f12e55792cf87ac6873f07ad5b07d5598826842e517ffacd76"
+    },
+    {
+      "path": "assets/hover_drone/red/die_sheet.png",
+      "sourceSha256": "81bc91a822b33e220f39ac11516ffb13c30f10f511217640f422f4d8cb210f30",
+      "importedSha256": "81bc91a822b33e220f39ac11516ffb13c30f10f511217640f422f4d8cb210f30"
+    },
+    {
+      "path": "assets/hover_drone/red/front_attack/front_attack_00.png",
+      "sourceSha256": "22252d7ab47d0ccd99739abf1a5f5ea5c041b888a8fd89a1d264f6c6ba63f62d",
+      "importedSha256": "22252d7ab47d0ccd99739abf1a5f5ea5c041b888a8fd89a1d264f6c6ba63f62d"
+    },
+    {
+      "path": "assets/hover_drone/red/front_attack/front_attack_01.png",
+      "sourceSha256": "2780aa035c65d93a60e9a0c400b4b351f3569309409aafeac3f3fce917c05690",
+      "importedSha256": "2780aa035c65d93a60e9a0c400b4b351f3569309409aafeac3f3fce917c05690"
+    },
+    {
+      "path": "assets/hover_drone/red/front_attack/front_attack_02.png",
+      "sourceSha256": "6ae2253268a373d16f3c943239fe6f1ec3093b5a1c813f6e0c00d8b63acaa047",
+      "importedSha256": "6ae2253268a373d16f3c943239fe6f1ec3093b5a1c813f6e0c00d8b63acaa047"
+    },
+    {
+      "path": "assets/hover_drone/red/front_attack/front_attack_03.png",
+      "sourceSha256": "a6392d3cb2c1337ff33e7336f1932e184c47fbb9ca5abdbfeb044133a41eab6f",
+      "importedSha256": "a6392d3cb2c1337ff33e7336f1932e184c47fbb9ca5abdbfeb044133a41eab6f"
+    },
+    {
+      "path": "assets/hover_drone/red/front_attack_sheet.png",
+      "sourceSha256": "646aea087988906689dfca3c96953165d7405d52ae9a257ca223b2102c316109",
+      "importedSha256": "646aea087988906689dfca3c96953165d7405d52ae9a257ca223b2102c316109"
+    },
+    {
+      "path": "assets/hover_drone/red/front_idle/front_idle_00.png",
+      "sourceSha256": "09836c8a7656e3943dfae2367c77b7b99bcaaa2041d1e23f5e98d3e061194305",
+      "importedSha256": "09836c8a7656e3943dfae2367c77b7b99bcaaa2041d1e23f5e98d3e061194305"
+    },
+    {
+      "path": "assets/hover_drone/red/front_idle/front_idle_01.png",
+      "sourceSha256": "4c7ed905752fbc6841aa393690702ac1e147ad6f2812f5041a02275cd3d657db",
+      "importedSha256": "4c7ed905752fbc6841aa393690702ac1e147ad6f2812f5041a02275cd3d657db"
+    },
+    {
+      "path": "assets/hover_drone/red/front_idle/front_idle_02.png",
+      "sourceSha256": "1137ffd9cdd4b21daaf55e00c64350251479878a575d66d9aa65605c3a721c04",
+      "importedSha256": "1137ffd9cdd4b21daaf55e00c64350251479878a575d66d9aa65605c3a721c04"
+    },
+    {
+      "path": "assets/hover_drone/red/front_idle/front_idle_03.png",
+      "sourceSha256": "02f9f4fd64ecafb830de544cb656d2dd63b64c9bdddbff25592f09dff176d573",
+      "importedSha256": "02f9f4fd64ecafb830de544cb656d2dd63b64c9bdddbff25592f09dff176d573"
+    },
+    {
+      "path": "assets/hover_drone/red/front_idle_sheet.png",
+      "sourceSha256": "b8be603006a509a1a54004747054a025bdfdd291b5d2638303f0e497cb222cf8",
+      "importedSha256": "b8be603006a509a1a54004747054a025bdfdd291b5d2638303f0e497cb222cf8"
+    },
+    {
+      "path": "assets/hover_drone/red/left_idle/left_idle_00.png",
+      "sourceSha256": "1a992737dec82aa4e4516cbd520ad21d9bbd76cd29b7959080f4276b72537f8f",
+      "importedSha256": "1a992737dec82aa4e4516cbd520ad21d9bbd76cd29b7959080f4276b72537f8f"
+    },
+    {
+      "path": "assets/hover_drone/red/left_idle/left_idle_01.png",
+      "sourceSha256": "f23b8fc30d1e6907a7b5b7d5c3d343abaa0f250e725dfb4580b301ca3849e517",
+      "importedSha256": "f23b8fc30d1e6907a7b5b7d5c3d343abaa0f250e725dfb4580b301ca3849e517"
+    },
+    {
+      "path": "assets/hover_drone/red/left_idle/left_idle_02.png",
+      "sourceSha256": "a5bc4d29271b2f6daed7b98534fbd94d95fb64f413ecb36ce368d96d6411caef",
+      "importedSha256": "a5bc4d29271b2f6daed7b98534fbd94d95fb64f413ecb36ce368d96d6411caef"
+    },
+    {
+      "path": "assets/hover_drone/red/left_idle/left_idle_03.png",
+      "sourceSha256": "cf8f05da208eb187fd6e567b256fc38ab0fbd267d6aaee6737925ba4d6920dca",
+      "importedSha256": "cf8f05da208eb187fd6e567b256fc38ab0fbd267d6aaee6737925ba4d6920dca"
+    },
+    {
+      "path": "assets/hover_drone/red/left_idle_sheet.png",
+      "sourceSha256": "71dda863ba9167e7979875f817e19bcd24ce0459ebbbfb0a73b69f97576bb907",
+      "importedSha256": "71dda863ba9167e7979875f817e19bcd24ce0459ebbbfb0a73b69f97576bb907"
+    },
+    {
+      "path": "assets/hover_drone/red/right_idle/right_idle_00.png",
+      "sourceSha256": "7c9bc557cc4351e36425c947500cb125e666995824e2a97d1fbfd201efea0fc9",
+      "importedSha256": "7c9bc557cc4351e36425c947500cb125e666995824e2a97d1fbfd201efea0fc9"
+    },
+    {
+      "path": "assets/hover_drone/red/right_idle/right_idle_01.png",
+      "sourceSha256": "e9519af4f75d1604498ecda9f61f687db8d633acfea2f9ee9a1b1d5f77da9592",
+      "importedSha256": "e9519af4f75d1604498ecda9f61f687db8d633acfea2f9ee9a1b1d5f77da9592"
+    },
+    {
+      "path": "assets/hover_drone/red/right_idle/right_idle_02.png",
+      "sourceSha256": "1f4baa4135039e542f9c89a181a8607de750482e0d17c51f480adca9cf13e386",
+      "importedSha256": "1f4baa4135039e542f9c89a181a8607de750482e0d17c51f480adca9cf13e386"
+    },
+    {
+      "path": "assets/hover_drone/red/right_idle/right_idle_03.png",
+      "sourceSha256": "7aa22f4f31ce0f742bcf332c7937b567a7171fbf06e28c5726f877f282f81c96",
+      "importedSha256": "7aa22f4f31ce0f742bcf332c7937b567a7171fbf06e28c5726f877f282f81c96"
+    },
+    {
+      "path": "assets/hover_drone/red/right_idle_sheet.png",
+      "sourceSha256": "8e882f4ca5618ee20a37b1f32b1d0d02ba34dcdbd9dc63018e099135ea80d04e",
+      "importedSha256": "8e882f4ca5618ee20a37b1f32b1d0d02ba34dcdbd9dc63018e099135ea80d04e"
+    },
+    {
+      "path": "assets/stone_guardian/blue/appear/appear_00.png",
+      "sourceSha256": "e1d024372fe9c78eb203c46fe32498db0fee222897666981a11e76bd983e3df1",
+      "importedSha256": "e1d024372fe9c78eb203c46fe32498db0fee222897666981a11e76bd983e3df1"
+    },
+    {
+      "path": "assets/stone_guardian/blue/appear/appear_01.png",
+      "sourceSha256": "ef1d2d2defdf7786588a6e7153d1625dd811574cdb3e170ff9582df86a4fc935",
+      "importedSha256": "ef1d2d2defdf7786588a6e7153d1625dd811574cdb3e170ff9582df86a4fc935"
+    },
+    {
+      "path": "assets/stone_guardian/blue/appear/appear_02.png",
+      "sourceSha256": "ce6f88777de838923337a5c7afe2eb484b5dca22a7a371aa6a2b072c314919a2",
+      "importedSha256": "ce6f88777de838923337a5c7afe2eb484b5dca22a7a371aa6a2b072c314919a2"
+    },
+    {
+      "path": "assets/stone_guardian/blue/appear/appear_03.png",
+      "sourceSha256": "8f0a3813908842088e7b085653fd0bc7a7f4085617749f561f156410c7f86087",
+      "importedSha256": "8f0a3813908842088e7b085653fd0bc7a7f4085617749f561f156410c7f86087"
+    },
+    {
+      "path": "assets/stone_guardian/blue/appear/appear_04.png",
+      "sourceSha256": "1228cbf8aad58bf31e914d9bff999d4b80c9f20ef9cdde3ae45decbc2fa48d42",
+      "importedSha256": "1228cbf8aad58bf31e914d9bff999d4b80c9f20ef9cdde3ae45decbc2fa48d42"
+    },
+    {
+      "path": "assets/stone_guardian/blue/appear/appear_05.png",
+      "sourceSha256": "654aa433184a01cdba8eb0d08aec5040b6c9265eaf38db5b2efd76173ade916a",
+      "importedSha256": "654aa433184a01cdba8eb0d08aec5040b6c9265eaf38db5b2efd76173ade916a"
+    },
+    {
+      "path": "assets/stone_guardian/blue/appear_sheet.png",
+      "sourceSha256": "92da558d4311acfc4cd68c040d172708d03e8bb41df664649a4f159426942eb7",
+      "importedSha256": "92da558d4311acfc4cd68c040d172708d03e8bb41df664649a4f159426942eb7"
+    },
+    {
+      "path": "assets/stone_guardian/blue/back_idle/back_idle_00.png",
+      "sourceSha256": "9bdf800895d36b99f368a2c34d90efd0c1f09309326e4b1c6837c492e5da441a",
+      "importedSha256": "9bdf800895d36b99f368a2c34d90efd0c1f09309326e4b1c6837c492e5da441a"
+    },
+    {
+      "path": "assets/stone_guardian/blue/back_idle/back_idle_01.png",
+      "sourceSha256": "a5e44a4eebfacb7413645543056a82bc39e45d0ba8bab878d80177cd11d03a28",
+      "importedSha256": "a5e44a4eebfacb7413645543056a82bc39e45d0ba8bab878d80177cd11d03a28"
+    },
+    {
+      "path": "assets/stone_guardian/blue/back_idle/back_idle_02.png",
+      "sourceSha256": "964b535bbf1a9b8b23377b9e3509ada8f56c2576eecb34624596712d91ebadcc",
+      "importedSha256": "964b535bbf1a9b8b23377b9e3509ada8f56c2576eecb34624596712d91ebadcc"
+    },
+    {
+      "path": "assets/stone_guardian/blue/back_idle/back_idle_03.png",
+      "sourceSha256": "b00d049114a48de24120faf121bd7d4f559f483b4ce1713dc81c6208f14bca47",
+      "importedSha256": "b00d049114a48de24120faf121bd7d4f559f483b4ce1713dc81c6208f14bca47"
+    },
+    {
+      "path": "assets/stone_guardian/blue/back_idle_sheet.png",
+      "sourceSha256": "c1473b5e1d96449a74e77d346347a4929ac22e096e405a14e8988c83f06da465",
+      "importedSha256": "c1473b5e1d96449a74e77d346347a4929ac22e096e405a14e8988c83f06da465"
+    },
+    {
+      "path": "assets/stone_guardian/blue/die/die_00.png",
+      "sourceSha256": "a1c8da86bf028ad646c97605ea7c1a3a3000aaecc8a4f9f22088a6b18cb413bd",
+      "importedSha256": "a1c8da86bf028ad646c97605ea7c1a3a3000aaecc8a4f9f22088a6b18cb413bd"
+    },
+    {
+      "path": "assets/stone_guardian/blue/die/die_01.png",
+      "sourceSha256": "522119f5d959ec67c5c70c71500a2a179f6c01d04745f5dfccf3a378d1642fa6",
+      "importedSha256": "522119f5d959ec67c5c70c71500a2a179f6c01d04745f5dfccf3a378d1642fa6"
+    },
+    {
+      "path": "assets/stone_guardian/blue/die/die_02.png",
+      "sourceSha256": "f909cfc6021da9e47b3ac5db0f6df57e40f5aeb38678fb42798a3397880e9fa8",
+      "importedSha256": "f909cfc6021da9e47b3ac5db0f6df57e40f5aeb38678fb42798a3397880e9fa8"
+    },
+    {
+      "path": "assets/stone_guardian/blue/die/die_03.png",
+      "sourceSha256": "fc4c29b7e6de390833579c232203289a496b6a5800da7eac0bf07cfd421b6524",
+      "importedSha256": "fc4c29b7e6de390833579c232203289a496b6a5800da7eac0bf07cfd421b6524"
+    },
+    {
+      "path": "assets/stone_guardian/blue/die/die_04.png",
+      "sourceSha256": "bdf3e756ecfb931c9998408cd799d675cc034e1eda9dc4a40a41930567d3dbd4",
+      "importedSha256": "bdf3e756ecfb931c9998408cd799d675cc034e1eda9dc4a40a41930567d3dbd4"
+    },
+    {
+      "path": "assets/stone_guardian/blue/die_sheet.png",
+      "sourceSha256": "172383ba30287edc8592e56557e4b0d655bd27574b0a7bb7ab570dca088c53be",
+      "importedSha256": "172383ba30287edc8592e56557e4b0d655bd27574b0a7bb7ab570dca088c53be"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_attack/front_attack_00.png",
+      "sourceSha256": "2f4957424d66afa1ee60a50ac8514a5112b08209a36775436afb56764546cd4a",
+      "importedSha256": "2f4957424d66afa1ee60a50ac8514a5112b08209a36775436afb56764546cd4a"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_attack/front_attack_01.png",
+      "sourceSha256": "b0e3bf14571dadda1eac95f98ae3550e285a4f1e52d29814ab340e206fe9a265",
+      "importedSha256": "b0e3bf14571dadda1eac95f98ae3550e285a4f1e52d29814ab340e206fe9a265"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_attack/front_attack_02.png",
+      "sourceSha256": "dc062f7c5767ccdbd1c5642f6cc3f0a87e6c566e62587f162ffbe4ef3dfe5055",
+      "importedSha256": "dc062f7c5767ccdbd1c5642f6cc3f0a87e6c566e62587f162ffbe4ef3dfe5055"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_attack/front_attack_03.png",
+      "sourceSha256": "dbed68c17faf7394a5f4a83352c91855645d951f0e9ede012ef66ae40d5f9efb",
+      "importedSha256": "dbed68c17faf7394a5f4a83352c91855645d951f0e9ede012ef66ae40d5f9efb"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_attack_sheet.png",
+      "sourceSha256": "1752f79e05c43c739139d0a70ed611b56eead158bdb3ff0b8886c1ae07825849",
+      "importedSha256": "1752f79e05c43c739139d0a70ed611b56eead158bdb3ff0b8886c1ae07825849"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_idle/front_idle_00.png",
+      "sourceSha256": "0f130f06b1519e77581dcf42855283a21a7a36baeca6b1b6618b8a61aa8ccf94",
+      "importedSha256": "0f130f06b1519e77581dcf42855283a21a7a36baeca6b1b6618b8a61aa8ccf94"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_idle/front_idle_01.png",
+      "sourceSha256": "44ecb9d8f23ef1aebd183d431dade16b04516e0091f50296f947fad3943a1f64",
+      "importedSha256": "44ecb9d8f23ef1aebd183d431dade16b04516e0091f50296f947fad3943a1f64"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_idle/front_idle_02.png",
+      "sourceSha256": "b753a1dc1ddf89a98bb035840acfdb35bbdfcedb660c02776c7ef79de0649824",
+      "importedSha256": "b753a1dc1ddf89a98bb035840acfdb35bbdfcedb660c02776c7ef79de0649824"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_idle/front_idle_03.png",
+      "sourceSha256": "31e366142fe4e72ed799510173c682ea2c66d6ce2fb928ac4fa267f744d0707a",
+      "importedSha256": "31e366142fe4e72ed799510173c682ea2c66d6ce2fb928ac4fa267f744d0707a"
+    },
+    {
+      "path": "assets/stone_guardian/blue/front_idle_sheet.png",
+      "sourceSha256": "f2e3b4fc1519699d9f41a68ba00377885c6f3b7cd9bbcc59943de3665721811c",
+      "importedSha256": "f2e3b4fc1519699d9f41a68ba00377885c6f3b7cd9bbcc59943de3665721811c"
+    },
+    {
+      "path": "assets/stone_guardian/blue/left_idle/left_idle_00.png",
+      "sourceSha256": "cbb8c45502884c68a29a5f527ca669a663108d9f79584fd6e496bccf40e196bc",
+      "importedSha256": "cbb8c45502884c68a29a5f527ca669a663108d9f79584fd6e496bccf40e196bc"
+    },
+    {
+      "path": "assets/stone_guardian/blue/left_idle/left_idle_01.png",
+      "sourceSha256": "c1d4bcf7b7d273437910a4f5d0e0c869f0909e0a8e24756e4b9ec575776f1091",
+      "importedSha256": "c1d4bcf7b7d273437910a4f5d0e0c869f0909e0a8e24756e4b9ec575776f1091"
+    },
+    {
+      "path": "assets/stone_guardian/blue/left_idle/left_idle_02.png",
+      "sourceSha256": "1152aa263c79a44fc5a0cd2fa6f5b5afb47bcb2ea02a4efc72949133acd461c5",
+      "importedSha256": "1152aa263c79a44fc5a0cd2fa6f5b5afb47bcb2ea02a4efc72949133acd461c5"
+    },
+    {
+      "path": "assets/stone_guardian/blue/left_idle/left_idle_03.png",
+      "sourceSha256": "7a0e04167e7ca25e34b13bce5549d9fe20eee946ec2f8cb04e24acc193cdceb2",
+      "importedSha256": "7a0e04167e7ca25e34b13bce5549d9fe20eee946ec2f8cb04e24acc193cdceb2"
+    },
+    {
+      "path": "assets/stone_guardian/blue/left_idle_sheet.png",
+      "sourceSha256": "a6309791fb47ba6626ab01cd337a3822a2d34cff4b031f9c6e29b61e1029d683",
+      "importedSha256": "a6309791fb47ba6626ab01cd337a3822a2d34cff4b031f9c6e29b61e1029d683"
+    },
+    {
+      "path": "assets/stone_guardian/blue/right_idle/right_idle_00.png",
+      "sourceSha256": "92824d0ba324040dd2787391c533acff1341f57a7e9962d210b37461f107a2be",
+      "importedSha256": "92824d0ba324040dd2787391c533acff1341f57a7e9962d210b37461f107a2be"
+    },
+    {
+      "path": "assets/stone_guardian/blue/right_idle/right_idle_01.png",
+      "sourceSha256": "583c790ef87dccf5a0c16f8ba99546de3c2cce4932f4b5bb74fe515c3be33d4f",
+      "importedSha256": "583c790ef87dccf5a0c16f8ba99546de3c2cce4932f4b5bb74fe515c3be33d4f"
+    },
+    {
+      "path": "assets/stone_guardian/blue/right_idle/right_idle_02.png",
+      "sourceSha256": "bacb8bd1afd94e72b34bec749c630fb2081bb4a027f7eced14a973946167a687",
+      "importedSha256": "bacb8bd1afd94e72b34bec749c630fb2081bb4a027f7eced14a973946167a687"
+    },
+    {
+      "path": "assets/stone_guardian/blue/right_idle/right_idle_03.png",
+      "sourceSha256": "00f86fa667f2a91ab146663759af27bba2301ed897bcf8b65fcc8132638ee4a8",
+      "importedSha256": "00f86fa667f2a91ab146663759af27bba2301ed897bcf8b65fcc8132638ee4a8"
+    },
+    {
+      "path": "assets/stone_guardian/blue/right_idle_sheet.png",
+      "sourceSha256": "d75238ca4c825186d7fdfc98fbb3efcc72b1ffdc0f096c39bb3cfa87f1e0a3d2",
+      "importedSha256": "d75238ca4c825186d7fdfc98fbb3efcc72b1ffdc0f096c39bb3cfa87f1e0a3d2"
+    },
+    {
+      "path": "assets/stone_guardian/gold/appear/appear_00.png",
+      "sourceSha256": "fb6c1102604c9fe519aea33f979166cb30efbbec8a0de337d02b364446d13ed0",
+      "importedSha256": "fb6c1102604c9fe519aea33f979166cb30efbbec8a0de337d02b364446d13ed0"
+    },
+    {
+      "path": "assets/stone_guardian/gold/appear/appear_01.png",
+      "sourceSha256": "24da4f7ce5b4852869da8f5d721c6f259a99b9b7d075b18ff5a468f3e4e738ab",
+      "importedSha256": "24da4f7ce5b4852869da8f5d721c6f259a99b9b7d075b18ff5a468f3e4e738ab"
+    },
+    {
+      "path": "assets/stone_guardian/gold/appear/appear_02.png",
+      "sourceSha256": "3fae4821222fe10d248af9aada0d9ac87d1e7d48106d90cb7fe9ed86649b9f3c",
+      "importedSha256": "3fae4821222fe10d248af9aada0d9ac87d1e7d48106d90cb7fe9ed86649b9f3c"
+    },
+    {
+      "path": "assets/stone_guardian/gold/appear/appear_03.png",
+      "sourceSha256": "76801912c451fe9e99b653bf50c5655859279e77b1e7818295d117dc723c8025",
+      "importedSha256": "76801912c451fe9e99b653bf50c5655859279e77b1e7818295d117dc723c8025"
+    },
+    {
+      "path": "assets/stone_guardian/gold/appear/appear_04.png",
+      "sourceSha256": "aa2c8ee76fccc2f6227067956bc23ac199d2c22aa4410165559ba99a2e6633fb",
+      "importedSha256": "aa2c8ee76fccc2f6227067956bc23ac199d2c22aa4410165559ba99a2e6633fb"
+    },
+    {
+      "path": "assets/stone_guardian/gold/appear/appear_05.png",
+      "sourceSha256": "6c2d23e5e8efd658a6eb30f944ec8ceaad08353e081f0ea9c065713cbf2eca04",
+      "importedSha256": "6c2d23e5e8efd658a6eb30f944ec8ceaad08353e081f0ea9c065713cbf2eca04"
+    },
+    {
+      "path": "assets/stone_guardian/gold/appear_sheet.png",
+      "sourceSha256": "98baf1914619a18894cff7277fcf1c56af1348e00a2cf359dac5490ad583eb6c",
+      "importedSha256": "98baf1914619a18894cff7277fcf1c56af1348e00a2cf359dac5490ad583eb6c"
+    },
+    {
+      "path": "assets/stone_guardian/gold/back_idle/back_idle_00.png",
+      "sourceSha256": "e8f3d796c438118daeb20746dda236fc4c415e32f47eac3ff857e28da8842f76",
+      "importedSha256": "e8f3d796c438118daeb20746dda236fc4c415e32f47eac3ff857e28da8842f76"
+    },
+    {
+      "path": "assets/stone_guardian/gold/back_idle/back_idle_01.png",
+      "sourceSha256": "a77c55453f9a6728db9a30946ccd09c2ee97f675b66989b74e4d87c6f86d0b85",
+      "importedSha256": "a77c55453f9a6728db9a30946ccd09c2ee97f675b66989b74e4d87c6f86d0b85"
+    },
+    {
+      "path": "assets/stone_guardian/gold/back_idle/back_idle_02.png",
+      "sourceSha256": "f7fc45845887ae171d350353b2b1330f32900310799fe91a37db664531dcba07",
+      "importedSha256": "f7fc45845887ae171d350353b2b1330f32900310799fe91a37db664531dcba07"
+    },
+    {
+      "path": "assets/stone_guardian/gold/back_idle/back_idle_03.png",
+      "sourceSha256": "20de2064800089ace27c13405bc79aca6e15f508bab24d962cff3dfc1315af9d",
+      "importedSha256": "20de2064800089ace27c13405bc79aca6e15f508bab24d962cff3dfc1315af9d"
+    },
+    {
+      "path": "assets/stone_guardian/gold/back_idle_sheet.png",
+      "sourceSha256": "ba915abe143436cb3a6bf1cc5397e44abcefb07033808d1ca63034b6fc06951d",
+      "importedSha256": "ba915abe143436cb3a6bf1cc5397e44abcefb07033808d1ca63034b6fc06951d"
+    },
+    {
+      "path": "assets/stone_guardian/gold/die/die_00.png",
+      "sourceSha256": "08220a9fd1afb34cb51744b0c43a1fb70002d9bda6006a0456b21d18a5a5a2b9",
+      "importedSha256": "08220a9fd1afb34cb51744b0c43a1fb70002d9bda6006a0456b21d18a5a5a2b9"
+    },
+    {
+      "path": "assets/stone_guardian/gold/die/die_01.png",
+      "sourceSha256": "d1a798351b8478c621aeb7f203f1e1bcd8b227a4dd40fa27187e2948be3a51ed",
+      "importedSha256": "d1a798351b8478c621aeb7f203f1e1bcd8b227a4dd40fa27187e2948be3a51ed"
+    },
+    {
+      "path": "assets/stone_guardian/gold/die/die_02.png",
+      "sourceSha256": "728c8e310f478fda7926dd2867adf1cd271a1e4798a8ead574411b2fe407e68b",
+      "importedSha256": "728c8e310f478fda7926dd2867adf1cd271a1e4798a8ead574411b2fe407e68b"
+    },
+    {
+      "path": "assets/stone_guardian/gold/die/die_03.png",
+      "sourceSha256": "50fd04308b2d0bed82b06babb528f28e43edf12fbe560958ad5614e82571dd1e",
+      "importedSha256": "50fd04308b2d0bed82b06babb528f28e43edf12fbe560958ad5614e82571dd1e"
+    },
+    {
+      "path": "assets/stone_guardian/gold/die/die_04.png",
+      "sourceSha256": "4ca636b1613a5131e2a3740745eca551993f2765c77947ca91a476a5329e2aed",
+      "importedSha256": "4ca636b1613a5131e2a3740745eca551993f2765c77947ca91a476a5329e2aed"
+    },
+    {
+      "path": "assets/stone_guardian/gold/die_sheet.png",
+      "sourceSha256": "683050cc4bd2a2584fec253c40743956da78abe369a2b01c0ec7d7b313f7f804",
+      "importedSha256": "683050cc4bd2a2584fec253c40743956da78abe369a2b01c0ec7d7b313f7f804"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_attack/front_attack_00.png",
+      "sourceSha256": "a5ea9d09a7910b68eb1f579ccf1e0ed0f2e671c8d02cb3efada56448182776d7",
+      "importedSha256": "a5ea9d09a7910b68eb1f579ccf1e0ed0f2e671c8d02cb3efada56448182776d7"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_attack/front_attack_01.png",
+      "sourceSha256": "f677956b28f1790b739c1c43e3413412933547dc7518675e94510bda656b30a8",
+      "importedSha256": "f677956b28f1790b739c1c43e3413412933547dc7518675e94510bda656b30a8"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_attack/front_attack_02.png",
+      "sourceSha256": "5720129f07ee78f7ff9dfa258749654d2d0f1d3d59fda8b78627ab8419053e9e",
+      "importedSha256": "5720129f07ee78f7ff9dfa258749654d2d0f1d3d59fda8b78627ab8419053e9e"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_attack/front_attack_03.png",
+      "sourceSha256": "1202924f9d42370289afa6f48beebf545e35577f8c8632fb6ac0372e5b622a58",
+      "importedSha256": "1202924f9d42370289afa6f48beebf545e35577f8c8632fb6ac0372e5b622a58"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_attack_sheet.png",
+      "sourceSha256": "272e28c2de2bca8965164bc71b16b947377f62f639433cfd9481b47e8b0ff577",
+      "importedSha256": "272e28c2de2bca8965164bc71b16b947377f62f639433cfd9481b47e8b0ff577"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_idle/front_idle_00.png",
+      "sourceSha256": "9af93e5d87bc301539da1cc20f8e96354cf2d418b216dc6659250cc76870ae47",
+      "importedSha256": "9af93e5d87bc301539da1cc20f8e96354cf2d418b216dc6659250cc76870ae47"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_idle/front_idle_01.png",
+      "sourceSha256": "8449a005bae00c866bc5ff60625d001cb5954aa4ac5f927bb81a14cf1f789e1f",
+      "importedSha256": "8449a005bae00c866bc5ff60625d001cb5954aa4ac5f927bb81a14cf1f789e1f"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_idle/front_idle_02.png",
+      "sourceSha256": "5cec027e36b43bd3638307fd3f25be3b9896d65d744cfa2af87e4cacd7c0c7e7",
+      "importedSha256": "5cec027e36b43bd3638307fd3f25be3b9896d65d744cfa2af87e4cacd7c0c7e7"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_idle/front_idle_03.png",
+      "sourceSha256": "3b2d4f2eced0555df3227681340884195460845ea74bd23cf467d5e94166865c",
+      "importedSha256": "3b2d4f2eced0555df3227681340884195460845ea74bd23cf467d5e94166865c"
+    },
+    {
+      "path": "assets/stone_guardian/gold/front_idle_sheet.png",
+      "sourceSha256": "205db5b71dbf62daea1398ef0935aa42a04cf730008fea059ba1a6a76a946b0d",
+      "importedSha256": "205db5b71dbf62daea1398ef0935aa42a04cf730008fea059ba1a6a76a946b0d"
+    },
+    {
+      "path": "assets/stone_guardian/gold/left_idle/left_idle_00.png",
+      "sourceSha256": "6e699f70e1744e677470360139e59c6eb60eb2004611cfcf08a0d08bd14b8f8b",
+      "importedSha256": "6e699f70e1744e677470360139e59c6eb60eb2004611cfcf08a0d08bd14b8f8b"
+    },
+    {
+      "path": "assets/stone_guardian/gold/left_idle/left_idle_01.png",
+      "sourceSha256": "4183bd5ea884370d74d3b9a7b008f96a7d8375718c6498152ddee244dd6e4b78",
+      "importedSha256": "4183bd5ea884370d74d3b9a7b008f96a7d8375718c6498152ddee244dd6e4b78"
+    },
+    {
+      "path": "assets/stone_guardian/gold/left_idle/left_idle_02.png",
+      "sourceSha256": "8985aedf1e3ea835f000b8b1e9a693b67e42a19e330e05836eb67952e10a08a6",
+      "importedSha256": "8985aedf1e3ea835f000b8b1e9a693b67e42a19e330e05836eb67952e10a08a6"
+    },
+    {
+      "path": "assets/stone_guardian/gold/left_idle/left_idle_03.png",
+      "sourceSha256": "894a974d4d07b092c4d9a728e0732a9d8a9425942f5c16075be658849db8861b",
+      "importedSha256": "894a974d4d07b092c4d9a728e0732a9d8a9425942f5c16075be658849db8861b"
+    },
+    {
+      "path": "assets/stone_guardian/gold/left_idle_sheet.png",
+      "sourceSha256": "95d63cdb1a9aaed4e9dd9ac33fea182ea403490612e7869fc3b9a446b4573194",
+      "importedSha256": "95d63cdb1a9aaed4e9dd9ac33fea182ea403490612e7869fc3b9a446b4573194"
+    },
+    {
+      "path": "assets/stone_guardian/gold/right_idle/right_idle_00.png",
+      "sourceSha256": "a380313c230559bfa877841f8efd619d3c72355806f57b5bf4fcc2bd3e87a080",
+      "importedSha256": "a380313c230559bfa877841f8efd619d3c72355806f57b5bf4fcc2bd3e87a080"
+    },
+    {
+      "path": "assets/stone_guardian/gold/right_idle/right_idle_01.png",
+      "sourceSha256": "1374799ea3366fe8bab7829a75011d6ffe2306a3baeb3940ca3fdc992bedcb1e",
+      "importedSha256": "1374799ea3366fe8bab7829a75011d6ffe2306a3baeb3940ca3fdc992bedcb1e"
+    },
+    {
+      "path": "assets/stone_guardian/gold/right_idle/right_idle_02.png",
+      "sourceSha256": "52722d3ef4fbbef19c2d5cc4e6661df727209bef640da8a8f8b4f758e3377769",
+      "importedSha256": "52722d3ef4fbbef19c2d5cc4e6661df727209bef640da8a8f8b4f758e3377769"
+    },
+    {
+      "path": "assets/stone_guardian/gold/right_idle/right_idle_03.png",
+      "sourceSha256": "bc0bd6b786f65ec53b39f410aeccf933b0bd75982eca71080d6c578d409f9220",
+      "importedSha256": "bc0bd6b786f65ec53b39f410aeccf933b0bd75982eca71080d6c578d409f9220"
+    },
+    {
+      "path": "assets/stone_guardian/gold/right_idle_sheet.png",
+      "sourceSha256": "ce2fce254d13e2cf7d9f80f7bab35b6d0c09c3b337990094f6db680826044281",
+      "importedSha256": "ce2fce254d13e2cf7d9f80f7bab35b6d0c09c3b337990094f6db680826044281"
+    },
+    {
+      "path": "assets/stone_guardian/green/appear/appear_00.png",
+      "sourceSha256": "dcc16a7f474c87ef6b3569258691df9f96101bccf0a4f8aa9091f44b5ea7f843",
+      "importedSha256": "dcc16a7f474c87ef6b3569258691df9f96101bccf0a4f8aa9091f44b5ea7f843"
+    },
+    {
+      "path": "assets/stone_guardian/green/appear/appear_01.png",
+      "sourceSha256": "197f1808b9e46b6db43a4b04102cacb87777c498e3cbd37d54e0c1bd0b25d2e3",
+      "importedSha256": "197f1808b9e46b6db43a4b04102cacb87777c498e3cbd37d54e0c1bd0b25d2e3"
+    },
+    {
+      "path": "assets/stone_guardian/green/appear/appear_02.png",
+      "sourceSha256": "63a48b3ec71e7b5c2707f81fa1cddc36ebe1118d0c611f556d0c90675ee5d15b",
+      "importedSha256": "63a48b3ec71e7b5c2707f81fa1cddc36ebe1118d0c611f556d0c90675ee5d15b"
+    },
+    {
+      "path": "assets/stone_guardian/green/appear/appear_03.png",
+      "sourceSha256": "e778b9b2917f1d1ba332532fed6a76a1da1fdc0d5f1d5fb2f533783cb219d258",
+      "importedSha256": "e778b9b2917f1d1ba332532fed6a76a1da1fdc0d5f1d5fb2f533783cb219d258"
+    },
+    {
+      "path": "assets/stone_guardian/green/appear/appear_04.png",
+      "sourceSha256": "0abb71892c6a2d487003f946eaa707eae640a33ca3dbc8e5d711957edb8c2d29",
+      "importedSha256": "0abb71892c6a2d487003f946eaa707eae640a33ca3dbc8e5d711957edb8c2d29"
+    },
+    {
+      "path": "assets/stone_guardian/green/appear/appear_05.png",
+      "sourceSha256": "d261c2a9774823010ca8cfecca4f7367a728828abbb45062037cdfe597013818",
+      "importedSha256": "d261c2a9774823010ca8cfecca4f7367a728828abbb45062037cdfe597013818"
+    },
+    {
+      "path": "assets/stone_guardian/green/appear_sheet.png",
+      "sourceSha256": "039c79937294f13fd18429d2498532a06b6b07e73a7363d6210488d1b09b492f",
+      "importedSha256": "039c79937294f13fd18429d2498532a06b6b07e73a7363d6210488d1b09b492f"
+    },
+    {
+      "path": "assets/stone_guardian/green/back_idle/back_idle_00.png",
+      "sourceSha256": "097489387402ee72caf4a34db10eeb3443cd49de69bffa36ab08fa84c7d6ee16",
+      "importedSha256": "097489387402ee72caf4a34db10eeb3443cd49de69bffa36ab08fa84c7d6ee16"
+    },
+    {
+      "path": "assets/stone_guardian/green/back_idle/back_idle_01.png",
+      "sourceSha256": "7a2c2dc028151530ca99189878248f6bc1c5c1fe2747714e506c9e1829ece027",
+      "importedSha256": "7a2c2dc028151530ca99189878248f6bc1c5c1fe2747714e506c9e1829ece027"
+    },
+    {
+      "path": "assets/stone_guardian/green/back_idle/back_idle_02.png",
+      "sourceSha256": "9a2ce040c2f8c82138d0d47c49bd15edfa2645e907d739c604c7da255d5783a2",
+      "importedSha256": "9a2ce040c2f8c82138d0d47c49bd15edfa2645e907d739c604c7da255d5783a2"
+    },
+    {
+      "path": "assets/stone_guardian/green/back_idle/back_idle_03.png",
+      "sourceSha256": "e913276847ebed974443b51d31060a889c6adfaf1b7897d0860a4ee08b9cd775",
+      "importedSha256": "e913276847ebed974443b51d31060a889c6adfaf1b7897d0860a4ee08b9cd775"
+    },
+    {
+      "path": "assets/stone_guardian/green/back_idle_sheet.png",
+      "sourceSha256": "e0715b75accf6142a540a0d6b4bdfe2280cb169b637265fc42f718240c98f7fa",
+      "importedSha256": "e0715b75accf6142a540a0d6b4bdfe2280cb169b637265fc42f718240c98f7fa"
+    },
+    {
+      "path": "assets/stone_guardian/green/die/die_00.png",
+      "sourceSha256": "a72f17d354a36f6fbf7efb5c7f21f1949652493141f94c0ec85523cfd088c590",
+      "importedSha256": "a72f17d354a36f6fbf7efb5c7f21f1949652493141f94c0ec85523cfd088c590"
+    },
+    {
+      "path": "assets/stone_guardian/green/die/die_01.png",
+      "sourceSha256": "81039337d713b28676b2d8576f84bc2db3f3eb59c9231b4ddd36a53eafd6b21b",
+      "importedSha256": "81039337d713b28676b2d8576f84bc2db3f3eb59c9231b4ddd36a53eafd6b21b"
+    },
+    {
+      "path": "assets/stone_guardian/green/die/die_02.png",
+      "sourceSha256": "7c08fbb698cdc5b75f047ff608dfac8d3d22a760ba1ccc99f7f9ce6227fcbd41",
+      "importedSha256": "7c08fbb698cdc5b75f047ff608dfac8d3d22a760ba1ccc99f7f9ce6227fcbd41"
+    },
+    {
+      "path": "assets/stone_guardian/green/die/die_03.png",
+      "sourceSha256": "d38f70eb00be4f5088361952beddc4c37edb3a94dc75f2962b8d9bb5324be204",
+      "importedSha256": "d38f70eb00be4f5088361952beddc4c37edb3a94dc75f2962b8d9bb5324be204"
+    },
+    {
+      "path": "assets/stone_guardian/green/die/die_04.png",
+      "sourceSha256": "68ec0167f2b2bafe33d2ab46763de86c4363221b20742766912f0b3b8f860cba",
+      "importedSha256": "68ec0167f2b2bafe33d2ab46763de86c4363221b20742766912f0b3b8f860cba"
+    },
+    {
+      "path": "assets/stone_guardian/green/die_sheet.png",
+      "sourceSha256": "14d214f7af05941cc2ceda469ce4c8a33533148a3c264d9e03f8135b7d4db81b",
+      "importedSha256": "14d214f7af05941cc2ceda469ce4c8a33533148a3c264d9e03f8135b7d4db81b"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_attack/front_attack_00.png",
+      "sourceSha256": "01e6b67868e5b79e3086099f48f0aba315de636634038dd6a3385e11261d8609",
+      "importedSha256": "01e6b67868e5b79e3086099f48f0aba315de636634038dd6a3385e11261d8609"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_attack/front_attack_01.png",
+      "sourceSha256": "e8bbead478fd15b8534aae945d12e9b7e7531116b5ebcdaf08500be658471d5d",
+      "importedSha256": "e8bbead478fd15b8534aae945d12e9b7e7531116b5ebcdaf08500be658471d5d"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_attack/front_attack_02.png",
+      "sourceSha256": "55f2a5a67d7698532f3195ad1e6f5465801b817904f4b7b4c13836be2e39dcbf",
+      "importedSha256": "55f2a5a67d7698532f3195ad1e6f5465801b817904f4b7b4c13836be2e39dcbf"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_attack/front_attack_03.png",
+      "sourceSha256": "158996d914bdfe9e2d899e9a9d658146612653a1bc8e579f6c56a2182bd5b4db",
+      "importedSha256": "158996d914bdfe9e2d899e9a9d658146612653a1bc8e579f6c56a2182bd5b4db"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_attack_sheet.png",
+      "sourceSha256": "20567800e985d5bbfce57b832a0b4e733ac1a8faccb1b6f3079d1ac7814ae046",
+      "importedSha256": "20567800e985d5bbfce57b832a0b4e733ac1a8faccb1b6f3079d1ac7814ae046"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_idle/front_idle_00.png",
+      "sourceSha256": "46cfad63faf1ba5a877dbca1c036edbd5d0319527ac7abdeea706f48f995b18d",
+      "importedSha256": "46cfad63faf1ba5a877dbca1c036edbd5d0319527ac7abdeea706f48f995b18d"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_idle/front_idle_01.png",
+      "sourceSha256": "2af02b366bfa285655f488824ff82d1b93c8de60d73d6115e4885565d93a875e",
+      "importedSha256": "2af02b366bfa285655f488824ff82d1b93c8de60d73d6115e4885565d93a875e"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_idle/front_idle_02.png",
+      "sourceSha256": "f69ae8f70d2ef8b44032606535fe63757fb075209875b9e5cb4327c20fddaeff",
+      "importedSha256": "f69ae8f70d2ef8b44032606535fe63757fb075209875b9e5cb4327c20fddaeff"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_idle/front_idle_03.png",
+      "sourceSha256": "1f4ac0604b13ce5886c0e13cb5250c0f4b0dfb3bd6f24f80ef3f3544514c2480",
+      "importedSha256": "1f4ac0604b13ce5886c0e13cb5250c0f4b0dfb3bd6f24f80ef3f3544514c2480"
+    },
+    {
+      "path": "assets/stone_guardian/green/front_idle_sheet.png",
+      "sourceSha256": "ed3d22edbc00ff73bdde889b196257d3e3f9148fa50a459317cb513f76285c57",
+      "importedSha256": "ed3d22edbc00ff73bdde889b196257d3e3f9148fa50a459317cb513f76285c57"
+    },
+    {
+      "path": "assets/stone_guardian/green/left_idle/left_idle_00.png",
+      "sourceSha256": "ebddfc17f1ffc525e15ace87e362f3da49c42d2daaeb8a9cd015c98ec23c5d12",
+      "importedSha256": "ebddfc17f1ffc525e15ace87e362f3da49c42d2daaeb8a9cd015c98ec23c5d12"
+    },
+    {
+      "path": "assets/stone_guardian/green/left_idle/left_idle_01.png",
+      "sourceSha256": "41155f3375eec9070a26ebe1991f2049da0fe7de776c4a37af71a5a6d0feee73",
+      "importedSha256": "41155f3375eec9070a26ebe1991f2049da0fe7de776c4a37af71a5a6d0feee73"
+    },
+    {
+      "path": "assets/stone_guardian/green/left_idle/left_idle_02.png",
+      "sourceSha256": "b5c939c5e2c3abc0c8d96f0f68925deb13ad223c490aba6eb242711ac2b65608",
+      "importedSha256": "b5c939c5e2c3abc0c8d96f0f68925deb13ad223c490aba6eb242711ac2b65608"
+    },
+    {
+      "path": "assets/stone_guardian/green/left_idle/left_idle_03.png",
+      "sourceSha256": "8c18da23465a511090a20a3f58797bae0bedf1a29cf1404046bffedc56f55815",
+      "importedSha256": "8c18da23465a511090a20a3f58797bae0bedf1a29cf1404046bffedc56f55815"
+    },
+    {
+      "path": "assets/stone_guardian/green/left_idle_sheet.png",
+      "sourceSha256": "ac95c7297473bd64a924170a77ca177418bd1659bae30d70fc9c1579e55fed2c",
+      "importedSha256": "ac95c7297473bd64a924170a77ca177418bd1659bae30d70fc9c1579e55fed2c"
+    },
+    {
+      "path": "assets/stone_guardian/green/right_idle/right_idle_00.png",
+      "sourceSha256": "1655ab8123a194e3b1d08dea3a5c5213d2d03f1f25479ec3d0397805cb49f2e1",
+      "importedSha256": "1655ab8123a194e3b1d08dea3a5c5213d2d03f1f25479ec3d0397805cb49f2e1"
+    },
+    {
+      "path": "assets/stone_guardian/green/right_idle/right_idle_01.png",
+      "sourceSha256": "21e9a4aadcd862af262c89522c8f6eda4f53b80f912c0df66b05da8ab9a89ea4",
+      "importedSha256": "21e9a4aadcd862af262c89522c8f6eda4f53b80f912c0df66b05da8ab9a89ea4"
+    },
+    {
+      "path": "assets/stone_guardian/green/right_idle/right_idle_02.png",
+      "sourceSha256": "007273fef331193eead0c35a076257600eebc710cfdad24f3cbfa24e33c5f60d",
+      "importedSha256": "007273fef331193eead0c35a076257600eebc710cfdad24f3cbfa24e33c5f60d"
+    },
+    {
+      "path": "assets/stone_guardian/green/right_idle/right_idle_03.png",
+      "sourceSha256": "e45bfbb607df3d3fc1934d27e1d3bb230c1211dfa6190cc416494171d76c8498",
+      "importedSha256": "e45bfbb607df3d3fc1934d27e1d3bb230c1211dfa6190cc416494171d76c8498"
+    },
+    {
+      "path": "assets/stone_guardian/green/right_idle_sheet.png",
+      "sourceSha256": "71ec8cc18d26135b589cdc1bc5c13c9145eac99cfce4055aad86c48e74afb41a",
+      "importedSha256": "71ec8cc18d26135b589cdc1bc5c13c9145eac99cfce4055aad86c48e74afb41a"
+    },
+    {
+      "path": "assets/stone_guardian/manifest.json",
+      "sourceSha256": "dbdf3e61f30a67a6d5991c5b710772a050ff7916eb89161678fb26a52a8a9b1e",
+      "importedSha256": "dbdf3e61f30a67a6d5991c5b710772a050ff7916eb89161678fb26a52a8a9b1e"
+    },
+    {
+      "path": "assets/stone_guardian/original/appear/appear_00.png",
+      "sourceSha256": "b468ec13f1607ebcfeff0d5af13fe14687749db62f79750049c6e0a9fbf3cc7d",
+      "importedSha256": "b468ec13f1607ebcfeff0d5af13fe14687749db62f79750049c6e0a9fbf3cc7d"
+    },
+    {
+      "path": "assets/stone_guardian/original/appear/appear_01.png",
+      "sourceSha256": "e1faf63352f0b52957f9afa0800519c7c15bbadd22d644dab6a9bf34c27bffcc",
+      "importedSha256": "e1faf63352f0b52957f9afa0800519c7c15bbadd22d644dab6a9bf34c27bffcc"
+    },
+    {
+      "path": "assets/stone_guardian/original/appear/appear_02.png",
+      "sourceSha256": "157c1372b93950594d9ebdd8923c7d70ac376f02a84d583141d9d23ec274e7d6",
+      "importedSha256": "157c1372b93950594d9ebdd8923c7d70ac376f02a84d583141d9d23ec274e7d6"
+    },
+    {
+      "path": "assets/stone_guardian/original/appear/appear_03.png",
+      "sourceSha256": "56ff69217066c2d4f61b304e28d1ea10ab0e26d7cb863211804a731c43f1d96c",
+      "importedSha256": "56ff69217066c2d4f61b304e28d1ea10ab0e26d7cb863211804a731c43f1d96c"
+    },
+    {
+      "path": "assets/stone_guardian/original/appear/appear_04.png",
+      "sourceSha256": "6ecb96c5a4fd1a70989b2d8043c8bc2d3bf6167c436faadc8769701f4aaf1ced",
+      "importedSha256": "6ecb96c5a4fd1a70989b2d8043c8bc2d3bf6167c436faadc8769701f4aaf1ced"
+    },
+    {
+      "path": "assets/stone_guardian/original/appear/appear_05.png",
+      "sourceSha256": "3b33cf7f367f51d04993a145784030035fe7108f74c443c67ca48e6108a71d78",
+      "importedSha256": "3b33cf7f367f51d04993a145784030035fe7108f74c443c67ca48e6108a71d78"
+    },
+    {
+      "path": "assets/stone_guardian/original/appear_sheet.png",
+      "sourceSha256": "4e48942f203cb86e13947d8b3dd6f75344acc29eb2a139e0f9d477907659aab0",
+      "importedSha256": "4e48942f203cb86e13947d8b3dd6f75344acc29eb2a139e0f9d477907659aab0"
+    },
+    {
+      "path": "assets/stone_guardian/original/back_idle/back_idle_00.png",
+      "sourceSha256": "1f644c943d80f0339af1c4d0f17e6b69a06960f01f60bfd0f4fe8667a24b8223",
+      "importedSha256": "1f644c943d80f0339af1c4d0f17e6b69a06960f01f60bfd0f4fe8667a24b8223"
+    },
+    {
+      "path": "assets/stone_guardian/original/back_idle/back_idle_01.png",
+      "sourceSha256": "184d4078791e8d3a344143b4fa01a5581d5308ebf75f7e4593525da26f32161d",
+      "importedSha256": "184d4078791e8d3a344143b4fa01a5581d5308ebf75f7e4593525da26f32161d"
+    },
+    {
+      "path": "assets/stone_guardian/original/back_idle/back_idle_02.png",
+      "sourceSha256": "217756df124199c9e18ded74f00a0fa357f92c594fb435c35e5a9b7b43f7accf",
+      "importedSha256": "217756df124199c9e18ded74f00a0fa357f92c594fb435c35e5a9b7b43f7accf"
+    },
+    {
+      "path": "assets/stone_guardian/original/back_idle/back_idle_03.png",
+      "sourceSha256": "17b359003cd0e6e42e258844457fe9f45f4e59cb0892f511a131585f74d95099",
+      "importedSha256": "17b359003cd0e6e42e258844457fe9f45f4e59cb0892f511a131585f74d95099"
+    },
+    {
+      "path": "assets/stone_guardian/original/back_idle_sheet.png",
+      "sourceSha256": "ae003c33a24c42b8cc9dd1e7cacc601a6a50d5760ad9487fa52fccdeb87f955f",
+      "importedSha256": "ae003c33a24c42b8cc9dd1e7cacc601a6a50d5760ad9487fa52fccdeb87f955f"
+    },
+    {
+      "path": "assets/stone_guardian/original/die/die_00.png",
+      "sourceSha256": "eace4f8995c4a61bc502afc9933b8bf36829d2b9a8eef456f679b159efb5447f",
+      "importedSha256": "eace4f8995c4a61bc502afc9933b8bf36829d2b9a8eef456f679b159efb5447f"
+    },
+    {
+      "path": "assets/stone_guardian/original/die/die_01.png",
+      "sourceSha256": "c13cf76cd6d18bf71ac0d60a0288bf75d56f458f99117adcf8af506de2099836",
+      "importedSha256": "c13cf76cd6d18bf71ac0d60a0288bf75d56f458f99117adcf8af506de2099836"
+    },
+    {
+      "path": "assets/stone_guardian/original/die/die_02.png",
+      "sourceSha256": "1ff9f76bcd363db8b6aac30185a2ff59e0b6fed5f1ee57adac177b588b87afb4",
+      "importedSha256": "1ff9f76bcd363db8b6aac30185a2ff59e0b6fed5f1ee57adac177b588b87afb4"
+    },
+    {
+      "path": "assets/stone_guardian/original/die/die_03.png",
+      "sourceSha256": "c10ed3142b75b2252c29c16e824ce8eb7e82af6035933fde980ca8e44e5407f4",
+      "importedSha256": "c10ed3142b75b2252c29c16e824ce8eb7e82af6035933fde980ca8e44e5407f4"
+    },
+    {
+      "path": "assets/stone_guardian/original/die/die_04.png",
+      "sourceSha256": "feb078b3388ba170264cbed561f584b117daded4eb5167241e9c7041429788a0",
+      "importedSha256": "feb078b3388ba170264cbed561f584b117daded4eb5167241e9c7041429788a0"
+    },
+    {
+      "path": "assets/stone_guardian/original/die_sheet.png",
+      "sourceSha256": "cc4568bbbbb2f92ca3384150a5c3c7def3f9a9b502558e2b2c568dac1970958e",
+      "importedSha256": "cc4568bbbbb2f92ca3384150a5c3c7def3f9a9b502558e2b2c568dac1970958e"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_attack/front_attack_00.png",
+      "sourceSha256": "4605e6c614e11340d0d0e3471d49c50b3b70e88e0c3a5d11e07383e4a94f01f2",
+      "importedSha256": "4605e6c614e11340d0d0e3471d49c50b3b70e88e0c3a5d11e07383e4a94f01f2"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_attack/front_attack_01.png",
+      "sourceSha256": "115e45a074bb48278f440cf0bd9da7d3e1a1278b7102eb8ed6c0b21d32f989c4",
+      "importedSha256": "115e45a074bb48278f440cf0bd9da7d3e1a1278b7102eb8ed6c0b21d32f989c4"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_attack/front_attack_02.png",
+      "sourceSha256": "0b631121d0297755465bb4042180db134962ed79958e7d20e5a502c24cffd8e1",
+      "importedSha256": "0b631121d0297755465bb4042180db134962ed79958e7d20e5a502c24cffd8e1"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_attack/front_attack_03.png",
+      "sourceSha256": "6ba588fe8e701ad56fe333aba0956bbeb43e06763d18bb3ea1df836c37bd2e9f",
+      "importedSha256": "6ba588fe8e701ad56fe333aba0956bbeb43e06763d18bb3ea1df836c37bd2e9f"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_attack_sheet.png",
+      "sourceSha256": "ad7df7df7757bb5d5c54488ccae6f03d87e452dc6ee983a169240aaeed0b9463",
+      "importedSha256": "ad7df7df7757bb5d5c54488ccae6f03d87e452dc6ee983a169240aaeed0b9463"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_idle/front_idle_00.png",
+      "sourceSha256": "3cc4c8758e2252ef2444468a5094f875e4f316e75fb8ef428c595eb6faca3865",
+      "importedSha256": "3cc4c8758e2252ef2444468a5094f875e4f316e75fb8ef428c595eb6faca3865"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_idle/front_idle_01.png",
+      "sourceSha256": "09ce07e3f1a84e4cee6c3e1ce8f4acfae14b996d7d2a034a8e0e4caca055b5f7",
+      "importedSha256": "09ce07e3f1a84e4cee6c3e1ce8f4acfae14b996d7d2a034a8e0e4caca055b5f7"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_idle/front_idle_02.png",
+      "sourceSha256": "6d71776bd44f1db9a49ae8e7bfdf7115ef8f4e27423a4224ee30034df8cff9fc",
+      "importedSha256": "6d71776bd44f1db9a49ae8e7bfdf7115ef8f4e27423a4224ee30034df8cff9fc"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_idle/front_idle_03.png",
+      "sourceSha256": "4d8a3eacf987752530531e6daa0d5c5d6602903ed67ecb96a7de8825537a6c0d",
+      "importedSha256": "4d8a3eacf987752530531e6daa0d5c5d6602903ed67ecb96a7de8825537a6c0d"
+    },
+    {
+      "path": "assets/stone_guardian/original/front_idle_sheet.png",
+      "sourceSha256": "8f7efaf99003037d2a25d73dce1dcdbe10746b8af471a4aca12dbb9edd025278",
+      "importedSha256": "8f7efaf99003037d2a25d73dce1dcdbe10746b8af471a4aca12dbb9edd025278"
+    },
+    {
+      "path": "assets/stone_guardian/original/left_idle/left_idle_00.png",
+      "sourceSha256": "7d92babfb8e7719c7aed12f09bdae312aac665b059866fe7cb48e43d7c282b62",
+      "importedSha256": "7d92babfb8e7719c7aed12f09bdae312aac665b059866fe7cb48e43d7c282b62"
+    },
+    {
+      "path": "assets/stone_guardian/original/left_idle/left_idle_01.png",
+      "sourceSha256": "48c9c5408ec37cb2b22e60303ddc8e9af91163b3e898238fdecd8eba203d1ad2",
+      "importedSha256": "48c9c5408ec37cb2b22e60303ddc8e9af91163b3e898238fdecd8eba203d1ad2"
+    },
+    {
+      "path": "assets/stone_guardian/original/left_idle/left_idle_02.png",
+      "sourceSha256": "cd1ec67a2453ed18349bdf9935b843c989f69ad708d314f1e61d625055007ef9",
+      "importedSha256": "cd1ec67a2453ed18349bdf9935b843c989f69ad708d314f1e61d625055007ef9"
+    },
+    {
+      "path": "assets/stone_guardian/original/left_idle/left_idle_03.png",
+      "sourceSha256": "d327d66d50e58de4abb366b17389ca066297839db7f7a4438bd3b45a8454983d",
+      "importedSha256": "d327d66d50e58de4abb366b17389ca066297839db7f7a4438bd3b45a8454983d"
+    },
+    {
+      "path": "assets/stone_guardian/original/left_idle_sheet.png",
+      "sourceSha256": "81460fcc43414f61f73de8e678323d821fa92c29cdd3e9728d3cfd326cdfd0b7",
+      "importedSha256": "81460fcc43414f61f73de8e678323d821fa92c29cdd3e9728d3cfd326cdfd0b7"
+    },
+    {
+      "path": "assets/stone_guardian/original/right_idle/right_idle_00.png",
+      "sourceSha256": "41f542f5b33c8c0b424b04bca97e475ff255d724fcf19f46f8505d1020bd36e8",
+      "importedSha256": "41f542f5b33c8c0b424b04bca97e475ff255d724fcf19f46f8505d1020bd36e8"
+    },
+    {
+      "path": "assets/stone_guardian/original/right_idle/right_idle_01.png",
+      "sourceSha256": "7f07404aa7f6fefda6cc567834734a312d9967b6070bb15bf05aa95f1c82ba3a",
+      "importedSha256": "7f07404aa7f6fefda6cc567834734a312d9967b6070bb15bf05aa95f1c82ba3a"
+    },
+    {
+      "path": "assets/stone_guardian/original/right_idle/right_idle_02.png",
+      "sourceSha256": "40be9bd3ba93ec89efad78a7980f8f89c282937c112ce8e469943ddf9a6997ca",
+      "importedSha256": "40be9bd3ba93ec89efad78a7980f8f89c282937c112ce8e469943ddf9a6997ca"
+    },
+    {
+      "path": "assets/stone_guardian/original/right_idle/right_idle_03.png",
+      "sourceSha256": "ef1d8cd367cca1208b5520591b17b57899a11931f7defea03c5162210b5b1049",
+      "importedSha256": "ef1d8cd367cca1208b5520591b17b57899a11931f7defea03c5162210b5b1049"
+    },
+    {
+      "path": "assets/stone_guardian/original/right_idle_sheet.png",
+      "sourceSha256": "2ac1f600b694685e496bd40460c3c603af66a11440d568345af376ea39861b2a",
+      "importedSha256": "2ac1f600b694685e496bd40460c3c603af66a11440d568345af376ea39861b2a"
+    },
+    {
+      "path": "assets/stone_guardian/purple/appear/appear_00.png",
+      "sourceSha256": "f977673bb15ddc6e9316b14346c33b852b0d7b9373c5c053e2683c97c1b30a9a",
+      "importedSha256": "f977673bb15ddc6e9316b14346c33b852b0d7b9373c5c053e2683c97c1b30a9a"
+    },
+    {
+      "path": "assets/stone_guardian/purple/appear/appear_01.png",
+      "sourceSha256": "589ecb6cb8c48f35aef83750862e0d4eb235b58a6cc70a32669ec7ee18f5db15",
+      "importedSha256": "589ecb6cb8c48f35aef83750862e0d4eb235b58a6cc70a32669ec7ee18f5db15"
+    },
+    {
+      "path": "assets/stone_guardian/purple/appear/appear_02.png",
+      "sourceSha256": "0a4aa50dfa7a580d8b2e487665f0a884ec234da5b848382020b5e2889851b6ca",
+      "importedSha256": "0a4aa50dfa7a580d8b2e487665f0a884ec234da5b848382020b5e2889851b6ca"
+    },
+    {
+      "path": "assets/stone_guardian/purple/appear/appear_03.png",
+      "sourceSha256": "a1baa239f8c6a4c1e91c397a081a233b4b0fcbe8409ae11906ecd5b4735e3973",
+      "importedSha256": "a1baa239f8c6a4c1e91c397a081a233b4b0fcbe8409ae11906ecd5b4735e3973"
+    },
+    {
+      "path": "assets/stone_guardian/purple/appear/appear_04.png",
+      "sourceSha256": "bbedc401d5103d9cab25dce3528f340296db3e72e854f66b1c00217a86371570",
+      "importedSha256": "bbedc401d5103d9cab25dce3528f340296db3e72e854f66b1c00217a86371570"
+    },
+    {
+      "path": "assets/stone_guardian/purple/appear/appear_05.png",
+      "sourceSha256": "472c9c87e1b40f8a8e30e23d4beff867e1890ee46ea87484bbccc1c2c8c6d4a6",
+      "importedSha256": "472c9c87e1b40f8a8e30e23d4beff867e1890ee46ea87484bbccc1c2c8c6d4a6"
+    },
+    {
+      "path": "assets/stone_guardian/purple/appear_sheet.png",
+      "sourceSha256": "ec777863a16b8201443379ee89353baaf010c068b245c482de8d34bc7b2ba086",
+      "importedSha256": "ec777863a16b8201443379ee89353baaf010c068b245c482de8d34bc7b2ba086"
+    },
+    {
+      "path": "assets/stone_guardian/purple/back_idle/back_idle_00.png",
+      "sourceSha256": "bcbe0a540379248ab6269da60b4f435875fabadd8b13e3366beddf0fee4497bb",
+      "importedSha256": "bcbe0a540379248ab6269da60b4f435875fabadd8b13e3366beddf0fee4497bb"
+    },
+    {
+      "path": "assets/stone_guardian/purple/back_idle/back_idle_01.png",
+      "sourceSha256": "7240c98afca8b30fae386c0129e2210cd843df09669fed8a1a0728496faaeba0",
+      "importedSha256": "7240c98afca8b30fae386c0129e2210cd843df09669fed8a1a0728496faaeba0"
+    },
+    {
+      "path": "assets/stone_guardian/purple/back_idle/back_idle_02.png",
+      "sourceSha256": "a48873d25be8e8c8d11eb0f8b91e9c5e265f5a503d20839f34e63a6975270cf3",
+      "importedSha256": "a48873d25be8e8c8d11eb0f8b91e9c5e265f5a503d20839f34e63a6975270cf3"
+    },
+    {
+      "path": "assets/stone_guardian/purple/back_idle/back_idle_03.png",
+      "sourceSha256": "361fdc8deebd08fd46f564f3bc21a7bbbd99b4abcebdeeffa7362849038a0a2d",
+      "importedSha256": "361fdc8deebd08fd46f564f3bc21a7bbbd99b4abcebdeeffa7362849038a0a2d"
+    },
+    {
+      "path": "assets/stone_guardian/purple/back_idle_sheet.png",
+      "sourceSha256": "630adedf6ce7797fff75d394c5148776288c1c048596d9df065060a9d8553c6c",
+      "importedSha256": "630adedf6ce7797fff75d394c5148776288c1c048596d9df065060a9d8553c6c"
+    },
+    {
+      "path": "assets/stone_guardian/purple/die/die_00.png",
+      "sourceSha256": "f368e6955a8653b123b0deb6072a6a443b38400adce49454978c6c9eb144a600",
+      "importedSha256": "f368e6955a8653b123b0deb6072a6a443b38400adce49454978c6c9eb144a600"
+    },
+    {
+      "path": "assets/stone_guardian/purple/die/die_01.png",
+      "sourceSha256": "4ad662813f962b1adf8f368197efa164fadd011f6195d95229a0ddfd43745e50",
+      "importedSha256": "4ad662813f962b1adf8f368197efa164fadd011f6195d95229a0ddfd43745e50"
+    },
+    {
+      "path": "assets/stone_guardian/purple/die/die_02.png",
+      "sourceSha256": "4ac9eff9ad8454f7aa213bb3e6b022b6b9ff8d88e79f96dc41dc37bd9de75d4f",
+      "importedSha256": "4ac9eff9ad8454f7aa213bb3e6b022b6b9ff8d88e79f96dc41dc37bd9de75d4f"
+    },
+    {
+      "path": "assets/stone_guardian/purple/die/die_03.png",
+      "sourceSha256": "9c18bf17af977a115aa35b4a9904fa07010c329e19d88af9d6865b1fb7e1ab12",
+      "importedSha256": "9c18bf17af977a115aa35b4a9904fa07010c329e19d88af9d6865b1fb7e1ab12"
+    },
+    {
+      "path": "assets/stone_guardian/purple/die/die_04.png",
+      "sourceSha256": "f7b6876365ad65b597a2397de698e6f3f2197c40680c7d420a425c525401dead",
+      "importedSha256": "f7b6876365ad65b597a2397de698e6f3f2197c40680c7d420a425c525401dead"
+    },
+    {
+      "path": "assets/stone_guardian/purple/die_sheet.png",
+      "sourceSha256": "cbb93fbcf18a901c86a63b83f3b6c551a2e23efca8b31fc8293a7102c40bc9d3",
+      "importedSha256": "cbb93fbcf18a901c86a63b83f3b6c551a2e23efca8b31fc8293a7102c40bc9d3"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_attack/front_attack_00.png",
+      "sourceSha256": "ac787b172e75722821aeb238d76ee4cdef1798301e0ec826053bdff05cf1af07",
+      "importedSha256": "ac787b172e75722821aeb238d76ee4cdef1798301e0ec826053bdff05cf1af07"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_attack/front_attack_01.png",
+      "sourceSha256": "b9e52fa106d6a33a4e32b36920e01943378a548cf6b3f572d1ab83b8677b5070",
+      "importedSha256": "b9e52fa106d6a33a4e32b36920e01943378a548cf6b3f572d1ab83b8677b5070"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_attack/front_attack_02.png",
+      "sourceSha256": "4a9c534e2fd2f1da62261a7859cb8b6bc4c83448e7b4307cd5beea0097bdbf22",
+      "importedSha256": "4a9c534e2fd2f1da62261a7859cb8b6bc4c83448e7b4307cd5beea0097bdbf22"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_attack/front_attack_03.png",
+      "sourceSha256": "b62bc109cc72329cf07ee7bb3b80be4f5a16c6b1c4e7871379a5777b29e581fe",
+      "importedSha256": "b62bc109cc72329cf07ee7bb3b80be4f5a16c6b1c4e7871379a5777b29e581fe"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_attack_sheet.png",
+      "sourceSha256": "67cfa3963ca05c711d3382c6628ee9776c8c3374f74f4cfb2ee18421d30d6fad",
+      "importedSha256": "67cfa3963ca05c711d3382c6628ee9776c8c3374f74f4cfb2ee18421d30d6fad"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_idle/front_idle_00.png",
+      "sourceSha256": "22ad4fb97a8edfb776dda0ad41475510919aa9b1400aa7f82d379db1a74b7ee7",
+      "importedSha256": "22ad4fb97a8edfb776dda0ad41475510919aa9b1400aa7f82d379db1a74b7ee7"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_idle/front_idle_01.png",
+      "sourceSha256": "befd0b50e0b9de653b667d85c6ca6e8f26b828e42c6ee2db539e8ef16942e017",
+      "importedSha256": "befd0b50e0b9de653b667d85c6ca6e8f26b828e42c6ee2db539e8ef16942e017"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_idle/front_idle_02.png",
+      "sourceSha256": "294b6fff8ea760413de432c5fee1c9d082b7dd0425bb1271b3be22e61b6a07ae",
+      "importedSha256": "294b6fff8ea760413de432c5fee1c9d082b7dd0425bb1271b3be22e61b6a07ae"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_idle/front_idle_03.png",
+      "sourceSha256": "9c6b8c11b91cd7a2f88d769a282b7e57b3cc2f945fdb12fa9901128bb28c8cbd",
+      "importedSha256": "9c6b8c11b91cd7a2f88d769a282b7e57b3cc2f945fdb12fa9901128bb28c8cbd"
+    },
+    {
+      "path": "assets/stone_guardian/purple/front_idle_sheet.png",
+      "sourceSha256": "455f3f3a7674d74424206413c779131a4ebc3b44241ab9b44f665058c2ae4a31",
+      "importedSha256": "455f3f3a7674d74424206413c779131a4ebc3b44241ab9b44f665058c2ae4a31"
+    },
+    {
+      "path": "assets/stone_guardian/purple/left_idle/left_idle_00.png",
+      "sourceSha256": "faec1eab72e3b977fac1f03ccc84e317e691be23b2157b19c0e941408d2e1282",
+      "importedSha256": "faec1eab72e3b977fac1f03ccc84e317e691be23b2157b19c0e941408d2e1282"
+    },
+    {
+      "path": "assets/stone_guardian/purple/left_idle/left_idle_01.png",
+      "sourceSha256": "bd7d9ee136b6c9f1b517490f0da1a16d40b4fd37dbddb1c4f6bde76bf598c73d",
+      "importedSha256": "bd7d9ee136b6c9f1b517490f0da1a16d40b4fd37dbddb1c4f6bde76bf598c73d"
+    },
+    {
+      "path": "assets/stone_guardian/purple/left_idle/left_idle_02.png",
+      "sourceSha256": "933e2e27d36afb44f8c85daf2fc531818cdfed870cdcee111053eb033d0af7d2",
+      "importedSha256": "933e2e27d36afb44f8c85daf2fc531818cdfed870cdcee111053eb033d0af7d2"
+    },
+    {
+      "path": "assets/stone_guardian/purple/left_idle/left_idle_03.png",
+      "sourceSha256": "6ab5278bbbb9898e4c47e714409c52211fac0904877e667249c219ace681ba3f",
+      "importedSha256": "6ab5278bbbb9898e4c47e714409c52211fac0904877e667249c219ace681ba3f"
+    },
+    {
+      "path": "assets/stone_guardian/purple/left_idle_sheet.png",
+      "sourceSha256": "e4f7f1fe00f6ffba2699c7d98bc9c08a893846b09c32ff2489efa58d70126635",
+      "importedSha256": "e4f7f1fe00f6ffba2699c7d98bc9c08a893846b09c32ff2489efa58d70126635"
+    },
+    {
+      "path": "assets/stone_guardian/purple/right_idle/right_idle_00.png",
+      "sourceSha256": "6d16c01fd04fa4538d5b44af895e5d4cbe470a4d9ce69ae3be1bc6a7d577837f",
+      "importedSha256": "6d16c01fd04fa4538d5b44af895e5d4cbe470a4d9ce69ae3be1bc6a7d577837f"
+    },
+    {
+      "path": "assets/stone_guardian/purple/right_idle/right_idle_01.png",
+      "sourceSha256": "53a0286bdc9e637c00649dac4c288f2548a2c9e3ffff5d4ec1a5443193d29cbe",
+      "importedSha256": "53a0286bdc9e637c00649dac4c288f2548a2c9e3ffff5d4ec1a5443193d29cbe"
+    },
+    {
+      "path": "assets/stone_guardian/purple/right_idle/right_idle_02.png",
+      "sourceSha256": "b18fd112d5adb8ec2a718d3cfb17e7fe899602ed8330080fb39c34fb048e0773",
+      "importedSha256": "b18fd112d5adb8ec2a718d3cfb17e7fe899602ed8330080fb39c34fb048e0773"
+    },
+    {
+      "path": "assets/stone_guardian/purple/right_idle/right_idle_03.png",
+      "sourceSha256": "87d1cc3cc19fbaadc55e7c66dc31f15e39daa4cbb2dc5197cc02d9abc5baa372",
+      "importedSha256": "87d1cc3cc19fbaadc55e7c66dc31f15e39daa4cbb2dc5197cc02d9abc5baa372"
+    },
+    {
+      "path": "assets/stone_guardian/purple/right_idle_sheet.png",
+      "sourceSha256": "645793e95d6d1600054783d0f1e7783627de59a1d10764e8fa503bbf6d53bff5",
+      "importedSha256": "645793e95d6d1600054783d0f1e7783627de59a1d10764e8fa503bbf6d53bff5"
+    },
+    {
+      "path": "assets/stone_guardian/red/appear/appear_00.png",
+      "sourceSha256": "28b3d1810a73cb456cfd893e88ade3ddc4043ac8ea99baa681d3dbc9e11a8ce3",
+      "importedSha256": "28b3d1810a73cb456cfd893e88ade3ddc4043ac8ea99baa681d3dbc9e11a8ce3"
+    },
+    {
+      "path": "assets/stone_guardian/red/appear/appear_01.png",
+      "sourceSha256": "adb07b5533946c18f098048fe03530cce6559805e6c6469efe5935abfcd5c6f6",
+      "importedSha256": "adb07b5533946c18f098048fe03530cce6559805e6c6469efe5935abfcd5c6f6"
+    },
+    {
+      "path": "assets/stone_guardian/red/appear/appear_02.png",
+      "sourceSha256": "dbaf5b12915846ccdd3445ddfc0f69c4811a097e63d570084e5bb24908d3a270",
+      "importedSha256": "dbaf5b12915846ccdd3445ddfc0f69c4811a097e63d570084e5bb24908d3a270"
+    },
+    {
+      "path": "assets/stone_guardian/red/appear/appear_03.png",
+      "sourceSha256": "a69292b4d3df121b829a9f0e5c4730aa7986c814b35ec416fe66bed960aaaa9e",
+      "importedSha256": "a69292b4d3df121b829a9f0e5c4730aa7986c814b35ec416fe66bed960aaaa9e"
+    },
+    {
+      "path": "assets/stone_guardian/red/appear/appear_04.png",
+      "sourceSha256": "3ab3e759faf2f8143a128557980b7b13faec6dadbce04d14c66dc8e0c1370605",
+      "importedSha256": "3ab3e759faf2f8143a128557980b7b13faec6dadbce04d14c66dc8e0c1370605"
+    },
+    {
+      "path": "assets/stone_guardian/red/appear/appear_05.png",
+      "sourceSha256": "3bbe95b274d720351eac580c5ebdcee9f85aaa17a4c99482e9d61dd5883204b0",
+      "importedSha256": "3bbe95b274d720351eac580c5ebdcee9f85aaa17a4c99482e9d61dd5883204b0"
+    },
+    {
+      "path": "assets/stone_guardian/red/appear_sheet.png",
+      "sourceSha256": "d4cecd6cd93e628a00534eb2e9ea8a7a3f2016229fbb0de3123735203312d484",
+      "importedSha256": "d4cecd6cd93e628a00534eb2e9ea8a7a3f2016229fbb0de3123735203312d484"
+    },
+    {
+      "path": "assets/stone_guardian/red/back_idle/back_idle_00.png",
+      "sourceSha256": "2431ac7d67223ed426051ddc8369eddee16c5d86ab86de88b6b7890f8f25e715",
+      "importedSha256": "2431ac7d67223ed426051ddc8369eddee16c5d86ab86de88b6b7890f8f25e715"
+    },
+    {
+      "path": "assets/stone_guardian/red/back_idle/back_idle_01.png",
+      "sourceSha256": "240d268f6b06346602f5b5139e4cef40aa633abe5b56d1c24f6d137849e12834",
+      "importedSha256": "240d268f6b06346602f5b5139e4cef40aa633abe5b56d1c24f6d137849e12834"
+    },
+    {
+      "path": "assets/stone_guardian/red/back_idle/back_idle_02.png",
+      "sourceSha256": "15157233f85a10f844b260741739510cfa12f95c89286dc21e273fa9b9a93ef9",
+      "importedSha256": "15157233f85a10f844b260741739510cfa12f95c89286dc21e273fa9b9a93ef9"
+    },
+    {
+      "path": "assets/stone_guardian/red/back_idle/back_idle_03.png",
+      "sourceSha256": "005540380a69425f69ab4b3cd9092c522502ca68a598c0132fbaff577d034abc",
+      "importedSha256": "005540380a69425f69ab4b3cd9092c522502ca68a598c0132fbaff577d034abc"
+    },
+    {
+      "path": "assets/stone_guardian/red/back_idle_sheet.png",
+      "sourceSha256": "693d8fb9776d390f9ed804081cc6f6a87852a0317b8e759c15e07f346a251af4",
+      "importedSha256": "693d8fb9776d390f9ed804081cc6f6a87852a0317b8e759c15e07f346a251af4"
+    },
+    {
+      "path": "assets/stone_guardian/red/die/die_00.png",
+      "sourceSha256": "d9dc073f5fafc1b78f954ec046823888e7be0049e862d04a885780aa5fff768e",
+      "importedSha256": "d9dc073f5fafc1b78f954ec046823888e7be0049e862d04a885780aa5fff768e"
+    },
+    {
+      "path": "assets/stone_guardian/red/die/die_01.png",
+      "sourceSha256": "db31121fb57b72b329bff3ec0bbdc79f9ce872a497ab6f25ffbb74c25272dd82",
+      "importedSha256": "db31121fb57b72b329bff3ec0bbdc79f9ce872a497ab6f25ffbb74c25272dd82"
+    },
+    {
+      "path": "assets/stone_guardian/red/die/die_02.png",
+      "sourceSha256": "ffcc02a31d1f464dd1271bbf04a4f00af26ece1090cfc5b5f5c79ad8eb878fb3",
+      "importedSha256": "ffcc02a31d1f464dd1271bbf04a4f00af26ece1090cfc5b5f5c79ad8eb878fb3"
+    },
+    {
+      "path": "assets/stone_guardian/red/die/die_03.png",
+      "sourceSha256": "0a61893a73e19d4f8aa41254e2f591840ce56853064d80074c447ab5549b9ce8",
+      "importedSha256": "0a61893a73e19d4f8aa41254e2f591840ce56853064d80074c447ab5549b9ce8"
+    },
+    {
+      "path": "assets/stone_guardian/red/die/die_04.png",
+      "sourceSha256": "ed2f3eec98fa0cc898eed78fba20c1a4929b787bff9a0f9b3e50ea3c287cc0d9",
+      "importedSha256": "ed2f3eec98fa0cc898eed78fba20c1a4929b787bff9a0f9b3e50ea3c287cc0d9"
+    },
+    {
+      "path": "assets/stone_guardian/red/die_sheet.png",
+      "sourceSha256": "6fd315fcb63dd716d431ea37e6430a78062dfefc1c0c78f55466bae1aedb0ba0",
+      "importedSha256": "6fd315fcb63dd716d431ea37e6430a78062dfefc1c0c78f55466bae1aedb0ba0"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_attack/front_attack_00.png",
+      "sourceSha256": "f33ab490296a0f11d9e6c2f55c95dbb5acbdce710c4821c9608c22a02b8f7a79",
+      "importedSha256": "f33ab490296a0f11d9e6c2f55c95dbb5acbdce710c4821c9608c22a02b8f7a79"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_attack/front_attack_01.png",
+      "sourceSha256": "f7daba1e494138b3b538781d02213e313129eaf3ebadec2c1be8d9f1a1630d68",
+      "importedSha256": "f7daba1e494138b3b538781d02213e313129eaf3ebadec2c1be8d9f1a1630d68"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_attack/front_attack_02.png",
+      "sourceSha256": "fde647721c7bd2b8f2907886e8491d39f539e1182fd31740980fc03b162f53f2",
+      "importedSha256": "fde647721c7bd2b8f2907886e8491d39f539e1182fd31740980fc03b162f53f2"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_attack/front_attack_03.png",
+      "sourceSha256": "28ff09bf788a4c1004be8bdf5de71c7b7de859c0ae32ff28e6def2cbdaa5c2b4",
+      "importedSha256": "28ff09bf788a4c1004be8bdf5de71c7b7de859c0ae32ff28e6def2cbdaa5c2b4"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_attack_sheet.png",
+      "sourceSha256": "510653519335141e7cc0368a08e8390235d6709f7175c38180cbaea3afc49e84",
+      "importedSha256": "510653519335141e7cc0368a08e8390235d6709f7175c38180cbaea3afc49e84"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_idle/front_idle_00.png",
+      "sourceSha256": "403516015296088228c38809ce25710d9420f7fae35afa8355193b9594839f48",
+      "importedSha256": "403516015296088228c38809ce25710d9420f7fae35afa8355193b9594839f48"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_idle/front_idle_01.png",
+      "sourceSha256": "6a5b40680e3124223e4130e20c37db12538593a108234de9fdaa8063a068aefb",
+      "importedSha256": "6a5b40680e3124223e4130e20c37db12538593a108234de9fdaa8063a068aefb"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_idle/front_idle_02.png",
+      "sourceSha256": "2b4338f775d090d1d8c40704423910ff642b426c75e7d920622b4374f813568b",
+      "importedSha256": "2b4338f775d090d1d8c40704423910ff642b426c75e7d920622b4374f813568b"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_idle/front_idle_03.png",
+      "sourceSha256": "afb06e0d52d94397c50b5316761651f39e070cc9ac60739b2d0694d13d08925c",
+      "importedSha256": "afb06e0d52d94397c50b5316761651f39e070cc9ac60739b2d0694d13d08925c"
+    },
+    {
+      "path": "assets/stone_guardian/red/front_idle_sheet.png",
+      "sourceSha256": "cf64191025250ddde7fa93845ec7adc4411f6a39e82216a25cd95485db61c00b",
+      "importedSha256": "cf64191025250ddde7fa93845ec7adc4411f6a39e82216a25cd95485db61c00b"
+    },
+    {
+      "path": "assets/stone_guardian/red/left_idle/left_idle_00.png",
+      "sourceSha256": "cf5a2324deac096d63986dd4c133c4228b8d69d9f3df36daff2339d7f7368696",
+      "importedSha256": "cf5a2324deac096d63986dd4c133c4228b8d69d9f3df36daff2339d7f7368696"
+    },
+    {
+      "path": "assets/stone_guardian/red/left_idle/left_idle_01.png",
+      "sourceSha256": "572fb5b844510900c3151267542695b6784efaec3f1fb6231b2a53911bb8f6b3",
+      "importedSha256": "572fb5b844510900c3151267542695b6784efaec3f1fb6231b2a53911bb8f6b3"
+    },
+    {
+      "path": "assets/stone_guardian/red/left_idle/left_idle_02.png",
+      "sourceSha256": "6b8a6b58337c601dfb2f7bb4feecdf1363447aaad95aff32ee7d9c4554d11289",
+      "importedSha256": "6b8a6b58337c601dfb2f7bb4feecdf1363447aaad95aff32ee7d9c4554d11289"
+    },
+    {
+      "path": "assets/stone_guardian/red/left_idle/left_idle_03.png",
+      "sourceSha256": "7bb1015b0920de8620c7d78dbb3f26a6061b6a6a48451b1d29bfe6ceadfa4996",
+      "importedSha256": "7bb1015b0920de8620c7d78dbb3f26a6061b6a6a48451b1d29bfe6ceadfa4996"
+    },
+    {
+      "path": "assets/stone_guardian/red/left_idle_sheet.png",
+      "sourceSha256": "c1a2205653142f0864f5dbb5b6d143f8199ed12e62191a5cc917242dfa7bf51e",
+      "importedSha256": "c1a2205653142f0864f5dbb5b6d143f8199ed12e62191a5cc917242dfa7bf51e"
+    },
+    {
+      "path": "assets/stone_guardian/red/right_idle/right_idle_00.png",
+      "sourceSha256": "7b1319927b8cc888b59d5c167254af8258ee218d37465921562c79b3b21cc7c4",
+      "importedSha256": "7b1319927b8cc888b59d5c167254af8258ee218d37465921562c79b3b21cc7c4"
+    },
+    {
+      "path": "assets/stone_guardian/red/right_idle/right_idle_01.png",
+      "sourceSha256": "a268e1f00186297a73f55de41bc5f9515676283e40e5479770575559e77b9ada",
+      "importedSha256": "a268e1f00186297a73f55de41bc5f9515676283e40e5479770575559e77b9ada"
+    },
+    {
+      "path": "assets/stone_guardian/red/right_idle/right_idle_02.png",
+      "sourceSha256": "cf22b1ed19663376e1fa06dfa1af3ff7463f1f5b2d38c839125471dece72b5cd",
+      "importedSha256": "cf22b1ed19663376e1fa06dfa1af3ff7463f1f5b2d38c839125471dece72b5cd"
+    },
+    {
+      "path": "assets/stone_guardian/red/right_idle/right_idle_03.png",
+      "sourceSha256": "8aeb39cd624fa5436e8bb2fef52a985c5027000dea874af2f2005a249187a260",
+      "importedSha256": "8aeb39cd624fa5436e8bb2fef52a985c5027000dea874af2f2005a249187a260"
+    },
+    {
+      "path": "assets/stone_guardian/red/right_idle_sheet.png",
+      "sourceSha256": "b7d6137736aefd2d8de394188e5b782725b95fbba7c116c1afea44d7d9a617ba",
+      "importedSha256": "b7d6137736aefd2d8de394188e5b782725b95fbba7c116c1afea44d7d9a617ba"
+    },
+    {
+      "path": "assets/stone_guardian/stone_guardian_atlas_source.png",
+      "sourceSha256": "fa24b880de74ffafe3355a2281be76f5212e53651e6510fa75a3acadc9d53bab",
+      "importedSha256": "fa24b880de74ffafe3355a2281be76f5212e53651e6510fa75a3acadc9d53bab"
+    },
+    {
+      "path": "hover_drone_source_transparent.png",
+      "sourceSha256": "6b392a3c6c83aa0b37c0f04cc34a3888acf105c5889f7c2c2451943f3129e07d",
+      "importedSha256": "6b392a3c6c83aa0b37c0f04cc34a3888acf105c5889f7c2c2451943f3129e07d"
+    },
+    {
+      "path": "index.html",
+      "sourceSha256": "fee95e2ff5ca9183b77031a44c8fc3f82240cbdda18ab29ad6e293ef77f41e92",
+      "importedSha256": "e0302fbb52b612b0394c771d91df2df130d45641cff81fa1e935a59d3b73d589"
+    },
+    {
+      "path": "manifest.js",
+      "sourceSha256": "319fca02c8510d3104ac6bb9dd479fb4173b21881c2979c32a4fef4dbeae83a0",
+      "importedSha256": "319fca02c8510d3104ac6bb9dd479fb4173b21881c2979c32a4fef4dbeae83a0"
+    },
+    {
+      "path": "README.md",
+      "sourceSha256": "201ef02ff555a57eef7854b1ce90dbcf98bb291fbfeae2b4bcd26fb1523d2a08",
+      "importedSha256": "92d11c64e36d519b4276efaf5f221924fdb9f64633a779f310fc873505050d7a"
+    },
+    {
+      "path": "stone_guardian_source_transparent.png",
+      "sourceSha256": "fa24b880de74ffafe3355a2281be76f5212e53651e6510fa75a3acadc9d53bab",
+      "importedSha256": "fa24b880de74ffafe3355a2281be76f5212e53651e6510fa75a3acadc9d53bab"
+    },
+    {
+      "path": "style.css",
+      "sourceSha256": "06b791b60293463f70f31b264a897bfa54c00da2a18dc160193576dea4d8a0dc",
+      "importedSha256": "8c6fe74df28e3bdd10d7f8bd05ef6608ca4649635bb08630ace0d9ed08871a59"
+    },
+    {
+      "path": "VERIFICATION_REPORT.md",
+      "sourceSha256": "5bf6883205a58ed41f9ad741f73c4c94e4e106e4f877a5faeacc3994961b4a66",
+      "importedSha256": "5bf6883205a58ed41f9ad741f73c4c94e4e106e4f877a5faeacc3994961b4a66"
+    }
+  ]
+}
