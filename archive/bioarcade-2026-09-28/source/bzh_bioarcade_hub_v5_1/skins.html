@@ -1,0 +1,13 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Skins — BioArcade</title><link rel="stylesheet" href="shared/base.css"/><link rel="stylesheet" href="shared/hub.css"/>
+  <link rel="stylesheet" href="shared/arcade.css" /></head>
+<script type="module">import { applyDA } from "./shared/da.js"; import { applySkinToDocument } from "./shared/skins.js"; applyDA(); applySkinToDocument();</script>
+
+<body class="arcade bg">
+<header class="topbar"><a class="btn small ghost" href="hub.html" data-sfx>← Hub</a><div class="title">Skins</div><div class="spacer"></div><button id="hubMute" class="btn small" aria-pressed="false" data-sfx>Mute</button></header>
+<main class="panel" style="max-width:1100px;margin:14px auto;padding:14px;">
+<div class="mini" style="opacity:.9;margin-bottom:10px;">Choisis un skin. Certains se débloquent en terminant des runs (badges).</div>
+<section class="hub-controls-row" style="margin-bottom:10px;"><label class="mini" for="hubVolume">Volume</label><input id="hubVolume" type="range" min="0" max="100" step="1" value="25"/><div id="hubVolLabel" class="mini mono">25%</div><div class="spacer"></div><button id="btnResetSkin" class="btn small ghost" data-sfx>Reset skin</button></section>
+<div id="skinsGrid" class="hub-badges"></div>
+</main>
+<script type="module" src="shared/skins_page.js"></script>
+</body></html>

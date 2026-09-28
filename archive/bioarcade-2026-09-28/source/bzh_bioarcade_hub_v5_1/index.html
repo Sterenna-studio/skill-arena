@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr" data-da="NEOGEO">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>BioArcade Hub — RetroSpace</title>
+  <link rel="stylesheet" href="shared/base.css"/>
+  <link rel="stylesheet" href="shared/retrospace.css"/>
+  <link rel="stylesheet" href="shared/arcade.css"/>
+  </head>
+<body class="bg arcade retrospace presshub">
+  <div class="crt-overlay"></div>
+
+  <div class="rs-shell">
+    <div class="rs-header">
+      <div class="rs-brand">
+        <div class="rs-title">RETROSPACE HUB</div>
+        <div class="rs-sub">BioArcade • retropunk dashboard • scan-based projects</div>
+      </div>
+      <div class="rs-actions">
+        <button id="muteBtn" class="rs-btn accent" data-sfx aria-pressed="false">Mute</button>
+      </div>
+    </div>
+
+    <section class="rs-dash">
+      <div class="rs-screen">
+        <div class="rs-screen-top">
+          <div>
+            <div class="rs-biglabel"><span class="a">RETRO</span><br/><span class="c">SPACE</span> SYSTEM</div>
+            <div class="rs-info">
+              <div><span class="k">NODE</span> <span id="infoNode">BIO-ARCADE</span></div>
+              <div><span class="k">DA</span> <span id="infoDA">SYNTHWAVE</span></div>
+              <div><span class="k">STATUS</span> <span id="infoStatus">LOCKED</span></div>
+              <div><span class="k">GAMES</span> <span id="infoCount">0</span></div>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="rs-pill"><span class="rs-led red" id="led"></span><span id="pillText">INSERT COIN</span></span>
+              <span class="rs-pill mono" id="activePill">—</span>
+            </div>
+          </div>
+          <div class="rs-orb" aria-hidden="true"></div>
+        </div>
+        <div class="rs-screen-bottom">
+          <div class="rs-status">
+            <span class="mono">NAV</span> <span>↑ ↓ / WASD</span>
+            <span class="mono">LAUNCH</span> <span>ENTER</span>
+            <span class="mono">START</span> <span>SPACE</span>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button id="startBtn" class="rs-btn warn" data-sfx>PRESS START</button>
+            <button id="scanBtn" class="rs-btn ghost" data-sfx>SCAN /games</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="rs-list">
+        <div class="rs-list-head">
+          <div class="rs-list-title">GAME SELECT</div>
+          <div class="rs-vol">
+            <span class="mono" style="opacity:.8;">VOL</span>
+            <input id="vol" type="range" min="0" max="100" step="1" value="25"/>
+            <span id="volLabel" class="mono">25%</span>
+          </div>
+        </div>
+        <div class="rs-games" id="gamesGrid"></div>
+        <div class="rs-foot">Place tes sous-projets dans <span class="mono">/games/&lt;id&gt;/</span> + <span class="mono">game.json</span> (ou manifest).</div>
+      </aside>
+    </section>
+  </div>
+
+  <div id="pressOverlay" class="press-overlay" role="dialog" aria-modal="true" aria-label="Press Start">
+    <div class="press-center">
+      <div class="press-title">INSERT COIN</div>
+      <div class="press-start" id="pressStart" tabindex="0" role="button" aria-label="Press Start">
+        &gt;&gt;&gt; PRESS START &lt;&lt;&lt;
+      </div>
+      <div class="press-hint">Enter / Space / Click</div>
+      <div class="press-mini mono">Le hub est lisible, mais verrouillé tant que tu n'as pas START.</div>
+    </div>
+  </div>
+
+  <div id="toast" class="rs-toast mono"></div>
+
+  <script type="module" src="shared/retrospace_hub.js"></script>
+</body>
+</html>

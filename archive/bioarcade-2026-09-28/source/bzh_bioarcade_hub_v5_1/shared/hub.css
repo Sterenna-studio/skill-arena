@@ -1,0 +1,118 @@
+.grid{
+  display:grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap:14px;
+}
+.hero{
+  grid-column: 1 / -1;
+  padding:18px;
+  overflow:hidden;
+  position:relative;
+}
+.hero::before{
+  content:"";
+  position:absolute; inset:-40px;
+  background:
+    radial-gradient(600px 300px at 15% 30%, rgba(55,245,197,.12), transparent 60%),
+    radial-gradient(520px 260px at 80% 40%, rgba(181,92,255,.12), transparent 60%),
+    radial-gradient(520px 260px at 45% 120%, rgba(195,138,61,.10), transparent 60%);
+  filter: blur(6px);
+  pointer-events:none;
+}
+.hero > *{position:relative}
+
+.hero h2{
+  margin:0;
+  font-size:1.4rem;
+  letter-spacing:.2px;
+}
+.hero p{margin:.45rem 0 0; color:var(--fg1); max-width:72ch}
+
+.tiles{
+  grid-column: 1 / -1;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap:14px;
+}
+
+.tile{
+  padding:14px;
+  border-radius: var(--radius2);
+  position:relative;
+  overflow:hidden;
+}
+.tile::after{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    radial-gradient(250px 120px at 10% 0%, rgba(55,245,197,.12), transparent 60%),
+    radial-gradient(250px 120px at 90% 0%, rgba(181,92,255,.10), transparent 60%);
+  opacity:.9;
+  pointer-events:none;
+}
+.tile > *{position:relative}
+
+.tile h3{margin:.1rem 0 .3rem; font-size:1.1rem}
+.tile p{margin:0; color:var(--fg1); font-size:.92rem; min-height:2.6em}
+
+.tile .meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0 12px;
+}
+
+.tile .actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:flex-end;
+}
+
+.footer{
+  margin-top:18px;
+  color: var(--muted);
+  font-size:.85rem;
+}
+
+/* Hub controls + badges */
+.hub-controls.panel{
+  margin: 14px auto 0;
+  max-width: 1100px;
+  padding: 14px 14px 10px;
+}
+.hub-controls-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.hub-controls-title{
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-right:auto;
+}
+input[type="range"]{
+  width: min(420px, 70vw);
+}
+.hub-badges{
+  margin-top: 10px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.badge{
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.badge.empty{
+  opacity:.7;
+  font-style: italic;
+}
+.badge-title{ font-weight: 700; }
+.badge-sub{ opacity: .75; font-size: 12px; margin-top: 2px; }
