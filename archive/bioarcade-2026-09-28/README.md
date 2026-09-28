@@ -2,7 +2,8 @@
 
 Origine : `C:\DEV\toCheck\bioarcade`. Les 71 fichiers sont conservés à
 l'identique dans `source/`, avec empreintes SHA-256 dans `manifest.json`.
-La source d'origine reste intacte. Aucun jeu actuel de Skill Arena n'est remplacé.
+Le lot d'origine dans `toCheck` a été retiré après vérification intégrale de
+cette copie et de ses dossiers. Aucun jeu actuel de Skill Arena n'est remplacé.
 
 Ce hub expérimental regroupe Tankgame, Sniky Alpha/Beta, Steam Manager et RPG.
 Skill Arena possède déjà les jeux `tank-protocol`, `sniky` et
