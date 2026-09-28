@@ -2,6 +2,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+L'ancien hub BioArcade est conservé comme référence dans
+[`archive/bioarcade-2026-09-28`](archive/bioarcade-2026-09-28/README.md).
+Cette archive ne remplace pas les jeux actifs et n'est pas déployée.
+
 First, run the development server:
 
 ```bash

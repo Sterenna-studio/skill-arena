@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sniky — Web Alpha • BioArcade</title>
+  <link rel="stylesheet" href="../../shared/base.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="sig" aria-hidden="true"></div>
+          <div>
+            <h1>Sniky — Web Alpha</h1>
+            <div class="subtitle">Prototype jouable • collecte & movement</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <a class="btn" href="../../index.html" data-sfx>← Hub</a>
+          <button class="btn btn-primary" id="btnRestart">Restart</button>
+        </div>
+      </div>
+    </header>
+<script type="module">import { applySkinToDocument } from "../../shared/skins.js"; applySkinToDocument();</script>
+
+
+    <main class="main">
+      <section class="layout">
+        <div class="card stage">
+          <canvas id="c" width="960" height="540" aria-label="Sniky Alpha canvas"></canvas>
+          <div class="hint">
+            <span class="tag"><span class="dot"></span> WASD / Flèches</span>
+            <span class="tag"><span class="dot"></span> Collecte les spores</span>
+            <span class="tag warn"><span class="dot"></span> Alpha</span>
+          </div>
+        </div>
+
+        <aside class="card panel">
+          <div class="panel-head">
+            <div class="mono small">OBJECTIF</div>
+            <h2>Récupérer 7 spores</h2>
+            <p class="small">Une micro boucle “feel” pour valider la DA et les contrôles avant la vraie infiltration.</p>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="k">Spore</div>
+              <div class="v"><span id="spore">0</span>/7</div>
+            </div>
+            <div class="stat">
+              <div class="k">Temps</div>
+              <div class="v"><span id="time">0.0</span>s</div>
+            </div>
+            <div class="stat">
+              <div class="k">Best</div>
+              <div class="v"><span id="best">—</span></div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="small mono">
+            Sauvegarde locale: <span id="saveState">OK</span><br/>
+            Stockage: <span class="mono">localStorage</span>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="small">
+            <strong>Note:</strong> cette alpha correspond à un “mini-loop” simple.
+            La bêta ajoute drones, cônes de vision, dash, level design, score.
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

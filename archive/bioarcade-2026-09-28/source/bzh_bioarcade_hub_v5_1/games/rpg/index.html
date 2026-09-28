@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RPG — BioArcade</title>
+  <link rel="stylesheet" href="../../shared/base.css" />
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="sig" aria-hidden="true"></div>
+          <div>
+            <h1>RPG</h1>
+            <div class="subtitle">Portage web (tiles + dialogues) en DA biopunk / BZH Chronicles</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <a class="btn" href="../../index.html">← Hub</a>
+          <button class="btn btn-primary" id="btnPlan">Plan de portage</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="card" style="padding:16px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="tag"><span class="dot"></span> RPG</span><span class="tag"><span class="dot"></span> Tiles</span><span class="tag"><span class="dot"></span> Lore</span>
+          <span class="tag lock"><span class="dot"></span> À venir</span>
+        </div>
+        <h2 style="margin:0 0 10px">Module en préparation</h2>
+        <p class="small" style="margin:0 0 12px">
+          Ce module est un “slot” dans le hub. Quand tu veux, on le remplace par un vrai port web :
+          canvas, assets, contrôles, et une base de niveaux.
+        </p>
+
+        <div class="hr"></div>
+
+        <h3 style="margin:0 0 8px">Ce que je te propose pour la V1</h3>
+        <ul class="small">
+          <li>Structure identique aux autres modules : <span class="mono">index.html + game.js + styles.css</span>.</li>
+          <li>Stockage séparé (<span class="mono">localStorage</span>) + menu pause.</li>
+          <li>Un mini “debug overlay” (FPS, collisions, entités).</li>
+        </ul>
+
+        <div class="hr"></div>
+
+        <div class="small mono">
+          Dossier du hub : <span style="color:var(--fg0)">rpg</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { toast } from "../../shared/ui.js";
+    document.getElementById("btnPlan").addEventListener("click", ()=>{
+      toast("OK. Dis-moi : vue top-down ou side, et on branche le port web proprement.", "warn");
+    });
+  </script>
+</body>
+</html>

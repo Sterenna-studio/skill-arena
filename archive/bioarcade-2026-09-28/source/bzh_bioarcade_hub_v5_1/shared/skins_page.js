@@ -1,0 +1,8 @@
+import { AudioBus } from "./audio.js";
+import { BioSFX } from "./sfx.js";
+import { getSkins,getCurrentSkin,setCurrentSkin,isSkinUnlocked,applySkinToDocument,resetSkin } from "./skins.js";
+const qs=(s,e=document)=>e.querySelector(s);
+function renderAudio(){const st=AudioBus.getState();qs("#hubVolume").value=String(Math.round(st.volume*100));qs("#hubVolLabel").textContent=st.muted?"0%":`${Math.round(st.volume*100)}%`;const m=qs("#hubMute");m.setAttribute("aria-pressed",st.muted?"true":"false");m.textContent=st.muted?"Muted":"Mute";}
+function renderSkins(){const g=qs("#skinsGrid");const cur=getCurrentSkin();g.innerHTML="";for(const s of getSkins()){const u=isSkinUnlocked(s);const c=document.createElement("div");c.className="badge";c.style.cursor=u?"pointer":"not-allowed";c.style.opacity=u?"1":"0.55";c.innerHTML=`<div class="badge-title">${s.name}${s.id===cur?" — ACTIVE":""}</div><div class="badge-sub">${s.desc}</div><div class="badge-sub" style="margin-top:6px;">${u?"Unlocked":`Locked (needs: ${s.requires})`}</div>`;c.addEventListener("click",()=>{if(!u){BioSFX.play("error");return;}setCurrentSkin(s.id);BioSFX.play("success");renderSkins();});g.appendChild(c);}}
+function init(){applySkinToDocument();qs("#hubVolume").addEventListener("input",()=>{AudioBus.setVolume(parseInt(qs("#hubVolume").value,10)/100);BioSFX.play("blip");});qs("#hubMute").addEventListener("click",()=>{AudioBus.toggleMute();BioSFX.play("blip");renderAudio();});qs("#btnResetSkin").addEventListener("click",()=>{resetSkin();BioSFX.play("blip");renderSkins();});renderAudio();renderSkins();window.addEventListener("bioarcade:audio",renderAudio);window.addEventListener("bio:skin",()=>{applySkinToDocument();renderSkins();});}
+init();

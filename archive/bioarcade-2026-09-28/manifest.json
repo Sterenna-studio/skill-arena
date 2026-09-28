@@ -1,0 +1,357 @@
+[
+  {
+    "path": "bzh_bioarcade_hub_v5_1/CREDITS.md",
+    "sha256": "cb8a44a373fa62114691935b935d8d298b6bf9a5516809506117c868ec161cf6",
+    "bytes": 1551
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/da.html",
+    "sha256": "8098a4da76643ed6a95f6201bb6c1f1e017c87a892deba81d293df04cf775543",
+    "bytes": 1623
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/favicon.ico",
+    "sha256": "b219099aee5bffebb0025b30566c7b465ae203511dd5257ec8f3ef9dceab2e23",
+    "bytes": 285
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/hub.html",
+    "sha256": "4aeaf927324cbab15ed24cd04c486653ede37ea2bc01d860f86737c2252223e6",
+    "bytes": 116
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/index.html",
+    "sha256": "91da9bec33a21c23ba142fb574956fd9f9ff1ab651a1600bfdf5c03ef0758742",
+    "bytes": 3708
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/README.html",
+    "sha256": "3e9ba3b2962b4421e4b37e35314f5c77333f4de08793d025f9fe54a4076bfecb",
+    "bytes": 2716
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/README.md",
+    "sha256": "0130ea09da799e82c96a30785c31a349e1ca440b5381d8242a904cdfd91a09bb",
+    "bytes": 922
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/README_HUB_SCAN.md",
+    "sha256": "de6fe9131b598b820bf86d0e1e8fce5d1b5cb981859aaa141b103baae5981863",
+    "bytes": 485
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/README_RUN_LOCAL.md",
+    "sha256": "8d0071bef6aa066514c043252f32dbb51aea6a598d13f207f96bed0b7d697ff8",
+    "bytes": 560
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/skins.html",
+    "sha256": "3252765490e8b25c6c0128cdc5af5a2f4bef8135d131aeb82d384edb96f4de6f",
+    "bytes": 1431
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/start_server.bat",
+    "sha256": "18dfd1096eb9cf6230e85978b43dc5c1220cc012a7ed8f6ee2276ee104cf7694",
+    "bytes": 182
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/start_server.ps1",
+    "sha256": "c3bf71365f39345f500905bef80fb8e915adf343ef7f181e2bcf6bf193b02d78",
+    "bytes": 220
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/alert_01.ogg",
+    "sha256": "5b1b73bbe6e6ad1b1d39422f640f1bbee3376e8e18916f9305b04b9d143f5cf3",
+    "bytes": 123515
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/alert_02.wav",
+    "sha256": "95f2d176647ac0a7cd1d217c1852c41d1ebe3728d49df9c32820b256437c700d",
+    "bytes": 317570
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/audio_manifest.json",
+    "sha256": "865521dc2dc73c7172b5e3552900a89a5be8f11969d1110ad4212251e8935ead",
+    "bytes": 1806
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/door_open_01.ogg",
+    "sha256": "8c204ca94eb722d3af95f29221f4551938ca3c217fda32c14dabe2cf6a9c782b",
+    "bytes": 21442
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/explosion_01.ogg",
+    "sha256": "4b597d658d0ae101f0a030fbeea5fc3a4292ab85f017470a8254a8e7959cbd69",
+    "bytes": 28274
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/explosion_02.ogg",
+    "sha256": "8c7197bb3a1c504690319c3abe0e62a5423ee246dd70caab57963d0b7aa8144f",
+    "bytes": 54824
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/hit_01.ogg",
+    "sha256": "0c1bb4db8a4d48b2b8c2e65a175d9056b845f1063837599995d81be1c5957d2c",
+    "bytes": 12708
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/hit_02.ogg",
+    "sha256": "de8fbd92a3b26c9758073b66119e125c19de64c965f21ef326a5abeeeed37de8",
+    "bytes": 36939
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/mech_clank_01.wav",
+    "sha256": "899a46a8423fa0ca349b3c70a07a422d1eaa3a58695ce6facfbae074dd70226f",
+    "bytes": 59436
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/mech_click_01.wav",
+    "sha256": "27b9430c35123a6b2e662b4268adb2238c59fa02522b060756d47666c6b0ffe0",
+    "bytes": 35884
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/mech_rattle_01.wav",
+    "sha256": "65ae71cd800986e4e4c0c1a180221c0f240f6ffd9e306f8634c0335a5e3f039a",
+    "bytes": 68652
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/pickup_01.wav",
+    "sha256": "e0bb4d819650a349b4fd4e31183779fc6714f8902792c2a983a3a70a1a263300",
+    "bytes": 417246
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/pickup_02.wav",
+    "sha256": "0af2e6b0a07c8565d3c42923163cdfab1e5d554526d83cded4e6522990a4907b",
+    "bytes": 119936
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/shoot_01.ogg",
+    "sha256": "a0a99efaa755594982d5dfebf3d9cecaed5249bdf1f0de29cf26ca9ea24c191a",
+    "bytes": 12732
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/shoot_02.ogg",
+    "sha256": "4442b847419f5f203ef8ba16f19957124884da176c843d68d48a22e9cd022796",
+    "bytes": 14271
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/slime_01.ogg",
+    "sha256": "0457afad5cafa7fab030cfb0ca9003b3cec79468392fe5bc10532afdb9798344",
+    "bytes": 32038
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/slime_02.ogg",
+    "sha256": "d6ba3a2f75bad2b363eea152c7d98331ee360b96f49c962c7497a7d035d2f32c",
+    "bytes": 12539
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/ui_blip_01.wav",
+    "sha256": "682f7511f236688f0eeb7f4d5995249a461da95025e892fdb0924bd481121441",
+    "bytes": 88450
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/ui_blip_02.wav",
+    "sha256": "9f5942d4014e9550ff92d405ffcb44eacd80cf4a5e46d5c861f11a8090ebdfbd",
+    "bytes": 88450
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/ui_blip_03.wav",
+    "sha256": "cb18a9dc5b418504a5f552473917aff6c46e2b225844564825c33d5d9774bbf3",
+    "bytes": 81534
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/ui_error_01.wav",
+    "sha256": "b299de6db69461f68f9962beef664ff448076ae5b11eccc286880180967b0e7a",
+    "bytes": 88450
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/ui_error_02.wav",
+    "sha256": "41732c7f6c8316e5ba4bd67d505aebc10ae7846885bce44b07e9f848d97d9924",
+    "bytes": 88450
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/ui_success_01.wav",
+    "sha256": "0af2e6b0a07c8565d3c42923163cdfab1e5d554526d83cded4e6522990a4907b",
+    "bytes": 119936
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/assets/audio/ui_success_02.wav",
+    "sha256": "41732c7f6c8316e5ba4bd67d505aebc10ae7846885bce44b07e9f848d97d9924",
+    "bytes": 88450
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/manifest.json",
+    "sha256": "775958924b3989b122686789222c6d63ca750fce07e9469377bc5c3108eb905d",
+    "bytes": 605
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/rpg/index.html",
+    "sha256": "3b9a17bec8c700de3740689acc8c5718a41f318ba7af57859637c5ee7833b306",
+    "bytes": 2438
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/sniky-alpha/game.js",
+    "sha256": "b2da93c28e3b6b7c2e66746b60f5a4675be05cb527a0a0496ac007fddad60dc4",
+    "bytes": 7117
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/sniky-alpha/index.html",
+    "sha256": "afa9d524cf4367937782af2e505c5c077859a9ef89edca7f3e8582ddb0f38f46",
+    "bytes": 2909
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/sniky-alpha/style.css",
+    "sha256": "c3b284101ee2524ab17e00440f85a77b30fa7d242be09556ea93f606c76154a6",
+    "bytes": 1044
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/sniky-beta/index.html",
+    "sha256": "73ac1266b3d420e9817187e002e8b5a26b41ee7fbe149a7eeb2d97d651849e29",
+    "bytes": 3316
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/sniky-beta/main.js",
+    "sha256": "7238a7ed8211cdee085ff41a1f161855790e27106690967b4746f9d724d45342",
+    "bytes": 15775
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/sniky-beta/style.css",
+    "sha256": "0f0d2a7127fa5400e38fcaedfa5fc2ce0f735940665ce64b3f04a35d8c98b8c4",
+    "bytes": 1118
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/steam-manager/index.html",
+    "sha256": "e5bbf53668f07e039e524cc6059740ecbdf56b393336703207f46855dcfa6f79",
+    "bytes": 3866
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/steam-manager/main.js",
+    "sha256": "004ba99f3834f5d6a9af302b81220d05a8e79af83e09188ea343a6907912455b",
+    "bytes": 18667
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/steam-manager/README.md",
+    "sha256": "3a9f40f01fa93b792845045bc8012586b61441094f5801cb90306034a4058d9d",
+    "bytes": 1213
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/steam-manager/styles.css",
+    "sha256": "01075ebb0a603c594d61e4eebc0bfbef51270778a001233daf4cf5f716f70667",
+    "bytes": 3754
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/tankgame/index.html",
+    "sha256": "3241c035f8644883e3a889eac5f75952d925883d4f9f63fa78f4eba16ed4df76",
+    "bytes": 2219
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/tankgame/main.js",
+    "sha256": "0f0ff9b9ff4c1dc3d5406650b071796e90c8a974a604d6a7227a1ecc5a1820aa",
+    "bytes": 20580
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/games/tankgame/style.css",
+    "sha256": "d10441c7c9f325ffd5205b48f4d090b8c91c5c218a2df7d1b692d60ec0c054d0",
+    "bytes": 2229
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/arcade.css",
+    "sha256": "517d4539049708ba36ad9ae34e811c32cc99fbffce3e5ed5dbfeb2998b724336",
+    "bytes": 11122
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/audio.js",
+    "sha256": "9737b9a07651a5487086964f442510bcfb53adafb6f752dadf273a1a0c3acfc6",
+    "bytes": 4390
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/audio_manifest.js",
+    "sha256": "28965cc189b0f4f5bb8b096ec997467af74fbe81faecd70d5630d0122554ef7f",
+    "bytes": 2462
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/base.css",
+    "sha256": "852436a53c3e3e868be2d32191ca349e8d47e1d1040a1f63d6d1fc1773e59d46",
+    "bytes": 4283
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/da.js",
+    "sha256": "bbbae209d5e817bd2dd54ed6fbc6aa4c4bdad93ef2511e122221344ec99d9336",
+    "bytes": 841
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/da_page.js",
+    "sha256": "1aeb21dee38c1aa13886ac4f8a77ee50404ecccab9617a18cf4efe103426318d",
+    "bytes": 1791
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/hub.css",
+    "sha256": "1949ae86248ca8815c22a815fa43be55a7b6ae5f80ac5503aac05c1021e2ff2a",
+    "bytes": 2507
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/hub.js",
+    "sha256": "675a0b4fcada89038d0f7bccaec1a0d50abe99d414c4c8ae3fcce0de3b4b1225",
+    "bytes": 7502
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/press.js",
+    "sha256": "02f473b00b00c96ebbacf65c83bb1803dca6cba4cdefecab45b4f2325eddbc3f",
+    "bytes": 607
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/presshub.js",
+    "sha256": "7ca3de9b506739aec8341b93337b8da43551aff2c2e975aad643fb7d4bb21711",
+    "bytes": 1059
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/progress.js",
+    "sha256": "5b35847846c0572f80442e7dcf9792d07054af0c8501b31b8b2f5e91152e1517",
+    "bytes": 1212
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/retrospace.css",
+    "sha256": "e2f299d700080bf70bfdc6cf510a061b24ee0ae0218709430a8bd9aad9b28d20",
+    "bytes": 7521
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/retrospace_hub.js",
+    "sha256": "f7403dbb437cd5ae79771b7362b169e501921fc9d8d232f1a4eb419527611480",
+    "bytes": 4636
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/scanner.js",
+    "sha256": "2bf4e19710b38fe4f32c15f736a06fd70bc9f219cc608bec4853e430bd872857",
+    "bytes": 287
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/sfx.js",
+    "sha256": "51a6ffcff35e65a082ea527aa295c14ab97277a0cb8b948020902337ce925165",
+    "bytes": 732
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/skins.js",
+    "sha256": "0bf1c012fb28c6ddc30ba240a63357716787fafed7888ebb80141ef2a849378e",
+    "bytes": 1419
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/skins_page.js",
+    "sha256": "93e3a24d0a7f357627c2367363f183fdac33437d430fadfcce83892ec858ad7b",
+    "bytes": 1723
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/soundscape.js",
+    "sha256": "42e72018a52d5c85ae3040de1c8abfe9e92d003b4efaadb5c3b2a57b788677cc",
+    "bytes": 2445
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/shared/ui.js",
+    "sha256": "cd6c3ab683905cb8ff906b29c134add3b9af48e688504c15c9f796351c9b585c",
+    "bytes": 1661
+  },
+  {
+    "path": "bzh_bioarcade_hub_v5_1/tools/generate_manifest.py",
+    "sha256": "3af756ebe49f7e1528a81946d40677e22f2d735edefdc82b3fca5f21e07e2c62",
+    "bytes": 600
+  }
+]

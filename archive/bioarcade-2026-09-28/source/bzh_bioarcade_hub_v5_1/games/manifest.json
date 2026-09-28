@@ -1,0 +1,35 @@
+{
+  "games": [
+    {
+      "id": "tankgame",
+      "title": "Tank Protocol",
+      "version": "v0.1",
+      "status": "alpha",
+      "genre": [
+        "arcade",
+        "shooter"
+      ],
+      "entry": "index.html"
+    },
+    {
+      "id": "sniky-run",
+      "title": "Sniky Run",
+      "version": "v0.2",
+      "status": "beta",
+      "genre": [
+        "runner"
+      ],
+      "entry": "index.html"
+    },
+    {
+      "id": "steam-puzzle",
+      "title": "Steam Puzzle",
+      "version": "v0.3",
+      "status": "dev",
+      "genre": [
+        "puzzle"
+      ],
+      "entry": "index.html"
+    }
+  ]
+}
