@@ -3,6 +3,15 @@ import { GAMES, CATEGORY_LABELS } from '@/lib/games'
 
 const FULLGAMES = [
   {
+    slug: 'core-defense',
+    title: 'Core Defense',
+    desc: 'Défends le noyau contre les robots rouges, améliore ton gardien et tes drones entre les vagues, puis affronte le boss. Clavier requis.',
+    icon: '🛡️',
+    tag: 'DÉFENSE',
+    tagColor: '--c-cyan',
+    external: '/arena/games/core-defense/',
+  },
+  {
     slug: 'drone-quota-3d',
     title: 'Drone Quota 3D',
     desc: 'Un plateau en perspective et des drones en volume. Retrouve les quotas, les duels et ton arbre de compétences dans la version 3D.',

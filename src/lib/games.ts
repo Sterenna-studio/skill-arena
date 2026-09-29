@@ -13,6 +13,17 @@ export interface GameMeta {
 
 export const GAMES: GameMeta[] = [
   {
+    slug: 'core-defense',
+    title: 'Core Defense',
+    description: 'Défends le noyau contre les vagues de robots, choisis tes modules et affronte le boss. Clavier requis, record local.',
+    icon: '🛡️',
+    category: 'arcade',
+    unit: 'score',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/games/core-defense/',
+  },
+  {
     slug: 'drone-quota-3d',
     title: 'Drone Quota 3D',
     description: 'Le terminal en trois dimensions : drones en volume, chaînes de frappes, duels et progression partagée avec Drone Quota.',
