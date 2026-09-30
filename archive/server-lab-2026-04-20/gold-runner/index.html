@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gold Runner – Mini‑jeu</title>
+  <style>
+    :root { --bg:#0b0e12; --fg:#e7f0ff; --accent:#38bdf8; --muted:#8fa3bd; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,Segoe UI,Roboto,sans-serif}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #1e293b;background:#0b0e12cc;backdrop-filter:saturate(1.2) blur(4px);position:sticky;top:0}
+    header .left{display:flex;gap:10px;align-items:center}
+    h1{font-size:16px;margin:0}
+    .pill{padding:6px 10px;border:1px solid #1f2937;border-radius:999px;background:#0f172a}
+    .grid{display:grid;grid-template-columns:320px 1fr;gap:16px;max-width:1200px;margin:16px auto;padding:0 16px}
+    .card{background:#0f172a;border:1px solid #1f2937;border-radius:12px;box-shadow:0 1px 0 #111827 inset}
+    .card h2{font-size:14px;margin:0;padding:12px 14px;border-bottom:1px solid #1f2937;color:#cbd5e1}
+    .card .content{padding:12px 14px}
+    .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+    .row strong{font-variant-numeric:tabular-nums}
+    button{appearance:none;border:1px solid #1f2937;background:#0b1220;color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
+    button.primary{border-color:#0ea5e9;background:linear-gradient(180deg,#0ea5e922,#0ea5e90f)}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    #canvasWrap{position:relative;height:560px}
+    canvas{display:block;width:100%;height:560px;background:radial-gradient(1200px 600px at 20% -10%, #1e293b 0%, #0b0e12 55%)}
+    .hud{position:absolute;left:10px;top:10px;display:flex;gap:8px}
+    .hud .tag{background:#0b1220;border:1px solid #1f2937;border-radius:8px;padding:6px 10px;color:#cbd5e1}
+    .toast{position:fixed;right:14px;bottom:14px;max-width:360px;background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.35);display:none}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .ok{color:#34d399}
+    .bad{color:#f87171}
+    .link{color:var(--accent);text-decoration:none}
+    .kbd{border:1px solid #1f2937;background:#0b1220;border-radius:6px;padding:2px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  </style>
+</head>
+<body>
+<header>
+  <div class="left">
+    <h1>Gold Runner</h1>
+    <span class="pill small">Mini‑jeu de farm → conversion Or</span>
+  </div>
+  <div class="right small">
+    <span id="authState" class="muted">…</span>
+  </div>
+</header>
+
+<main class="grid">
+  <section class="card">
+    <h2>Joueur</h2>
+    <div class="content">
+      <div class="row"><span>Gold actuel</span><strong id="gold">—</strong></div>
+      <div class="row"><span>Cartes</span><strong id="cards">—</strong></div>
+      <div class="row"><span>Limite quotidienne (convert)</span><strong id="cap">—</strong></div>
+      <div class="row"><span>Utilisé aujourd’hui</span><strong id="used">—</strong></div>
+      <div class="row"><span class="muted small">Astuce : ZQSD / Flèches pour bouger, attrape les orbes. Fin à 45s.</span><span></span></div>
+      <div class="row" style="gap:8px">
+        <button id="btnStart" class="primary">Démarrer la session</button>
+        <button id="btnConvert" disabled>Convertir la récolte</button>
+        <button id="btnRefresh">Rafraîchir</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="gameCard">
+    <h2>Zone de jeu</h2>
+    <div class="content">
+      <div id="canvasWrap">
+        <div class="hud">
+          <div class="tag">⏱️ Temps : <span id="timer">45.0</span>s</div>
+          <div class="tag">🌾 Ressource : <span id="resource">0</span></div>
+          <div class="tag">🎯 Taux : <span id="rate">0.2</span></div>
+        </div>
+        <canvas id="game" width="960" height="560"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// --- Dépendances projet (adapte les chemins à ton repo) ---
+// Supabase client (doit exposer getClient / getUser équivalents à ton setup)
+import { supabase } from '/lab/shared/supabaseClient.js';
+import { getClient, getUser } from '/lab/tcg/logic/supaRaw.js';
+import { convertResourceToGold } from '/lab/shared/economy.js';
+
+// ——— UI helpers ———
+const $ = sel => document.querySelector(sel);
+const goldEl = $('#gold');
+const cardsEl = $('#cards');
+const capEl = $('#cap');
+const usedEl = $('#used');
+const authStateEl = $('#authState');
+const timerEl = $('#timer');
+const resourceEl = $('#resource');
+const rateEl = $('#rate');
+const toast = $('#toast');
+
+const BTN_START = $('#btnStart');
+const BTN_CONVERT = $('#btnConvert');
+const BTN_REFRESH = $('#btnRefresh');
+
+let session = null; // { id, startedAt }
+let resource = 0;
+let rate = 0.2; // adapte si tu veux lire depuis un paramètre serveur
+let dailyCap = 1000;
+let dailyUsed = 0;
+let running = false;
+let tLeft = 45.0; // secondes
+
+function showToast(msg, type=''){
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  toast.style.borderColor = type==='error' ? '#7f1d1d' : '#1f2937';
+  setTimeout(()=> toast.style.display = 'none', 3200);
+}
+
+async function refreshPlayer(){
+  const sb = await getClient();
+  const user = await getUser();
+  if(!user){ authStateEl.textContent = 'Non connecté'; return; }
+  authStateEl.textContent = `Connecté: ${user.email ?? user.id}`;
+
+  // players
+  const { data: player, error } = await sb
+    .from('players')
+    .select('id, gold, cards_qty, updated_at')
+    .eq('id', user.id)
+    .single();
+  if(error){ console.error(error); showToast('Erreur chargement joueur','error'); return; }
+  goldEl.textContent = player.gold;
+  cardsEl.textContent = player.cards_qty;
+
+  // usage quotidien convert (facultatif: lis depuis une vue ou RPC serveur si dispo)
+  const { data: used, error: e2 } = await sb
+    .from('gold_ledger') // adapte si le nom diffère
+    .select('delta, created_at')
+    .eq('player_id', player.id)
+    .eq('source','convert')
+    .gte('created_at', new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' }).replace(/(.*)/, d => new Date(d))).toISOString())
+  if(!e2 && Array.isArray(used)){
+    dailyUsed = used.reduce((a,r)=> a + (r.delta||0), 0);
+  }
+  usedEl.textContent = dailyUsed;
+  capEl.textContent = dailyCap;
+}
+
+// ——— Mini‑jeu canvas ———
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+const state = { px: W/2, py: H/2, vx: 0, vy: 0, speed: 210, keys: {}, orbs: [] };
+
+function spawnOrb(){
+  state.orbs.push({ x: 40 + Math.random()*(W-80), y: 40 + Math.random()*(H-80), r: 10 + Math.random()*8, ttl: 10 + Math.random()*6 });
+}
+
+for(let i=0;i<16;i++) spawnOrb();
+
+window.addEventListener('keydown', e=>{ state.keys[e.key.toLowerCase()] = true; });
+window.addEventListener('keyup', e=>{ state.keys[e.key.toLowerCase()] = false; });
+
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(0.032, (now - last)/1000);
+  last = now;
+  if(running){
+    tLeft = Math.max(0, tLeft - dt);
+    if(tLeft === 0){ running = false; BTN_CONVERT.disabled = false; showToast('Session terminée ! Convertis ta récolte.'); }
+  }
+
+  // physics
+  const k = state.speed * dt;
+  const left = state.keys['arrowleft'] || state.keys['q'];
+  const right= state.keys['arrowright']|| state.keys['d'];
+  const up   = state.keys['arrowup']   || state.keys['z'];
+  const down = state.keys['arrowdown'] || state.keys['s'];
+  if(running){
+    if(left) state.px -= k; if(right) state.px += k; if(up) state.py -= k; if(down) state.py += k;
+    state.px = Math.max(18, Math.min(W-18, state.px));
+    state.py = Math.max(18, Math.min(H-18, state.py));
+  }
+
+  // collect
+  for(let i=state.orbs.length-1;i>=0;i--){
+    const o = state.orbs[i]; o.ttl -= dt; if(o.ttl<=0){ state.orbs.splice(i,1); continue; }
+    const dx = o.x - state.px, dy = o.y - state.py; const d2 = dx*dx + dy*dy;
+    if(running && d2 < (o.r+14)*(o.r+14)){
+      resource += 1; resourceEl.textContent = resource;
+      state.orbs.splice(i,1);
+      spawnOrb();
+    }
+  }
+
+  // draw
+  ctx.clearRect(0,0,W,H);
+  // player
+  ctx.beginPath(); ctx.arc(state.px, state.py, 14, 0, Math.PI*2); ctx.fillStyle = '#38bdf8'; ctx.fill();
+  // orbs
+  for(const o of state.orbs){
+    ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,Math.PI*2); ctx.fillStyle = '#22c55e'; ctx.fill();
+  }
+
+  timerEl.textContent = tLeft.toFixed(1);
+  rateEl.textContent = rate.toString();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+BTN_START.addEventListener('click', async()=>{
+  try{
+    const { data: { user } } = await supabase.auth.getUser();
+    if(!user) throw new Error('Connecte‑toi d’abord.');
+    // reset local session
+    session = { id: crypto.randomUUID(), startedAt: Date.now() };
+    resource = 0; resourceEl.textContent = '0';
+    running = true; tLeft = 45.0; BTN_CONVERT.disabled = true;
+    showToast('Session démarrée. Bonne chance !');
+  }catch(err){ console.error(err); showToast(err.message || 'Erreur démarrage','error'); }
+});
+
+BTN_CONVERT.addEventListener('click', async()=>{
+  if(!session){ showToast('Pas de session active','error'); return; }
+  try{
+    BTN_CONVERT.disabled = true;
+    const ref = `runner:${session.id}`; // idempotent par session
+    const res = await convertResourceToGold({ resourceSpent: resource, rate, ref, meta:{ game:'runner', t:tLeft.toFixed(1) } });
+    if(res){
+      goldEl.textContent = res.new_gold;
+      usedEl.textContent = res.daily_used;
+      showToast(`+${Math.floor(resource*rate)} or ajouté`);
+    }
+  }catch(err){ console.error(err); showToast(err.message || 'Conversion impossible','error'); }
+});
+
+BTN_REFRESH.addEventListener('click', refreshPlayer);
+
+// init
+refreshPlayer();
+
+</script>
+</body>
+</html>

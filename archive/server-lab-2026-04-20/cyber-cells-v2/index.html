@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BZH Chronicles: Cyber Cellules</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="cyber-container">
+        
+        <!-- MAIN MENU -->
+        <div id="mainMenu" class="screen active">
+            <div class="game-header">
+                <h1 class="cyber-title">CYBER CELLULES</h1>
+                <p class="cyber-subtitle">BZH Chronicles</p>
+            </div>
+
+            <div class="menu-grid">
+                <!-- Characters Section -->
+                <div class="menu-section">
+                    <h3>Personnages</h3>
+                    <div id="characterSelection" class="character-grid">
+                        <!-- Characters will be dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Progression Section -->
+                <div class="menu-section">
+                    <h3>Progression</h3>
+                    <div class="progress-info">
+                        <div class="stat-row">
+                            <span>Shards Quantiques:</span>
+                            <span class="cyber-number" id="totalShards">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Achievements:</span>
+                            <span class="cyber-number" id="achievementCount">0/50</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Meilleur Score:</span>
+                            <span class="cyber-number" id="bestScore">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-actions">
+                <button id="startGame" class="cyber-btn btn-glow">LANCER MISSION</button>
+                <button id="achievementsBtn" class="cyber-btn">ACHIEVEMENTS</button>
+                <button id="talentsBtn" class="cyber-btn">TALENTS</button>
+                <button id="statsBtn" class="cyber-btn">STATISTIQUES</button>
+            </div>
+        </div>
+
+        <!-- ACHIEVEMENTS SCREEN -->
+        <div id="achievementsScreen" class="screen">
+            <div class="screen-header">
+                <h2>Achievements Cybernétiques</h2>
+                <button class="cyber-btn backToMenu">Retour</button>
+            </div>
+            <div id="achievementsList" class="achievements-grid">
+                <!-- Achievements will be dynamically populated -->
+            </div>
+        </div>
+
+        <!-- TALENTS SCREEN -->
+        <div id="talentsScreen" class="screen">
+            <div class="screen-header">
+                <h2>Talents Neuraux</h2>
+                <div>
+                    <span>Shards disponibles: </span>
+                    <span class="cyber-number" id="availableShards">0</span>
+                </div>
+                <button class="cyber-btn backToMenu">Retour</button>
+            </div>
+            <div id="talentsList" class="talents-grid">
+                <!-- Talents will be dynamically populated -->
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen" class="screen">
+            <!-- HUD -->
+            <div class="game-hud">
+                <div class="hud-top">
+                    <div class="player-info">
+                        <div class="hp-container">
+                            <div class="hp-bar-bg">
+                                <div class="hp-bar"></div>
+                            </div>
+                            <span class="hp-text">100/100</span>
+                        </div>
+                        <div class="character-name-display">
+                            <span id="characterDisplay">Néo-Druide</span>
+                            <span class="level-display">Niveau <span id="weaponLevel">1</span></span>
+                        </div>
+                    </div>
+
+                    <div class="room-info">
+                        <div class="info-item">
+                            <span class="info-label">Salle:</span>
+                            <span class="cyber-number" id="currentRoom">1</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Stage:</span>
+                            <span class="cyber-number" id="currentStage">1</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">⚡</span>
+                            <span class="cyber-number" id="shardsCollected">15</span>
+                        </div>
+                    </div>
+
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Ennemis:</span>
+                            <span class="cyber-number" id="enemiesLeft">0</span>
+                        </div>
+                        <div class="weapon-info">
+                            <span id="weaponName">Vigne Neural</span>
+                            <span class="weapon-level">Niv. <span id="weaponLevelNum">1</span></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Score:</span>
+                            <span class="cyber-number" id="currentScore">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="pauseBtn" class="cyber-btn pause-btn">⏸</button>
+            </div>
+
+            <!-- Game Canvas -->
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <!-- PAUSE SCREEN -->
+        <div id="pauseScreen" class="overlay">
+            <div class="overlay-content">
+                <h2>Pause - Mission Interrompue</h2>
+                <div class="pause-stats">
+                    <div class="stat-row">
+                        <span>Temps écoulé:</span>
+                        <span class="cyber-number" id="pauseTime">00:00</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Ennemis éliminés:</span>
+                        <span class="cyber-number" id="pauseKills">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Shards collectés:</span>
+                        <span class="cyber-number" id="pauseShards">0</span>
+                    </div>
+                </div>
+                <div class="overlay-actions">
+                    <button id="resumeBtn" class="cyber-btn btn-glow">Reprendre</button>
+                    <button id="quitToMenuBtn" class="cyber-btn">Menu Principal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="overlay">
+            <div class="overlay-content">
+                <h2 class="game-over-title">MISSION TERMINÉE</h2>
+                <div class="game-over-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Score Final</span>
+                        <span class="cyber-number large" id="finalScore">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Salles Complétées</span>
+                        <span class="cyber-number" id="finalStage">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Ennemis Éliminés</span>
+                        <span class="cyber-number" id="finalKills">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Temps de Survie</span>
+                        <span class="cyber-number" id="finalTime">00:00</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Shards Gagnés</span>
+                        <span class="cyber-number" id="finalShards">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Achievements</span>
+                        <span class="cyber-number" id="newAchievements">0</span>
+                    </div>
+                </div>
+                <div class="overlay-actions">
+                    <button id="playAgainBtn" class="cyber-btn btn-glow">NOUVELLE MISSION</button>
+                    <button id="backToMenuBtn" class="cyber-btn">MENU PRINCIPAL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPGRADE SCREEN -->
+        <div id="upgradeScreen" class="overlay">
+            <div class="overlay-content">
+                <h2>Amélioration Cybernétique</h2>
+                <p class="upgrade-subtitle">Choisissez votre évolution:</p>
+                <div id="upgradeChoices" class="upgrade-grid">
+                    <!-- Upgrade choices will be dynamically populated -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        // Dev reload if ?dev=1 is in URL
+        if (new URLSearchParams(window.location.search).get('dev') === '1') {
+            const script = document.createElement('script');
+            script.src = 'dev-reload.js';
+            document.head.appendChild(script);
+        }
+    </script>
+</body>
+</html>
