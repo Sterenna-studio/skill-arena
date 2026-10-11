@@ -57,6 +57,17 @@ export const GAMES: GameMeta[] = [
     external: '/arena/games/dungeon-elf-sound/',
   },
   {
+    slug: 'ardamir',
+    title: 'Ardamir — Réactions',
+    description: 'Choisis parmi dix émotions, découvre les réactions d’Ardamir et relève le petit défi du portrait.',
+    icon: '🧝‍♀️',
+    category: 'arcade',
+    unit: 'réactions',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/games/ardamir/',
+  },
+  {
     slug: 'mg-airship',
     title: 'MG Airship',
     description: 'Pilote ton dirigeable et survive le plus longtemps possible.',

@@ -39,6 +39,15 @@ const FULLGAMES = [
     external: '/arena/games/dungeon-elf-sound/',
   },
   {
+    slug: 'ardamir',
+    title: 'Ardamir — Réactions',
+    desc: 'Découvre les dix émotions d’Ardamir dans ce mini-jeu de portraits interactif.',
+    icon: '🧝‍♀️',
+    tag: 'MINI-JEU',
+    tagColor: '--c-purple',
+    external: '/arena/games/ardamir/',
+  },
+  {
     slug: 'mg-airship',
     title: 'MG Airship',
     desc: 'Pilote ton dirigeable steampunk — abats tes ennemis, collecte des engrenages et améliore ton navire.',
@@ -153,7 +162,7 @@ export default function HomePage() {
           <div className="panel" style={{ padding: 'clamp(1.5rem, 1rem + 2vw, 2.75rem)' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 380px' }}>
-                <p className="section-label">// STERENNA STUDIO · NITRO PLATFORM</p>
+                <p className="section-label">{'// STERENNA STUDIO · NITRO PLATFORM'}</p>
                 <h1 style={{
                   fontFamily: 'var(--font-display)',
                   fontSize: 'clamp(3rem, 1.6rem + 6vw, 6.5rem)',
@@ -179,7 +188,7 @@ export default function HomePage() {
 
         {/* ── 01 · JEUX COMPLETS ── */}
         <section style={{ marginBottom: '4rem' }}>
-          <p className="section-label">// 01 · JEUX COMPLETS</p>
+          <p className="section-label">{'// 01 · JEUX COMPLETS'}</p>
           <h2 className="section-title">Jeux <span>BZH Chronicles</span></h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
             {FULLGAMES.map(game => (
@@ -216,7 +225,7 @@ export default function HomePage() {
 
         {/* ── 02 · MINI-JEUX SKILL ── */}
         <section style={{ marginBottom: '4rem' }}>
-          <p className="section-label">// 02 · MINI-JEUX SKILL</p>
+          <p className="section-label">{'// 02 · MINI-JEUX SKILL'}</p>
           <h2 className="section-title">Teste tes <span>capacités</span></h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
             {skillGames.map(game => (
@@ -253,7 +262,7 @@ export default function HomePage() {
 
         {/* ── 03 · ARCADE & CASINO ── */}
         <section style={{ marginBottom: '4rem' }}>
-          <p className="section-label">// 03 · ARCADE & CASINO</p>
+          <p className="section-label">{'// 03 · ARCADE & CASINO'}</p>
           <h2 className="section-title">Star <span>Arcade</span></h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
             {[
@@ -292,7 +301,7 @@ export default function HomePage() {
         {/* ── 04 · PROCHAINEMENT ── */}
         {comingGames.length > 0 && (
           <section style={{ marginBottom: '4rem', opacity: 0.45 }}>
-            <p className="section-label">// 04 · EN DÉVELOPPEMENT</p>
+            <p className="section-label">{'// 04 · EN DÉVELOPPEMENT'}</p>
             <h2 className="section-title">Prochainement</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
               {comingGames.map(game => (

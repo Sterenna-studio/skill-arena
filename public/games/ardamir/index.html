@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ardamir — Défi des émotions</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="portrait-wrap">
+        <img id="portrait" class="portrait" src="assets/surprise.webp" alt="Réaction du personnage" />
+      </div>
+
+      <div class="dialogue">
+        <p class="eyebrow">Mini-jeu de réactions</p>
+        <h1>Ardamir</h1>
+        <p id="line" class="line">Oh… je ne m’attendais pas à ça.</p>
+      </div>
+    </section>
+
+    <section class="challenge" aria-label="Défi des émotions">
+      <div class="challenge-copy">
+        <p class="eyebrow">Défi express · 30 secondes</p>
+        <p id="challenge-prompt" class="challenge-prompt" aria-live="polite">Lance la partie, puis trouve l’émotion demandée.</p>
+      </div>
+      <div class="challenge-controls">
+        <div class="challenge-stat"><span id="challenge-score">0</span><small>trouvées</small></div>
+        <div class="challenge-stat"><span id="challenge-time">30</span><small>secondes</small></div>
+        <button id="challenge-start" class="start-button" type="button">Commencer</button>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Choisir une émotion">
+      <button class="emote active" data-emote="surprise">Surprise</button>
+      <button class="emote" data-emote="joie">Joie</button>
+      <button class="emote" data-emote="rire">Rire</button>
+      <button class="emote" data-emote="amoureuse">Amoureuse</button>
+      <button class="emote" data-emote="pensive">Pensive</button>
+      <button class="emote" data-emote="perplexe">Perplexe</button>
+      <button class="emote" data-emote="colere">Colère</button>
+      <button class="emote" data-emote="triste">Triste</button>
+      <button class="emote" data-emote="panique">Paniquée</button>
+      <button class="emote" data-emote="degoutee">Dégoûtée</button>
+    </section>
+
+    <section class="mini-grid" aria-label="Aperçu des réactions">
+      <button data-emote="surprise"><img src="assets/surprise.webp" alt="Surprise"></button>
+      <button data-emote="joie"><img src="assets/joie.webp" alt="Joie"></button>
+      <button data-emote="rire"><img src="assets/rire.webp" alt="Rire"></button>
+      <button data-emote="amoureuse"><img src="assets/amoureuse.webp" alt="Amoureuse"></button>
+      <button data-emote="pensive"><img src="assets/pensive.webp" alt="Pensive"></button>
+      <button data-emote="perplexe"><img src="assets/perplexe.webp" alt="Perplexe"></button>
+      <button data-emote="colere"><img src="assets/colere.webp" alt="Colère"></button>
+      <button data-emote="triste"><img src="assets/triste.webp" alt="Triste"></button>
+      <button data-emote="panique"><img src="assets/panique.webp" alt="Paniquée"></button>
+      <button data-emote="degoutee"><img src="assets/degoutee.webp" alt="Dégoûtée"></button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
