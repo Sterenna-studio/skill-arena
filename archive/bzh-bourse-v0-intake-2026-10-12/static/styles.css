@@ -1,0 +1,32 @@
+*{box-sizing:border-box}html,body{margin:0;padding:0;font:16px/1.5 ui-sans-serif,system-ui,Segoe UI,Roboto;background:#0b0f14;color:#e8f0f6}
+header{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:14px 18px;background:#0e1420;border-bottom:1px solid #1a2230;position:sticky;top:0}
+h1{margin:0;font-size:20px}h2{margin:0;font-size:16px}
+.badge{font-size:12px;background:#16263c;border:1px solid #254467;padding:2px 6px;border-radius:8px;color:#a8c7e8;margin-left:6px}
+.right{display:flex;gap:12px;align-items:center}
+#pauseBtn{background:#1a2a44;border:1px solid #274a7a;color:#cfe6ff;padding:6px 10px;border-radius:8px;cursor:pointer}
+#pauseBtn.paused{background:#432121;border-color:#7a2727;color:#ffd1d1}
+
+.grid{display:grid;grid-template-columns:360px 1fr;gap:16px;padding:16px}
+.panel{background:#0f1624;border:1px solid #1e2b43;border-radius:14px;overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #1a253b;background:#0f1a2c}
+.list{max-height:420px;overflow:auto}
+.item{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid #152138;cursor:pointer}
+.item:hover{background:#121e33}
+.item .sym{font-weight:700}
+.item .chg.up{color:#7fffb3}.item .chg.down{color:#ff9ba6}
+
+.events{list-style:none;margin:0;padding:8px 12px;max-height:220px;overflow:auto}
+.events li{padding:8px 6px;border-bottom:1px solid #142035}
+.events .ts{opacity:.6;margin-right:6px}
+.admin{padding:12px;border-top:1px solid #142035}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.admin-grid button{background:#172b45;border:1px solid #294a7a;color:#cfe6ff;padding:8px;border-radius:8px;cursor:pointer}
+.hidden{display:none}
+
+#chart{width:100%;height:auto;background:linear-gradient(180deg,#0b111d,#0c1322 40%,#0b111d)}
+.legend{display:flex;gap:12px;padding:8px 12px;border-top:1px solid #142035}
+.legend .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+
+#info{padding:12px}
+#search{margin-left:auto;border-radius:8px;border:1px solid #2a3c5e;background:#0e1420;color:#cfe6ff;padding:6px 8px;min-width:160px}
+footer{padding:10px 16px;border-top:1px solid #1a2230;color:#96abc7}

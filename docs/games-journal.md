@@ -156,3 +156,11 @@ part ; récupérable sur la branche `archive/cleanup-2026-07-11` :
   `bzh-nemeton-lockdown`, `spirit-overdrive`) n'a ni `LICENSE` ni fichier de
   crédits — à vérifier si ces assets ont des contraintes de licence avant
   publication.
+
+## BZH Bourse — 12 octobre 2026
+
+Le prototype a été intégré depuis la V1 consolidée de `C:\DEV\lab\bzh-bourse\static`
+dans `public/games/bzh-bourse/`, avec carte sur le hub. Simulation locale à monnaie
+fictive uniquement; le serveur Flask et l'ébauche SQL ne sont pas publiés. L'intake
+V0 reçu dans `toCheck` est conservé hors de `public/` dans
+`archive/bzh-bourse-v0-intake-2026-10-12/` avec `SHA256SUMS`.

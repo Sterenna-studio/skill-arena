@@ -13,6 +13,17 @@ export interface GameMeta {
 
 export const GAMES: GameMeta[] = [
   {
+    slug: 'bzh-bourse',
+    title: 'BZH Bourse',
+    description: 'Prototype de simulation boursière locale avec monnaie fictive, portefeuille et événements. Les données sont réinitialisées au rechargement.',
+    icon: '📈',
+    category: 'arcade',
+    unit: 'capital simulé',
+    higherIsBetter: true,
+    available: true,
+    external: '/arena/games/bzh-bourse/',
+  },
+  {
     slug: 'core-defense',
     title: 'Core Defense',
     description: 'Défends le noyau contre les vagues de robots, choisis tes modules et affronte le boss. Clavier requis, record local.',

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BZH Bourse — Prototype de jeu</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>BZH Bourse <span class="badge">Prototype • simulation locale</span></h1>
+    <div class="right">
+      <label><input type="checkbox" id="adminToggle"> Mode admin</label>
+      <button id="pauseBtn">Pause marché</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="left">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Titres</h2>
+          <input id="search" placeholder="Rechercher (ex: STER, ZRN…)">
+        </div>
+        <div id="tickerList" class="list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Évènements</h2></div>
+        <ul id="eventFeed" class="events"></ul>
+        <div id="adminPanel" class="admin hidden">
+          <h3>Admin — Déclencher un évènement</h3>
+          <div class="admin-grid">
+            <button data-ev="CRASH_GLOBAL">⚠ Crash global</button>
+            <button data-ev="HYPE_SPACE">✨ Hype Space Opera</button>
+            <button data-ev="DIVIDENDE">💰 Dividende (STER)</button>
+            <button data-ev="FUD_CHRO">📉 FUD Chronicle (CHRO)</button>
+            <button data-ev="MINING_BOOM">⛏ Découverte minerai (REDX)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="right">
+      <div class="panel">
+        <div class="panel-head"><h2 id="chartTitle">Cours</h2></div>
+        <svg id="chart" viewBox="0 0 800 360" aria-label="chart"></svg>
+        <div class="legend" id="legend"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Infos titre</h2></div>
+        <div id="info"></div>
+      </div>
+
+      <!-- Trading panel: permet d'acheter/vendre des actions et visualiser le portefeuille -->
+      <div class="panel">
+        <div class="panel-head"><h2>Trading</h2></div>
+        <div id="trade" class="trade-container"></div>
+      </div>
+
+      <!-- Inventaire du joueur : affiche les soldes et les positions globales -->
+      <div class="panel">
+        <div class="panel-head"><h2>Inventaire</h2></div>
+        <div id="inventory" class="inventory-container"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Tick toutes <strong>30s</strong> (simulation locale). Prototype sans Supabase. — BZH Chronicles ✦ Sterenna Lab
+  </footer>
+
+  <!-- Charger le script JavaScript sans module pour compatibilité avec l'ouverture via file:// -->
+  <script src="app.js"></script>
+</body>
+</html>
