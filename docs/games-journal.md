@@ -164,3 +164,14 @@ dans `public/games/bzh-bourse/`, avec carte sur le hub. Simulation locale à mon
 fictive uniquement; le serveur Flask et l'ébauche SQL ne sont pas publiés. L'intake
 V0 reçu dans `toCheck` est conservé hors de `public/` dans
 `archive/bzh-bourse-v0-intake-2026-10-12/` avec `SHA256SUMS`.
+
+## Aphalone — Crystal Quest — 14 octobre 2026
+
+Le RPG publié jusqu'ici sur `nitro.sterenna.fr/rpg/` par le dépôt
+`aphalone-crystal-quest` (commit `25dbb2d` du 6 juillet 2026) rejoint Skill Arena,
+à la demande de l'utilisateur, dans `public/games/aphalone/` avec carte sur le hub.
+Copie à l'identique de `index.html`, `script.js`, `styles.css` et `assets/`
+(portraits et marche d'Ardamir, PNG d'origine, 26 Mo) ; empreintes dans
+`public/games/aphalone/SHA256SUMS`. Le dossier `ardamir/` du dépôt source (sources
+du mini-jeu Ardamir, déjà intégré) et la page de travail `assets.html` ne sont pas
+repris. L'ancienne adresse `/rpg/` n'est plus servie.
