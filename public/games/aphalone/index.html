@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Aphalone Crystal Quest, un action-RPG magique jouable dans le navigateur." />
+  <meta name="theme-color" content="#123d54" />
+  <title>Aphalone — Crystal Quest Web</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="kicker">Monde d'Aphalone</p>
+        <h1>Aphalone — Crystal Quest</h1>
+        <p class="subtitle">Explore les intérieurs et les landes d'Aphalone, canalise ton bâton de pacte et lance tes sorts dans des duels de rythme.</p>
+      </div>
+
+      <div class="hudbox">
+        <div><span>Vie</span><strong id="hpText">5 / 5</strong></div>
+        <div><span>Niveau</span><strong id="levelText">1</strong></div>
+        <div><span>Énergie</span><strong id="staminaText">100%</strong></div>
+        <div><span>Cristaux</span><strong id="scoreText">0 / 5</strong></div>
+        <div><span>Zone</span><strong id="zoneText">Taverne</strong></div>
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="game-shell">
+        <canvas id="game" width="960" height="540" tabindex="0" aria-label="Ardamir Crystal Quest"></canvas>
+
+        <div id="overlay" class="overlay show">
+          <div class="panel">
+            <img class="panel-portrait" src="assets/portraits/joie.png" alt="" />
+            <div>
+              <h2>Crystal Quest</h2>
+              <p>Jean-Dolmac attend Ardamir dans la taverne d'Aphalone. Son bâton de pacte répond aux cristaux, mais chaque sort exige le bon rythme.</p>
+            </div>
+            <div class="panel-actions">
+              <button id="startBtn" class="primary">Nouvelle partie</button>
+              <button id="continueBtn" class="secondary hidden">Continuer</button>
+              <button id="settingsBtn" class="secondary">Configuration</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="dialogue" class="dialogue hidden">
+          <img id="dialoguePortrait" src="" alt="Portrait d'Ardamir" />
+          <div class="dialogue-body">
+            <p id="dialogueName">Ardamir</p>
+            <p id="dialogueText"></p>
+            <p class="hint">Espace / Entrée / clic pour continuer</p>
+          </div>
+        </div>
+
+        <div id="message" class="message hidden"></div>
+
+        <div class="touch-controls" aria-label="Contrôles tactiles">
+          <div class="dpad">
+            <button type="button" data-hold="up" aria-label="Monter">▲</button>
+            <button type="button" data-hold="left" aria-label="Aller à gauche">◀</button>
+            <button type="button" data-hold="down" aria-label="Descendre">▼</button>
+            <button type="button" data-hold="right" aria-label="Aller à droite">▶</button>
+          </div>
+          <div class="action-pad">
+            <button type="button" data-action="attack" aria-label="Lancer un sort">SORT</button>
+            <button type="button" data-action="dash" aria-label="Dash">DASH</button>
+            <button type="button" data-action="interact" aria-label="Interagir">E</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <section class="card">
+          <h3>Objectif</h3>
+          <p id="objectiveText">Parle à Jean-Dolmac dans la taverne.</p>
+          <div class="progress">
+            <span id="crystalFill"></span>
+          </div>
+        </section>
+        <section class="card">
+          <h3>Journal</h3>
+          <ol class="quest-steps">
+            <li data-step="intro">Rencontrer Jean-Dolmac</li>
+            <li data-step="collect">Collecter les cristaux</li>
+            <li data-step="boss">Vaincre le gardien</li>
+            <li data-step="return">Retourner à la taverne</li>
+          </ol>
+        </section>
+        <section class="card inventory-card">
+          <h3>Inventaire</h3>
+          <div class="inventory-row">
+            <span>Arme</span>
+            <strong id="staffText">Bâton de pacte</strong>
+          </div>
+          <div class="inventory-row">
+            <span>Cristaux</span>
+            <strong id="inventoryCrystals">0 / 5</strong>
+          </div>
+          <div class="inventory-row">
+            <span>Tonics</span>
+            <strong id="tonicText">0</strong>
+          </div>
+          <div class="inventory-row">
+            <span>État</span>
+            <strong id="statusText">Prête</strong>
+          </div>
+          <p class="small-note">ZQSD par défaut. Espace : duel magique. R : tonic. Échap / P : pause.</p>
+        </section>
+        <section class="card spell-card">
+          <h3>Pacte occulte</h3>
+          <div class="inventory-row">
+            <span>XP</span>
+            <strong id="xpText">0 / 6</strong>
+          </div>
+          <div class="inventory-row">
+            <span>Points</span>
+            <strong id="spellPointText">0</strong>
+          </div>
+          <div class="spell-list">
+            <button type="button" data-spell="bolt">Trait d'ombre</button>
+            <button type="button" data-spell="hex">Flamme hex</button>
+            <button type="button" data-spell="ward">Voile d'os</button>
+            <button type="button" data-spell="drain">Drain d'âme</button>
+            <button type="button" data-spell="runebolt">Foudre runique</button>
+          </div>
+        </section>
+        <section class="card">
+          <h3>Commandes</h3>
+          <button id="sidebarSettingsBtn" class="secondary wide-button" type="button">Configurer</button>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

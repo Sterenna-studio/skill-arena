@@ -57,6 +57,15 @@ const FULLGAMES = [
     external: '/arena/games/ardamir/',
   },
   {
+    slug: 'aphalone',
+    title: 'Aphalone — Crystal Quest',
+    desc: 'Pars de la taverne avec Ardamir, récupère les cinq cristaux des landes d’Aphalone en duels magiques de rythme, puis affronte le gardien cristallin.',
+    icon: '💎',
+    tag: 'RPG',
+    tagColor: '--c-purple',
+    external: '/arena/games/aphalone/',
+  },
+  {
     slug: 'mg-airship',
     title: 'MG Airship',
     desc: 'Pilote ton dirigeable steampunk — abats tes ennemis, collecte des engrenages et améliore ton navire.',
